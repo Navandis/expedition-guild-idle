@@ -3,6 +3,9 @@
 [ext_resource type="Script" uid="uid://c31ng4ivfwgb4" path="res://scripts/ui/ExpeditionBoardController.gd" id="1_cx6e2"]
 [ext_resource type="PackedScene" path="res://scenes/components/ExpeditionCard.tscn" id="2_u0gmk"]
 
+; Expedition board root.
+; Layout flow:
+; SafeArea -> RootColumn -> (Title, Selection text, Scroll list of cards, Dispatch button)
 [node name="ExpeditionBoard" type="Control" unique_id=2096162743]
 layout_mode = 3
 anchors_preset = 15
@@ -34,11 +37,13 @@ layout_mode = 2
 text = "Expedition Board"
 horizontal_alignment = 1
 
+; Updated via controller when a player clicks a card.
 [node name="SelectionLabel" type="Label" parent="SafeArea/RootColumn" unique_id=1866229231]
 layout_mode = 2
 text = "Select an expedition to continue."
 autowrap_mode = 3
 
+; Cards are instantiated at runtime into ExpeditionCardsContainer.
 [node name="CardScroll" type="ScrollContainer" parent="SafeArea/RootColumn" unique_id=1276735346]
 custom_minimum_size = Vector2(0, 420)
 layout_mode = 2
@@ -50,6 +55,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
+; Starts disabled; enabled by script only after a valid selection.
 [node name="DispatchButton" type="Button" parent="SafeArea/RootColumn" unique_id=726765546]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2

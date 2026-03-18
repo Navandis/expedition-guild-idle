@@ -1,6 +1,10 @@
 extends RefCounted
 class_name ExpeditionGenerator
 
+# ExpeditionGenerator is the content "assembler" for expedition offers.
+# It loads JSON content pools, picks random combinations, and returns
+# normalized dictionaries that UI/gameplay systems can consume directly.
+
 const BIOMES_PATH := "res://data/expeditions/biomes.json"
 const SITE_TYPES_PATH := "res://data/expeditions/site_types.json"
 const STATES_PATH := "res://data/expeditions/states.json"
@@ -46,10 +50,12 @@ func _init() -> void:
 
 
 func generate_expeditions(count: int) -> Array[Dictionary]:
+	# Clamp to board rules so callers cannot request impossible counts.
 	var expedition_count := clampi(count, 3, 5)
 	var expeditions: Array[Dictionary] = []
 
 	for index in expedition_count:
+		# Pick one record from each content category to build a full card.
 		var biome := _pick_random(_biomes)
 		var site_type := _pick_random(_site_types)
 		var state_modifier := _pick_random(_states)
@@ -75,8 +81,12 @@ func generate_expeditions(count: int) -> Array[Dictionary]:
 			"biome": str(biome.get("id", "unknown_biome")),
 			"site_type": str(site_type.get("id", "unknown_site")),
 			"state_modifier": str(state_modifier.get("id", "unknown_state")),
+			# Store internal IDs for save/load and gameplay lookups...
 			"reward_profile": str(reward_profile.get("id", "balanced")),
 			"hazard": str(hazard.get("id", "traps")),
+			# ...and include display names for player-facing UI text.
+			"reward_profile_name": str(reward_profile.get("name", "Balanced")),
+			"hazard_name": str(hazard.get("name", "Traps")),
 			"duration_minutes": duration_minutes,
 			"difficulty": str(difficulty_config.get("id", "medium")),
 			"risk_label": str(difficulty_config.get("risk_label", "Medium")),
@@ -95,6 +105,7 @@ func generate_expeditions(count: int) -> Array[Dictionary]:
 
 
 func _reload_content() -> void:
+	# required_keys ensures each entry has the schema fields we expect.
 	_biomes = _json_loader.load_array(BIOMES_PATH, ["id", "name"], FALLBACK_BIOMES)
 	_site_types = _json_loader.load_array(SITE_TYPES_PATH, ["id", "name"], FALLBACK_SITE_TYPES)
 	_states = _json_loader.load_array(STATES_PATH, ["id", "name"], FALLBACK_STATES)
@@ -138,6 +149,8 @@ func _generate_fallback_expeditions(count: int) -> Array[Dictionary]:
 			"state_modifier": "abandoned",
 			"reward_profile": "balanced",
 			"hazard": "traps",
+			"reward_profile_name": "Balanced",
+			"hazard_name": "Traps",
 			"duration_minutes": 60,
 			"difficulty": "easy",
 			"risk_label": "Low",
