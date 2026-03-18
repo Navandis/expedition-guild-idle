@@ -3,13 +3,17 @@ extends Node
 # GameManager owns high-level screen flow and shared runtime state.
 # For this milestone it closes the first loop by coordinating:
 # dispatch -> wait/finish -> report -> collect -> resource update.
+# Day-3 extends this flow with the Guild Upgrades screen and applies purchased
+# upgrade effects to newly started expeditions and reward calculations.
 
 const GUILD_HALL_SCENE := preload("res://scenes/guild_hall/GuildHall.tscn")
 const EXPEDITION_BOARD_SCENE := preload("res://scenes/expedition_board/ExpeditionBoard.tscn")
 const DISPATCH_SCREEN_SCENE := preload("res://scenes/dispatch/DispatchScreen.tscn")
 const EXPEDITION_REPORT_SCENE := preload("res://scenes/report/ExpeditionReport.tscn")
+const GUILD_UPGRADES_SCENE := preload("res://scenes/upgrades/GuildUpgrades.tscn")
 
 var _expedition_manager := ExpeditionManager.new()
+var _upgrade_system := UpgradeSystem.new()
 var _resources := {
 	"gold": 1250,
 	"relic_fragments": 0,
@@ -20,6 +24,7 @@ var _guild_hall_controller: GuildHallController
 var _expedition_board_controller: ExpeditionBoardController
 var _dispatch_controller: DispatchController
 var _report_controller: ReportController
+var _upgrades_controller: UpgradesController
 var _mounted_screen: Control
 
 @onready var _ui_root: Control = $CanvasLayer/UIRoot
@@ -39,6 +44,7 @@ func _show_guild_hall() -> void:
 		_guild_hall_controller = GUILD_HALL_SCENE.instantiate() as GuildHallController
 		_guild_hall_controller.open_expedition_board_requested.connect(_on_open_expedition_board_requested)
 		_guild_hall_controller.open_report_requested.connect(_on_open_report_requested)
+		_guild_hall_controller.open_upgrades_requested.connect(_on_open_upgrades_requested)
 		_guild_hall_controller.debug_finish_requested.connect(_on_debug_finish_requested)
 
 	_show_screen(_guild_hall_controller)
@@ -86,6 +92,16 @@ func _show_report_screen() -> void:
 	_report_controller.set_report_data(report)
 
 
+func _show_upgrades_screen() -> void:
+	if _upgrades_controller == null:
+		_upgrades_controller = GUILD_UPGRADES_SCENE.instantiate() as UpgradesController
+		_upgrades_controller.back_requested.connect(_on_upgrades_back_requested)
+		_upgrades_controller.purchase_requested.connect(_on_upgrade_purchase_requested)
+
+	_show_screen(_upgrades_controller)
+	_refresh_upgrades_view()
+
+
 func _show_screen(screen: Control) -> void:
 	if screen == null:
 		return
@@ -116,6 +132,10 @@ func _on_open_report_requested() -> void:
 	_show_report_screen()
 
 
+func _on_open_upgrades_requested() -> void:
+	_show_upgrades_screen()
+
+
 func _on_debug_finish_requested() -> void:
 	# This calls the same completion path used by natural timer completion.
 	_expedition_manager.complete_active_expedition()
@@ -134,7 +154,10 @@ func _on_expedition_dispatch_requested(expedition_data: Dictionary) -> void:
 
 
 func _on_dispatch_confirmed(expedition_data: Dictionary) -> void:
-	var started := _expedition_manager.start_expedition(expedition_data)
+	# Upgrade effects are applied right before launch so only future expeditions
+	# benefit from new purchases.
+	var effects := _upgrade_system.get_effects_summary()
+	var started := _expedition_manager.start_expedition(expedition_data, effects)
 	if not started:
 		_show_guild_hall()
 		return
@@ -165,6 +188,37 @@ func _on_report_collect_requested() -> void:
 	_resources["relic_fragments"] = int(_resources.get("relic_fragments", 0)) + int(rewards.get("relic_fragments", 0))
 	_resources["codex_entries"] = int(_resources.get("codex_entries", 0)) + int(rewards.get("codex_entries", 0))
 	_show_guild_hall()
+
+
+func _on_upgrades_back_requested() -> void:
+	_show_guild_hall()
+
+
+func _on_upgrade_purchase_requested(upgrade_id: String) -> void:
+	var result := _upgrade_system.try_purchase_upgrade(upgrade_id, int(_resources.get("gold", 0)))
+	if bool(result.get("ok", false)):
+		_resources["gold"] = int(result.get("remaining_gold", int(_resources.get("gold", 0))))
+
+	_refresh_upgrades_view()
+	if _upgrades_controller != null:
+		_upgrades_controller.show_purchase_result(result)
+
+
+func _refresh_upgrades_view() -> void:
+	if _upgrades_controller == null:
+		return
+
+	var owned_map := {}
+	for upgrade in _upgrade_system.get_all_upgrades():
+		var upgrade_id := str(upgrade.get("id", ""))
+		owned_map[upgrade_id] = _upgrade_system.is_owned(upgrade_id)
+
+	_upgrades_controller.set_view_model(
+		_upgrade_system.get_all_upgrades(),
+		owned_map,
+		int(_resources.get("gold", 0)),
+		_upgrade_system.get_effects_summary()
+	)
 
 
 func _on_report_close_requested() -> void:

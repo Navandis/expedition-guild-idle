@@ -4,15 +4,18 @@ class_name GuildHallController
 # GuildHallController is the home screen for the current gameplay loop.
 # It shows runtime resources, active expedition status, and entry points to
 # either start a run or review/collect a completed expedition report.
+# For day-3, it also exposes navigation into the new Guild Upgrades screen.
 
 signal open_expedition_board_requested
 signal open_report_requested
+signal open_upgrades_requested
 signal debug_finish_requested
 
 @onready var _gold_label: Label = $SafeArea/RootColumn/ResourcesPanel/ResourceRows/GoldLabel
 @onready var _relic_fragments_label: Label = $SafeArea/RootColumn/ResourcesPanel/ResourceRows/RelicFragmentsLabel
 @onready var _codex_entries_label: Label = $SafeArea/RootColumn/ResourcesPanel/ResourceRows/CodexEntriesLabel
 @onready var _open_report_button: Button = $SafeArea/RootColumn/OpenReportButton
+@onready var _open_upgrades_button: Button = $SafeArea/RootColumn/OpenUpgradesButton
 @onready var _debug_finish_button: Button = $SafeArea/RootColumn/DebugFinishButton
 @onready var _active_name_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/ActiveNameLabel
 @onready var _remaining_time_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/RemainingTimeLabel
@@ -28,6 +31,7 @@ var _resources := {
 
 func _ready() -> void:
 	$SafeArea/RootColumn/OpenBoardButton.pressed.connect(_on_open_board_pressed)
+	_open_upgrades_button.pressed.connect(_on_open_upgrades_pressed)
 	_open_report_button.pressed.connect(_on_open_report_pressed)
 	_debug_finish_button.pressed.connect(_on_debug_finish_pressed)
 	# Polling each frame is acceptable for this prototype-sized status block.
@@ -100,6 +104,10 @@ func _on_open_board_pressed() -> void:
 
 func _on_open_report_pressed() -> void:
 	open_report_requested.emit()
+
+
+func _on_open_upgrades_pressed() -> void:
+	open_upgrades_requested.emit()
 
 
 func _on_debug_finish_pressed() -> void:

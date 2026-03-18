@@ -60,6 +60,11 @@ custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "Open Expedition Board"
 
+[node name="OpenUpgradesButton" type="Button" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "Open Guild Upgrades"
+
 [node name="OpenReportButton" type="Button" parent="SafeArea/RootColumn" unique_id=1348621159]
 visible = false
 custom_minimum_size = Vector2(0, 52)
