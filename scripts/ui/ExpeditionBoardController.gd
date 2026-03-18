@@ -60,7 +60,7 @@ func _on_card_selected(expedition_data: Dictionary) -> void:
 	_selection_label.text = "Selected: %s" % str(_selected_expedition.get("display_name", "Unknown Expedition"))
 
 	for card in _card_views:
-		var is_selected := card.expedition_data.get("id", "") == _selected_expedition.get("id", "")
+		var is_selected: bool = card.expedition_data.get("id", "") == _selected_expedition.get("id", "")
 		card.set_selected(is_selected)
 
 
