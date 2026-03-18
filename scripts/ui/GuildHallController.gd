@@ -80,7 +80,7 @@ func _refresh_active_status() -> void:
 		# Names come from offer data; fallback text protects against malformed payloads.
 		_active_name_label.text = "Expedition: %s" % str(expedition.get("display_name", "Unknown Expedition"))
 		_active_status_label.text = "Status: %s" % _expedition_manager.get_status_label()
-
+		
 		if _expedition_manager.has_active_expedition():
 			_remaining_time_label.text = "Remaining: %s" % _expedition_manager.get_remaining_time_text()
 		else:

@@ -1,6 +1,4 @@
 [gd_scene format=3 uid="uid://ca4nismuvcpik"]
-; Guild Hall is the home screen shell.
-; It now also exposes report/debug actions for the expedition completion loop.
 
 [ext_resource type="Script" uid="uid://bky2lwy64owpe" path="res://scripts/ui/GuildHallController.gd" id="1_72fw3"]
 
@@ -49,11 +47,11 @@ text = "Resources"
 layout_mode = 2
 text = "Gold: 0"
 
-[node name="RelicFragmentsLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows"]
+[node name="RelicFragmentsLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows" unique_id=462742622]
 layout_mode = 2
 text = "Relic Fragments: 0"
 
-[node name="CodexEntriesLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows"]
+[node name="CodexEntriesLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows" unique_id=404869075]
 layout_mode = 2
 text = "Codex Entries: 0"
 
@@ -62,22 +60,21 @@ custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "Open Expedition Board"
 
-[node name="OpenReportButton" type="Button" parent="SafeArea/RootColumn"]
+[node name="OpenReportButton" type="Button" parent="SafeArea/RootColumn" unique_id=1348621159]
+visible = false
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Open Expedition Report"
-visible = false
 
-[node name="DebugFinishButton" type="Button" parent="SafeArea/RootColumn"]
+[node name="DebugFinishButton" type="Button" parent="SafeArea/RootColumn" unique_id=1694514361]
+visible = false
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Finish Active Expedition (Test)"
-visible = false
 
 [node name="ActiveExpeditionPanel" type="PanelContainer" parent="SafeArea/RootColumn" unique_id=1205453616]
 custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
-; Stretch status panel so live countdown remains readable on tall screens.
 size_flags_vertical = 3
 
 [node name="ActiveRows" type="VBoxContainer" parent="SafeArea/RootColumn/ActiveExpeditionPanel" unique_id=1742571574]
@@ -88,12 +85,12 @@ theme_override_constants/separation = 8
 layout_mode = 2
 text = "Active Expedition Status"
 
-[node name="ActiveNameLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
+[node name="ActiveNameLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=1010654892]
 layout_mode = 2
 text = "Expedition: None"
 autowrap_mode = 3
 
-[node name="RemainingTimeLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
+[node name="RemainingTimeLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=1273124495]
 layout_mode = 2
 text = "Remaining: --:--"
 
