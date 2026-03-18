@@ -81,8 +81,9 @@ func _show_report_screen() -> void:
 		_show_guild_hall()
 		return
 
-	_report_controller.set_report_data(report)
+	# Mount first so ReportController onready label references are initialized.
 	_show_screen(_report_controller)
+	_report_controller.set_report_data(report)
 
 
 func _show_screen(screen: Control) -> void:
