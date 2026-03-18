@@ -8,7 +8,7 @@ const GUILD_HALL_SCENE := preload("res://scenes/guild_hall/GuildHall.tscn")
 const EXPEDITION_BOARD_SCENE := preload("res://scenes/expedition_board/ExpeditionBoard.tscn")
 const DISPATCH_SCREEN_SCENE := preload("res://scenes/dispatch/DispatchScreen.tscn")
 
-var selected_expedition_for_activation: Dictionary = {}
+var _expedition_manager := ExpeditionManager.new()
 
 var _guild_hall_controller: GuildHallController
 var _expedition_board_controller: ExpeditionBoardController
@@ -23,8 +23,8 @@ func _ready() -> void:
 
 
 func get_selected_expedition_for_activation() -> Dictionary:
-	# Duplicate keeps outside callers from mutating manager-owned state.
-	return selected_expedition_for_activation.duplicate(true)
+	# Backward-compatible accessor while the runtime flow migrates to ExpeditionManager.
+	return _expedition_manager.get_active_expedition()
 
 
 func _show_guild_hall() -> void:
@@ -33,7 +33,7 @@ func _show_guild_hall() -> void:
 		_guild_hall_controller.open_expedition_board_requested.connect(_on_open_expedition_board_requested)
 
 	_show_screen(_guild_hall_controller)
-	_guild_hall_controller.set_active_expedition_status(selected_expedition_for_activation)
+	_guild_hall_controller.set_expedition_manager(_expedition_manager)
 
 
 func _show_expedition_board() -> void:
@@ -53,6 +53,10 @@ func _show_dispatch_screen(expedition_data: Dictionary) -> void:
 
 	_show_screen(_dispatch_controller)
 	_dispatch_controller.set_expedition_data(expedition_data)
+	_dispatch_controller.set_dispatch_blocked(
+		_expedition_manager.has_active_expedition(),
+		_expedition_manager.get_active_expedition()
+	)
 
 
 func _show_screen(screen: Control) -> void:
@@ -86,18 +90,25 @@ func _on_return_to_guild_hall_requested() -> void:
 
 
 func _on_expedition_dispatch_requested(expedition_data: Dictionary) -> void:
+	if _expedition_manager.has_active_expedition():
+		_show_guild_hall()
+		return
+
 	_show_dispatch_screen(expedition_data)
 
 
 func _on_dispatch_confirmed(expedition_data: Dictionary) -> void:
-	# This is the shared runtime handoff for the next milestone's active expedition loop.
-	selected_expedition_for_activation = expedition_data.duplicate(true)
-	print("Dispatch confirmed: %s" % str(selected_expedition_for_activation.get("id", "unknown")))
+	var started := _expedition_manager.start_expedition(expedition_data)
+	if not started:
+		_show_guild_hall()
+		return
+
+	print("Dispatch confirmed: %s" % str(expedition_data.get("id", "unknown")))
 
 	if _expedition_board_controller != null:
 		_expedition_board_controller.replace_expedition_by_id(
-			str(selected_expedition_for_activation.get("id", "")),
-			selected_expedition_for_activation
+			str(expedition_data.get("id", "")),
+			expedition_data
 		)
 
 	_show_guild_hall()
