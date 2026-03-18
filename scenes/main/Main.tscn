@@ -5,9 +5,9 @@
 [node name="Main" type="Node" unique_id=1013066676]
 script = ExtResource("1_u1xfj")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1368867378]
 
-[node name="UIRoot" type="Control" parent="CanvasLayer"]
+[node name="UIRoot" type="Control" parent="CanvasLayer" unique_id=1934921222]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
