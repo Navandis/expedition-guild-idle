@@ -7,7 +7,7 @@ class_name UpgradeSystem
 # systems can apply to future expeditions.
 
 const UPGRADES_PATH := "res://data/upgrades/guild_upgrades.json"
-const REQUIRED_KEYS := [
+const REQUIRED_KEYS: Array[String] = [
 	"id",
 	"name",
 	"description",
@@ -16,7 +16,7 @@ const REQUIRED_KEYS := [
 	"effect_value"
 ]
 
-const FALLBACK_UPGRADES := [
+const FALLBACK_UPGRADES: Array[Dictionary] = [
 	{
 		"id": "survey_tools_1",
 		"name": "Survey Tools",
