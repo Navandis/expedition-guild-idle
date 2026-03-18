@@ -1,0 +1,69 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/UpgradesController.gd" id="1_upg"]
+
+[node name="GuildUpgrades" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_upg")
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="RootColumn" type="VBoxContainer" parent="SafeArea"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="SafeArea/RootColumn"]
+layout_mode = 2
+text = "Guild Upgrades"
+horizontal_alignment = 1
+
+[node name="HeaderPanel" type="PanelContainer" parent="SafeArea/RootColumn"]
+layout_mode = 2
+
+[node name="HeaderRows" type="VBoxContainer" parent="SafeArea/RootColumn/HeaderPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="GoldLabel" type="Label" parent="SafeArea/RootColumn/HeaderPanel/HeaderRows"]
+layout_mode = 2
+text = "Gold: 0"
+
+[node name="EffectsLabel" type="Label" parent="SafeArea/RootColumn/HeaderPanel/HeaderRows"]
+layout_mode = 2
+text = "Effects"
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="SafeArea/RootColumn"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+
+[node name="UpgradesScroll" type="ScrollContainer" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 380)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="UpgradesList" type="VBoxContainer" parent="SafeArea/RootColumn/UpgradesScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="BackButton" type="Button" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "Back to Guild Hall"

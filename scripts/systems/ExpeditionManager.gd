@@ -4,6 +4,8 @@ class_name ExpeditionManager
 # ExpeditionManager owns active-expedition runtime state for this milestone's core loop.
 # It now handles completion detection, report creation, and one-time reward collection
 # so the UI can stay simple: dispatch -> wait -> report -> collect.
+# For day-3 progression, it also applies UpgradeSystem effect values when a new
+# expedition starts, so only future runs receive those bonuses.
 
 const STATUS_IDLE := "idle"
 const STATUS_IN_PROGRESS := "in_progress"
@@ -29,14 +31,21 @@ func can_start_expedition() -> bool:
 	return _active_expedition.is_empty() and _pending_report.is_empty()
 
 
-func start_expedition(expedition_offer: Dictionary) -> bool:
+func start_expedition(expedition_offer: Dictionary, upgrade_effects: Dictionary = {}) -> bool:
 	if not can_start_expedition():
 		return false
 
 	# Clamp duration so malformed content cannot create a zero-length timer.
-	var duration_minutes := int(expedition_offer.get("duration_minutes", 0))
+	var base_duration_minutes := int(expedition_offer.get("duration_minutes", 0))
+	var duration_multiplier := float(upgrade_effects.get("duration_multiplier", 1.0))
+	var duration_minutes := int(round(base_duration_minutes * duration_multiplier))
 	if duration_minutes <= 0:
 		duration_minutes = 1
+
+	var base_success := float(expedition_offer.get("base_success", 0.75))
+	var success_bonus := float(upgrade_effects.get("success_bonus", 0.0))
+	var final_success := clampf(base_success + success_bonus, 0.05, 0.99)
+	var gold_multiplier := max(0.20, float(upgrade_effects.get("gold_multiplier", 1.0)))
 
 	# Track wall-clock timestamps in unix seconds for cheap runtime checks.
 	var start_unix := Time.get_unix_time_from_system()
@@ -46,7 +55,11 @@ func start_expedition(expedition_offer: Dictionary) -> bool:
 		"id": str(expedition_offer.get("id", "")),
 		"display_name": str(expedition_offer.get("display_name", "Unknown Expedition")),
 		"duration_minutes": duration_minutes,
+		"base_duration_minutes": max(1, base_duration_minutes),
 		"risk_label": str(expedition_offer.get("risk_label", "Unknown")),
+		# Store values used by RewardSystem to resolve upgraded outcomes/rewards.
+		"base_success": final_success,
+		"gold_multiplier": gold_multiplier,
 		"start_time_unix": start_unix,
 		"expected_finish_time": finish_unix,
 		"status": STATUS_IN_PROGRESS

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "survey_tools_1",
+    "name": "Survey Tools",
+    "description": "Sharper route planning reduces expedition duration by 10%.",
+    "cost_gold": 300,
+    "effect_type": "duration_multiplier",
+    "effect_value": -0.1
+  },
+  {
+    "id": "guild_accounting_1",
+    "name": "Guild Accounting",
+    "description": "Standardized ledgers improve contract payouts by 15% gold.",
+    "cost_gold": 350,
+    "effect_type": "gold_multiplier",
+    "effect_value": 0.15
+  },
+  {
+    "id": "field_briefing_1",
+    "name": "Field Briefing",
+    "description": "Better prep adds +5% base success chance.",
+    "cost_gold": 250,
+    "effect_type": "success_bonus",
+    "effect_value": 0.05
+  }
+]
