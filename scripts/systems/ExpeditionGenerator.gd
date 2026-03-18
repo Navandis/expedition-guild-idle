@@ -33,6 +33,8 @@ const DIFFICULTY_CONFIG := [
 	{"id": "hard", "risk_label": "High", "duration_min": 120, "duration_max": 240, "base_success": 0.65}
 ]
 
+const MAX_UNIQUE_ATTEMPTS := 60
+
 var _rng := RandomNumberGenerator.new()
 
 var _json_loader := JsonLoader.new()
@@ -49,59 +51,92 @@ func _init() -> void:
 	_reload_content()
 
 
-func generate_expeditions(count: int) -> Array[Dictionary]:
+func generate_expeditions(count: int, excluded_signatures: Array[String] = []) -> Array[Dictionary]:
 	# Clamp to board rules so callers cannot request impossible counts.
 	var expedition_count := clampi(count, 3, 5)
 	var expeditions: Array[Dictionary] = []
+	var reserved_signatures := excluded_signatures.duplicate()
 
-	for index in expedition_count:
-		# Pick one record from each content category to build a full card.
-		var biome := _pick_random(_biomes)
-		var site_type := _pick_random(_site_types)
-		var state_modifier := _pick_random(_states)
-		var reward_profile := _pick_random(_reward_profiles)
-		var hazard := _pick_random(_hazards)
-		var difficulty_config := _pick_random(DIFFICULTY_CONFIG)
-
-		if biome.is_empty() or site_type.is_empty() or state_modifier.is_empty() or reward_profile.is_empty() or hazard.is_empty() or difficulty_config.is_empty():
+	for _i in expedition_count:
+		var expedition := generate_single_expedition(reserved_signatures)
+		if expedition.is_empty():
 			continue
 
-		var duration_minutes := _rng.randi_range(
-			int(difficulty_config.get("duration_min", 60)),
-			int(difficulty_config.get("duration_max", 120))
-		)
-		var display_name := "%s %s %s" % [
-			str(state_modifier.get("name", "Unknown")),
-			str(biome.get("name", "Unknown")),
-			str(site_type.get("name", "Site"))
-		]
-
-		var expedition: Dictionary = {
-			"id": _build_expedition_id(biome, site_type, state_modifier, index),
-			"biome": str(biome.get("id", "unknown_biome")),
-			"site_type": str(site_type.get("id", "unknown_site")),
-			"state_modifier": str(state_modifier.get("id", "unknown_state")),
-			# Store internal IDs for save/load and gameplay lookups...
-			"reward_profile": str(reward_profile.get("id", "balanced")),
-			"hazard": str(hazard.get("id", "traps")),
-			# ...and include display names for player-facing UI text.
-			"reward_profile_name": str(reward_profile.get("name", "Balanced")),
-			"hazard_name": str(hazard.get("name", "Traps")),
-			"duration_minutes": duration_minutes,
-			"difficulty": str(difficulty_config.get("id", "medium")),
-			"risk_label": str(difficulty_config.get("risk_label", "Medium")),
-			"display_name": display_name,
-			"flavor_summary": _build_flavor_summary(state_modifier, biome, site_type, hazard),
-			"base_success": float(difficulty_config.get("base_success", 0.75))
-		}
-
 		expeditions.append(expedition)
+		reserved_signatures.append(build_signature(expedition))
 
 	# Safe fallback if generation was interrupted by malformed content.
 	if expeditions.is_empty():
 		return _generate_fallback_expeditions(expedition_count)
 
 	return expeditions
+
+
+func generate_single_expedition(excluded_signatures: Array[String] = []) -> Dictionary:
+	# Keep trying random combinations until we find one not already on the board.
+	for attempt in MAX_UNIQUE_ATTEMPTS:
+		var expedition := _build_random_expedition(attempt)
+		if expedition.is_empty():
+			continue
+
+		var signature := build_signature(expedition)
+		if excluded_signatures.has(signature):
+			continue
+
+		return expedition
+
+	return {}
+
+
+func build_signature(expedition: Dictionary) -> String:
+	# Signature uses the display-defining content axes to avoid duplicate offers.
+	return "%s|%s|%s" % [
+		str(expedition.get("biome", "unknown_biome")),
+		str(expedition.get("site_type", "unknown_site")),
+		str(expedition.get("state_modifier", "unknown_state"))
+	]
+
+
+func _build_random_expedition(index: int) -> Dictionary:
+	# Pick one record from each content category to build a full card.
+	var biome := _pick_random(_biomes)
+	var site_type := _pick_random(_site_types)
+	var state_modifier := _pick_random(_states)
+	var reward_profile := _pick_random(_reward_profiles)
+	var hazard := _pick_random(_hazards)
+	var difficulty_config := _pick_random(DIFFICULTY_CONFIG)
+
+	if biome.is_empty() or site_type.is_empty() or state_modifier.is_empty() or reward_profile.is_empty() or hazard.is_empty() or difficulty_config.is_empty():
+		return {}
+
+	var duration_minutes := _rng.randi_range(
+		int(difficulty_config.get("duration_min", 60)),
+		int(difficulty_config.get("duration_max", 120))
+	)
+	var display_name := "%s %s %s" % [
+		str(state_modifier.get("name", "Unknown")),
+		str(biome.get("name", "Unknown")),
+		str(site_type.get("name", "Site"))
+	]
+
+	return {
+		"id": _build_expedition_id(biome, site_type, state_modifier, index),
+		"biome": str(biome.get("id", "unknown_biome")),
+		"site_type": str(site_type.get("id", "unknown_site")),
+		"state_modifier": str(state_modifier.get("id", "unknown_state")),
+		# Store internal IDs for save/load and gameplay lookups...
+		"reward_profile": str(reward_profile.get("id", "balanced")),
+		"hazard": str(hazard.get("id", "traps")),
+		# ...and include display names for player-facing UI text.
+		"reward_profile_name": str(reward_profile.get("name", "Balanced")),
+		"hazard_name": str(hazard.get("name", "Traps")),
+		"duration_minutes": duration_minutes,
+		"difficulty": str(difficulty_config.get("id", "medium")),
+		"risk_label": str(difficulty_config.get("risk_label", "Medium")),
+		"display_name": display_name,
+		"flavor_summary": _build_flavor_summary(state_modifier, biome, site_type, hazard),
+		"base_success": float(difficulty_config.get("base_success", 0.75))
+	}
 
 
 func _reload_content() -> void:
@@ -111,7 +146,6 @@ func _reload_content() -> void:
 	_states = _json_loader.load_array(STATES_PATH, ["id", "name"], FALLBACK_STATES)
 	_reward_profiles = _json_loader.load_array(REWARD_PROFILES_PATH, ["id", "name"], FALLBACK_REWARD_PROFILES)
 	_hazards = _json_loader.load_array(HAZARDS_PATH, ["id", "name"], FALLBACK_HAZARDS)
-
 
 
 func _pick_random(pool: Array) -> Dictionary:

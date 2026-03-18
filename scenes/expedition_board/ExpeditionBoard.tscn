@@ -54,3 +54,8 @@ theme_override_constants/separation = 10
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "Dispatch Selected Expedition"
+
+[node name="BackButton" type="Button" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Back to Guild Hall"
