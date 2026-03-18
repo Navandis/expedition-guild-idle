@@ -73,7 +73,16 @@ theme_override_constants/separation = 8
 layout_mode = 2
 text = "Active Expedition Status"
 
+[node name="ActiveNameLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
+layout_mode = 2
+text = "Expedition: None"
+autowrap_mode = 3
+
+[node name="RemainingTimeLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
+layout_mode = 2
+text = "Remaining: --:--"
+
 [node name="StatusLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=806509298]
 layout_mode = 2
-text = "No active expedition yet."
+text = "Status: No active expedition"
 autowrap_mode = 3

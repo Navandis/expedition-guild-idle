@@ -10,13 +10,17 @@ signal canceled
 @onready var _name_label: Label = $SafeArea/RootColumn/DispatchPanel/Rows/NameLabel
 @onready var _duration_label: Label = $SafeArea/RootColumn/DispatchPanel/Rows/DurationLabel
 @onready var _risk_label: Label = $SafeArea/RootColumn/DispatchPanel/Rows/RiskLabel
+@onready var _block_reason_label: Label = $SafeArea/RootColumn/DispatchPanel/Rows/BlockReasonLabel
+@onready var _confirm_button: Button = $SafeArea/RootColumn/ButtonsRow/ConfirmButton
 
 var _expedition_data: Dictionary = {}
+var _dispatch_blocked := false
 
 
 func _ready() -> void:
-	$SafeArea/RootColumn/ButtonsRow/ConfirmButton.pressed.connect(_on_confirm_pressed)
+	_confirm_button.pressed.connect(_on_confirm_pressed)
 	$SafeArea/RootColumn/ButtonsRow/CancelButton.pressed.connect(_on_cancel_pressed)
+	_refresh_block_state()
 
 
 func set_expedition_data(expedition_data: Dictionary) -> void:
@@ -27,7 +31,25 @@ func set_expedition_data(expedition_data: Dictionary) -> void:
 	_risk_label.text = "Risk: %s" % str(_expedition_data.get("risk_label", "Unknown"))
 
 
+func set_dispatch_blocked(is_blocked: bool, active_expedition: Dictionary = {}) -> void:
+	_dispatch_blocked = is_blocked
+	if _dispatch_blocked:
+		var active_name := str(active_expedition.get("display_name", "Unknown Expedition"))
+		_block_reason_label.text = "Dispatch blocked: %s is already in progress." % active_name
+	else:
+		_block_reason_label.text = ""
+	_refresh_block_state()
+
+
+func _refresh_block_state() -> void:
+	if _confirm_button == null:
+		return
+	_confirm_button.disabled = _dispatch_blocked
+
+
 func _on_confirm_pressed() -> void:
+	if _dispatch_blocked:
+		return
 	if _expedition_data.is_empty():
 		return
 	confirmed.emit(_expedition_data.duplicate(true))
