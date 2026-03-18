@@ -31,6 +31,8 @@ const DIFFICULTY_CONFIG := [
 
 var _rng := RandomNumberGenerator.new()
 
+var _json_loader := JsonLoader.new()
+
 var _biomes: Array = []
 var _site_types: Array = []
 var _states: Array = []
@@ -93,44 +95,12 @@ func generate_expeditions(count: int) -> Array[Dictionary]:
 
 
 func _reload_content() -> void:
-	_biomes = _load_pool(BIOMES_PATH, ["id", "name"], FALLBACK_BIOMES)
-	_site_types = _load_pool(SITE_TYPES_PATH, ["id", "name"], FALLBACK_SITE_TYPES)
-	_states = _load_pool(STATES_PATH, ["id", "name"], FALLBACK_STATES)
-	_reward_profiles = _load_pool(REWARD_PROFILES_PATH, ["id", "name"], FALLBACK_REWARD_PROFILES)
-	_hazards = _load_pool(HAZARDS_PATH, ["id", "name"], FALLBACK_HAZARDS)
+	_biomes = _json_loader.load_array(BIOMES_PATH, ["id", "name"], FALLBACK_BIOMES)
+	_site_types = _json_loader.load_array(SITE_TYPES_PATH, ["id", "name"], FALLBACK_SITE_TYPES)
+	_states = _json_loader.load_array(STATES_PATH, ["id", "name"], FALLBACK_STATES)
+	_reward_profiles = _json_loader.load_array(REWARD_PROFILES_PATH, ["id", "name"], FALLBACK_REWARD_PROFILES)
+	_hazards = _json_loader.load_array(HAZARDS_PATH, ["id", "name"], FALLBACK_HAZARDS)
 
-
-func _load_pool(path: String, required_keys: Array[String], fallback: Array) -> Array:
-	if not FileAccess.file_exists(path):
-		return fallback.duplicate(true)
-
-	var file := FileAccess.open(path, FileAccess.READ)
-	if file == null:
-		return fallback.duplicate(true)
-
-	var raw_text := file.get_as_text()
-	var parsed = JSON.parse_string(raw_text)
-	if typeof(parsed) != TYPE_ARRAY:
-		return fallback.duplicate(true)
-
-	var valid_entries: Array = []
-	for entry in parsed:
-		if typeof(entry) != TYPE_DICTIONARY:
-			continue
-		if _has_required_keys(entry, required_keys):
-			valid_entries.append(entry)
-
-	if valid_entries.is_empty():
-		return fallback.duplicate(true)
-
-	return valid_entries
-
-
-func _has_required_keys(entry: Dictionary, required_keys: Array[String]) -> bool:
-	for key in required_keys:
-		if not entry.has(key):
-			return false
-	return true
 
 
 func _pick_random(pool: Array) -> Dictionary:
