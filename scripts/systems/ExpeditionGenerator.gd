@@ -65,8 +65,9 @@ func generate_expeditions(count: int, excluded_signatures: Array[String] = []) -
 		expeditions.append(expedition)
 		reserved_signatures.append(build_signature(expedition))
 
-	# Safe fallback if generation was interrupted by malformed content.
-	if expeditions.is_empty():
+	# Safe fallback if generation was interrupted by malformed/degraded content
+	# and uniqueness filtering cannot satisfy the requested board size.
+	if expeditions.size() < expedition_count:
 		return _generate_fallback_expeditions(expedition_count)
 
 	return expeditions

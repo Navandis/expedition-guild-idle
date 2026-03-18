@@ -48,6 +48,9 @@ func replace_expedition_by_id(expedition_id: String, dispatched_expedition: Dict
 	signatures_to_exclude.append(_generator.build_signature(dispatched_expedition))
 	var replacement := _generator.generate_single_expedition(signatures_to_exclude)
 	if replacement.is_empty():
+		_selected_expedition = {}
+		_dispatch_button.disabled = true
+		_selection_label.text = "Select an expedition to continue."
 		return
 
 	_add_card(replacement)
