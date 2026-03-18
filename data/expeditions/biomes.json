@@ -1,0 +1,7 @@
+[
+  { "id": "plains", "name": "Plains" },
+  { "id": "jungle", "name": "Jungle" },
+  { "id": "coast", "name": "Coast" },
+  { "id": "desert", "name": "Desert" },
+  { "id": "mountains", "name": "Mountains" }
+]

@@ -1,0 +1,7 @@
+[
+  { "id": "abandoned", "name": "Abandoned" },
+  { "id": "flooded", "name": "Flooded" },
+  { "id": "overgrown", "name": "Overgrown" },
+  { "id": "contested", "name": "Contested" },
+  { "id": "buried", "name": "Buried" }
+]

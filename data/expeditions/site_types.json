@@ -1,0 +1,7 @@
+[
+  { "id": "ruins", "name": "Ruins" },
+  { "id": "temple_complex", "name": "Temple Complex" },
+  { "id": "watchtower", "name": "Watchtower" },
+  { "id": "fort", "name": "Fort" },
+  { "id": "library", "name": "Library" } 
+]

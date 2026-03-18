@@ -1,0 +1,7 @@
+[
+  { "id": "traps", "name": "Traps" },
+  { "id": "disease", "name": "Disease" },
+  { "id": "weather", "name": "Weather" },
+  { "id": "hostile_fauna", "name": "Hostile Fauna" },
+  { "id": "collapse", "name": "Collapse" }
+]
