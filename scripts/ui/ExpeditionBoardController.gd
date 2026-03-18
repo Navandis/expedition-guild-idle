@@ -8,9 +8,10 @@ const MAX_EXPEDITIONS := 5
 
 @export var expedition_card_scene: PackedScene
 
-@onready var _cards_container: VBoxContainer = %ExpeditionCardsContainer
-@onready var _dispatch_button: Button = %DispatchButton
-@onready var _selection_label: Label = %SelectionLabel
+@onready var _cards_container: VBoxContainer = $SafeArea/RootColumn/CardScroll/ExpeditionCardsContainer
+@onready var _dispatch_button: Button = $SafeArea/RootColumn/DispatchButton
+@onready var _selection_label: Label = $SafeArea/RootColumn/SelectionLabel
+
 
 var _generator := ExpeditionGenerator.new()
 var _selected_expedition: Dictionary = {}

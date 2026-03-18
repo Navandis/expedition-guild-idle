@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://c6nirf3040vhe"]
 
-[ext_resource type="Script" path="res://scripts/ui/ExpeditionBoardController.gd" id="1_cx6e2"]
+[ext_resource type="Script" uid="uid://c31ng4ivfwgb4" path="res://scripts/ui/ExpeditionBoardController.gd" id="1_cx6e2"]
 [ext_resource type="PackedScene" path="res://scenes/components/ExpeditionCard.tscn" id="2_u0gmk"]
 
-[node name="ExpeditionBoard" type="Control"]
+[node name="ExpeditionBoard" type="Control" unique_id=2096162743]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +13,7 @@ grow_vertical = 2
 script = ExtResource("1_cx6e2")
 expedition_card_scene = ExtResource("2_u0gmk")
 
-[node name="SafeArea" type="MarginContainer" parent="."]
+[node name="SafeArea" type="MarginContainer" parent="." unique_id=1893651646]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,32 +25,32 @@ theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="RootColumn" type="VBoxContainer" parent="SafeArea"]
+[node name="RootColumn" type="VBoxContainer" parent="SafeArea" unique_id=1123168830]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TitleLabel" type="Label" parent="SafeArea/RootColumn"]
+[node name="TitleLabel" type="Label" parent="SafeArea/RootColumn" unique_id=1571198669]
 layout_mode = 2
 text = "Expedition Board"
 horizontal_alignment = 1
 
-[node name="SelectionLabel" type="Label" parent="SafeArea/RootColumn" unique_name_in_owner=true]
+[node name="SelectionLabel" type="Label" parent="SafeArea/RootColumn" unique_id=1866229231]
 layout_mode = 2
 text = "Select an expedition to continue."
 autowrap_mode = 3
 
-[node name="CardScroll" type="ScrollContainer" parent="SafeArea/RootColumn"]
+[node name="CardScroll" type="ScrollContainer" parent="SafeArea/RootColumn" unique_id=1276735346]
 custom_minimum_size = Vector2(0, 420)
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="ExpeditionCardsContainer" type="VBoxContainer" parent="SafeArea/RootColumn/CardScroll" unique_name_in_owner=true]
+[node name="ExpeditionCardsContainer" type="VBoxContainer" parent="SafeArea/RootColumn/CardScroll" unique_id=983485744]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="DispatchButton" type="Button" parent="SafeArea/RootColumn" unique_name_in_owner=true]
+[node name="DispatchButton" type="Button" parent="SafeArea/RootColumn" unique_id=726765546]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "Dispatch Selected Expedition"

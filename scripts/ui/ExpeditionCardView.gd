@@ -3,11 +3,11 @@ class_name ExpeditionCardView
 
 signal pressed_with_data(expedition_data: Dictionary)
 
-@onready var _name_label: Label = %DisplayNameLabel
-@onready var _duration_label: Label = %DurationLabel
-@onready var _risk_label: Label = %RiskLabel
-@onready var _reward_label: Label = %RewardLabel
-@onready var _hazard_label: Label = %HazardLabel
+@onready var _name_label: Label = $CardContent/Rows/DisplayNameLabel
+@onready var _duration_label: Label = $CardContent/Rows/DurationLabel
+@onready var _risk_label: Label = $CardContent/Rows/RiskLabel
+@onready var _reward_label: Label = $CardContent/Rows/RewardLabel
+@onready var _hazard_label: Label = $CardContent/Rows/HazardLabel
 
 var expedition_data: Dictionary = {}
 
