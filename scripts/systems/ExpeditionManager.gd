@@ -1,14 +1,16 @@
 extends RefCounted
 class_name ExpeditionManager
 
-# ExpeditionManager tracks exactly one active expedition for v0.1.
-# It stores runtime timing fields and exposes a small read-only API for UI.
+# ExpeditionManager owns active-expedition runtime state for this milestone's core loop.
+# It now handles completion detection, report creation, and one-time reward collection
+# so the UI can stay simple: dispatch -> wait -> report -> collect.
 
 const STATUS_IDLE := "idle"
 const STATUS_IN_PROGRESS := "in_progress"
 const STATUS_COMPLETED := "completed"
 
 var _active_expedition: Dictionary = {}
+var _pending_report: Dictionary = {}
 
 
 func has_active_expedition() -> bool:
@@ -16,9 +18,19 @@ func has_active_expedition() -> bool:
 	return str(_active_expedition.get("status", STATUS_IDLE)) == STATUS_IN_PROGRESS
 
 
+func has_pending_report() -> bool:
+	return not _pending_report.is_empty()
+
+
+func can_start_expedition() -> bool:
+	# New expeditions are blocked while either a run is active or an uncollected
+	# report exists. This keeps the loop linear and easy to reason about.
+	_update_runtime_status()
+	return _active_expedition.is_empty() and _pending_report.is_empty()
+
+
 func start_expedition(expedition_offer: Dictionary) -> bool:
-	# One active expedition at a time keeps UX/state simple in this milestone.
-	if has_active_expedition():
+	if not can_start_expedition():
 		return false
 
 	# Clamp duration so malformed content cannot create a zero-length timer.
@@ -34,11 +46,44 @@ func start_expedition(expedition_offer: Dictionary) -> bool:
 		"id": str(expedition_offer.get("id", "")),
 		"display_name": str(expedition_offer.get("display_name", "Unknown Expedition")),
 		"duration_minutes": duration_minutes,
+		"risk_label": str(expedition_offer.get("risk_label", "Unknown")),
 		"start_time_unix": start_unix,
 		"expected_finish_time": finish_unix,
 		"status": STATUS_IN_PROGRESS
 	}
 	return true
+
+
+func complete_active_expedition() -> bool:
+	# Shared completion entry point used by both normal timer checks and debug button.
+	_update_runtime_status()
+	if _active_expedition.is_empty():
+		return false
+	if not _pending_report.is_empty():
+		# Protect against duplicate report generation.
+		return false
+
+	_active_expedition["status"] = STATUS_COMPLETED
+	_pending_report = RewardSystem.create_report_for_expedition(_active_expedition)
+	return true
+
+
+func collect_pending_report() -> Dictionary:
+	# Collection is one-time. After this, both report and active expedition are cleared.
+	if _pending_report.is_empty():
+		return {}
+	if bool(_pending_report.get("collected", false)):
+		return {}
+
+	var rewards := _pending_report.get("rewards", {}).duplicate(true)
+	_pending_report["collected"] = true
+	_pending_report = {}
+	_active_expedition = {}
+	return rewards
+
+
+func get_pending_report() -> Dictionary:
+	return _pending_report.duplicate(true)
 
 
 func get_active_expedition() -> Dictionary:
@@ -54,7 +99,7 @@ func get_status_label() -> String:
 		STATUS_IN_PROGRESS:
 			return "In Progress"
 		STATUS_COMPLETED:
-			return "Completed"
+			return "Awaiting Report Collection"
 		_:
 			return "No Active Expedition"
 
@@ -91,6 +136,6 @@ func _update_runtime_status() -> void:
 	if status != STATUS_IN_PROGRESS:
 		return
 
+	# Timer completion and debug completion both converge through this method.
 	if _compute_remaining_seconds() <= 0:
-		# Completion is auto-derived from time; no explicit "complete" action yet.
-		_active_expedition["status"] = STATUS_COMPLETED
+		complete_active_expedition()
