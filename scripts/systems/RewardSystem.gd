@@ -28,10 +28,12 @@ static func create_report_for_expedition(expedition: Dictionary) -> Dictionary:
 
 
 static func _roll_outcome(expedition: Dictionary) -> String:
-	# Day-3 outcome logic: expedition carries an explicit base_success value that
-	# may already include upgrade bonuses. Partial success threshold is fixed.
+	# Expedition carries an explicit base_success value that may already include
+	# upgrade bonuses. Split the remaining probability between partial success and
+	# failure so higher tiers still keep meaningful failure risk.
 	var success_chance := clampf(float(expedition.get("base_success", 0.50)), 0.05, 0.95)
-	var partial_cutoff := clampf(success_chance + 0.30, success_chance, 0.99)
+	var remaining_probability := 1.0 - success_chance
+	var partial_cutoff := success_chance + (remaining_probability * 0.50)
 	var roll := randf()
 
 	if roll <= success_chance:
