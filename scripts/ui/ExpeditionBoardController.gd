@@ -1,6 +1,12 @@
 extends Control
 class_name ExpeditionBoardController
 
+# ExpeditionBoardController manages the full board lifecycle:
+# 1) Generate expedition offers.
+# 2) Render one card per offer.
+# 3) Track which card is selected.
+# 4) Emit a dispatch signal with chosen expedition data.
+
 signal expedition_dispatch_requested(expedition_data: Dictionary)
 
 const MIN_EXPEDITIONS := 3
@@ -20,6 +26,7 @@ var _card_views: Array[ExpeditionCardView] = []
 
 func _ready() -> void:
 	randomize()
+	# Players cannot dispatch until they choose a card.
 	_dispatch_button.disabled = true
 	_dispatch_button.pressed.connect(_on_dispatch_pressed)
 	_generate_board()
@@ -40,6 +47,8 @@ func _generate_board() -> void:
 		if card == null:
 			continue
 
+		# Each card gets the full expedition dictionary so it can both
+		# display fields and emit them back when clicked.
 		_cards_container.add_child(card)
 		card.set_expedition_data(expedition)
 		card.pressed_with_data.connect(_on_card_selected)
@@ -56,6 +65,7 @@ func _clear_cards() -> void:
 
 
 func _on_card_selected(expedition_data: Dictionary) -> void:
+	# Duplicate to avoid accidental shared-mutation between UI and model data.
 	_selected_expedition = expedition_data.duplicate(true)
 	_dispatch_button.disabled = false
 	_selection_label.text = "Selected: %s" % str(_selected_expedition.get("display_name", "Unknown Expedition"))
