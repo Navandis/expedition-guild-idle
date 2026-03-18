@@ -53,8 +53,8 @@ static func _roll_outcome(expedition: Dictionary) -> String:
 
 
 static func _build_rewards(expedition: Dictionary, outcome: String) -> Dictionary:
-	var duration_minutes := max(1, int(expedition.get("duration_minutes", 1)))
-	var base_gold := 20 + (duration_minutes * 4)
+	var duration_minutes: int = int(max(1, int(expedition.get("duration_minutes", 1))))
+	var base_gold: int = 20 + (duration_minutes * 4)
 
 	match outcome:
 		OUTCOME_SUCCESS:
