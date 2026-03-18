@@ -56,7 +56,6 @@ func start_expedition(expedition_offer: Dictionary) -> bool:
 
 func complete_active_expedition() -> bool:
 	# Shared completion entry point used by both normal timer checks and debug button.
-	_update_runtime_status()
 	if _active_expedition.is_empty():
 		return false
 	if not _pending_report.is_empty():
