@@ -7,8 +7,7 @@ class_name GuildHallController
 
 signal open_expedition_board_requested
 
-@onready var _active_status_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/StatusLabel
-
+@onready var _active_status_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/StatusLabel
 
 func _ready() -> void:
 	$SafeArea/RootColumn/OpenBoardButton.pressed.connect(_on_open_board_pressed)

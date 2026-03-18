@@ -1,10 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://ca4nismuvcpik"]
 
-; Guild Hall home screen for day-2 shell flow.
+[ext_resource type="Script" uid="uid://bky2lwy64owpe" path="res://scripts/ui/GuildHallController.gd" id="1_72fw3"]
 
-[ext_resource type="Script" path="res://scripts/ui/GuildHallController.gd" id="1_72fw3"]
-
-[node name="GuildHall" type="Control"]
+[node name="GuildHall" type="Control" unique_id=1458496136]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_72fw3")
 
-[node name="SafeArea" type="MarginContainer" parent="."]
+[node name="SafeArea" type="MarginContainer" parent="." unique_id=2084556186]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,57 +23,57 @@ theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="RootColumn" type="VBoxContainer" parent="SafeArea"]
+[node name="RootColumn" type="VBoxContainer" parent="SafeArea" unique_id=845488305]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="TitleLabel" type="Label" parent="SafeArea/RootColumn"]
+[node name="TitleLabel" type="Label" parent="SafeArea/RootColumn" unique_id=1685169725]
 layout_mode = 2
 text = "Guild Hall"
 horizontal_alignment = 1
 
-[node name="ResourcesPanel" type="PanelContainer" parent="SafeArea/RootColumn"]
+[node name="ResourcesPanel" type="PanelContainer" parent="SafeArea/RootColumn" unique_id=620704676]
 layout_mode = 2
 
-[node name="ResourceRows" type="VBoxContainer" parent="SafeArea/RootColumn/ResourcesPanel"]
+[node name="ResourceRows" type="VBoxContainer" parent="SafeArea/RootColumn/ResourcesPanel" unique_id=1494783933]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ResourcesHeader" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows"]
+[node name="ResourcesHeader" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows" unique_id=1210295991]
 layout_mode = 2
 text = "Resources (Placeholder)"
 
-[node name="GoldLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows"]
+[node name="GoldLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows" unique_id=553301898]
 layout_mode = 2
 text = "Gold: 1,250"
 
-[node name="SuppliesLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows"]
+[node name="SuppliesLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows" unique_id=245117355]
 layout_mode = 2
 text = "Supplies: 80"
 
-[node name="MoraleLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows"]
+[node name="MoraleLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows" unique_id=1026819009]
 layout_mode = 2
 text = "Guild Morale: Stable"
 
-[node name="OpenBoardButton" type="Button" parent="SafeArea/RootColumn"]
+[node name="OpenBoardButton" type="Button" parent="SafeArea/RootColumn" unique_id=2015018345]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "Open Expedition Board"
 
-[node name="ActiveExpeditionPanel" type="PanelContainer" parent="SafeArea/RootColumn"]
+[node name="ActiveExpeditionPanel" type="PanelContainer" parent="SafeArea/RootColumn" unique_id=1205453616]
 custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ActiveRows" type="VBoxContainer" parent="SafeArea/RootColumn/ActiveExpeditionPanel"]
+[node name="ActiveRows" type="VBoxContainer" parent="SafeArea/RootColumn/ActiveExpeditionPanel" unique_id=1742571574]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ActiveHeader" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
+[node name="ActiveHeader" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=1411912238]
 layout_mode = 2
 text = "Active Expedition Status"
 
-[node name="StatusLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
+[node name="StatusLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=806509298]
 layout_mode = 2
 text = "No active expedition yet."
 autowrap_mode = 3
