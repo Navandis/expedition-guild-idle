@@ -28,7 +28,7 @@ func set_report_data(report: Dictionary) -> void:
 	_outcome_label.text = "Outcome: %s" % str(report.get("outcome_label", "Unknown"))
 	_summary_label.text = "Summary: %s" % str(report.get("summary", "No report summary."))
 
-	var rewards := report.get("rewards", {})
+	var rewards: Dictionary = report.get("rewards", {}) as Dictionary
 	_gold_label.text = "Gold: +%d" % int(rewards.get("gold", 0))
 	_relic_label.text = "Relic Fragments: +%d" % int(rewards.get("relic_fragments", 0))
 	_codex_label.text = "Codex Entries: +%d" % int(rewards.get("codex_entries", 0))

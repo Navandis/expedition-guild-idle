@@ -74,7 +74,7 @@ func collect_pending_report() -> Dictionary:
 	if bool(_pending_report.get("collected", false)):
 		return {}
 
-	var rewards := _pending_report.get("rewards", {}).duplicate(true)
+	var rewards: Dictionary = (_pending_report.get("rewards", {}) as Dictionary).duplicate(true)
 	_pending_report["collected"] = true
 	_pending_report = {}
 	_active_expedition = {}
