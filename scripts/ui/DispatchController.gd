@@ -18,6 +18,7 @@ var _dispatch_blocked := false
 
 
 func _ready() -> void:
+	# Controller owns button wiring so scene stays declarative in .tscn.
 	_confirm_button.pressed.connect(_on_confirm_pressed)
 	$SafeArea/RootColumn/ButtonsRow/CancelButton.pressed.connect(_on_cancel_pressed)
 	_refresh_block_state()
@@ -34,6 +35,7 @@ func set_expedition_data(expedition_data: Dictionary) -> void:
 func set_dispatch_blocked(is_blocked: bool, active_expedition: Dictionary = {}) -> void:
 	_dispatch_blocked = is_blocked
 	if _dispatch_blocked:
+		# Include the current expedition name to explain *which* run is blocking.
 		var active_name := str(active_expedition.get("display_name", "Unknown Expedition"))
 		_block_reason_label.text = "Dispatch blocked: %s is already in progress." % active_name
 	else:
@@ -48,6 +50,7 @@ func _refresh_block_state() -> void:
 
 
 func _on_confirm_pressed() -> void:
+	# Guard clauses keep this signal safe from race conditions and bad payloads.
 	if _dispatch_blocked:
 		return
 	if _expedition_data.is_empty():

@@ -51,6 +51,7 @@ func _show_dispatch_screen(expedition_data: Dictionary) -> void:
 		_dispatch_controller.confirmed.connect(_on_dispatch_confirmed)
 		_dispatch_controller.canceled.connect(_on_dispatch_canceled)
 
+	# Always route through the dispatch screen so it can explain why dispatch is blocked.
 	_show_screen(_dispatch_controller)
 	_dispatch_controller.set_expedition_data(expedition_data)
 	_dispatch_controller.set_dispatch_blocked(
@@ -90,10 +91,8 @@ func _on_return_to_guild_hall_requested() -> void:
 
 
 func _on_expedition_dispatch_requested(expedition_data: Dictionary) -> void:
-	if _expedition_manager.has_active_expedition():
-		_show_guild_hall()
-		return
-
+	# Even when dispatch is blocked, we still show this screen so users get
+	# contextual messaging and can explicitly back out.
 	_show_dispatch_screen(expedition_data)
 
 

@@ -1,4 +1,6 @@
 [gd_scene format=3 uid="uid://ca4nismuvcpik"]
+; Guild Hall is the home screen shell.
+; It exposes the board entry button and a live active-expedition summary panel.
 
 [ext_resource type="Script" uid="uid://bky2lwy64owpe" path="res://scripts/ui/GuildHallController.gd" id="1_72fw3"]
 
@@ -63,6 +65,7 @@ text = "Open Expedition Board"
 [node name="ActiveExpeditionPanel" type="PanelContainer" parent="SafeArea/RootColumn" unique_id=1205453616]
 custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
+; Stretch status panel so live countdown remains readable on tall screens.
 size_flags_vertical = 3
 
 [node name="ActiveRows" type="VBoxContainer" parent="SafeArea/RootColumn/ActiveExpeditionPanel" unique_id=1742571574]

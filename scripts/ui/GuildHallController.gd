@@ -16,6 +16,7 @@ var _expedition_manager: ExpeditionManager
 
 func _ready() -> void:
 	$SafeArea/RootColumn/OpenBoardButton.pressed.connect(_on_open_board_pressed)
+	# Polling each frame is acceptable for this prototype-sized status block.
 	set_process(true)
 	_refresh_active_status()
 
@@ -30,6 +31,7 @@ func set_expedition_manager(expedition_manager: ExpeditionManager) -> void:
 
 
 func _refresh_active_status() -> void:
+	# onready refs can be null during scene teardown/reparenting.
 	if _active_name_label == null or _remaining_time_label == null or _active_status_label == null:
 		return
 
@@ -46,6 +48,7 @@ func _refresh_active_status() -> void:
 		_active_status_label.text = "Status: No active expedition"
 		return
 
+	# Names come from offer data; fallback text protects against malformed payloads.
 	_active_name_label.text = "Expedition: %s" % str(expedition.get("display_name", "Unknown Expedition"))
 	_active_status_label.text = "Status: %s" % _expedition_manager.get_status_label()
 
