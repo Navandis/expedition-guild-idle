@@ -116,7 +116,8 @@ func get_remaining_time_text() -> String:
 	if remaining <= 0:
 		return "00:00"
 
-	var minutes := remaining / 60
+	# Avoid integer-division warnings during script reload.
+	var minutes := int(remaining / 60.0)
 	var seconds := remaining % 60
 	return "%02d:%02d" % [minutes, seconds]
 
