@@ -6,20 +6,28 @@ class_name ExpeditionCardView
 
 signal pressed_with_data(expedition_data: Dictionary)
 
-@onready var _name_label: Label = $CardContent/Rows/DisplayNameLabel
-@onready var _duration_label: Label = $CardContent/Rows/DurationLabel
-@onready var _risk_label: Label = $CardContent/Rows/RiskLabel
-@onready var _reward_label: Label = $CardContent/Rows/RewardLabel
-@onready var _hazard_label: Label = $CardContent/Rows/HazardLabel
+var _name_label: Label
+var _duration_label: Label
+var _risk_label: Label
+var _reward_label: Label
+var _hazard_label: Label
 
 var expedition_data: Dictionary = {}
 
 
 func _ready() -> void:
+	_resolve_labels()
 	pressed.connect(_on_pressed)
 
 
 func set_expedition_data(data: Dictionary) -> void:
+	# Cards can receive data immediately after being instantiated.
+	# Resolve label references here as a safeguard when _ready() has
+	# not run yet.
+	if not _resolve_labels():
+		push_error("ExpeditionCardView.set_expedition_data: Missing one or more label nodes.")
+		return
+
 	# Deep copy keeps the card's local state isolated from external changes.
 	expedition_data = data.duplicate(true)
 	_name_label.text = str(expedition_data.get("display_name", "Unknown Expedition"))
@@ -37,3 +45,22 @@ func set_selected(is_selected: bool) -> void:
 
 func _on_pressed() -> void:
 	pressed_with_data.emit(expedition_data.duplicate(true))
+
+
+func _resolve_labels() -> bool:
+	if _name_label == null:
+		_name_label = get_node_or_null("CardContent/Rows/DisplayNameLabel")
+	if _duration_label == null:
+		_duration_label = get_node_or_null("CardContent/Rows/DurationLabel")
+	if _risk_label == null:
+		_risk_label = get_node_or_null("CardContent/Rows/RiskLabel")
+	if _reward_label == null:
+		_reward_label = get_node_or_null("CardContent/Rows/RewardLabel")
+	if _hazard_label == null:
+		_hazard_label = get_node_or_null("CardContent/Rows/HazardLabel")
+
+	return _name_label != null \
+		and _duration_label != null \
+		and _risk_label != null \
+		and _reward_label != null \
+		and _hazard_label != null
