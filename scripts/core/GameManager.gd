@@ -1,18 +1,25 @@
 extends Node
 
-# GameManager owns the high-level "shell" flow for this prototype.
-# It swaps between Guild Hall, Expedition Board, and Dispatch confirmation
-# while keeping shared runtime state in one place.
+# GameManager owns high-level screen flow and shared runtime state.
+# For this milestone it closes the first loop by coordinating:
+# dispatch -> wait/finish -> report -> collect -> resource update.
 
 const GUILD_HALL_SCENE := preload("res://scenes/guild_hall/GuildHall.tscn")
 const EXPEDITION_BOARD_SCENE := preload("res://scenes/expedition_board/ExpeditionBoard.tscn")
 const DISPATCH_SCREEN_SCENE := preload("res://scenes/dispatch/DispatchScreen.tscn")
+const EXPEDITION_REPORT_SCENE := preload("res://scenes/report/ExpeditionReport.tscn")
 
 var _expedition_manager := ExpeditionManager.new()
+var _resources := {
+	"gold": 1250,
+	"relic_fragments": 0,
+	"codex_entries": 0
+}
 
 var _guild_hall_controller: GuildHallController
 var _expedition_board_controller: ExpeditionBoardController
 var _dispatch_controller: DispatchController
+var _report_controller: ReportController
 var _mounted_screen: Control
 
 @onready var _ui_root: Control = $CanvasLayer/UIRoot
@@ -31,9 +38,12 @@ func _show_guild_hall() -> void:
 	if _guild_hall_controller == null:
 		_guild_hall_controller = GUILD_HALL_SCENE.instantiate() as GuildHallController
 		_guild_hall_controller.open_expedition_board_requested.connect(_on_open_expedition_board_requested)
+		_guild_hall_controller.open_report_requested.connect(_on_open_report_requested)
+		_guild_hall_controller.debug_finish_requested.connect(_on_debug_finish_requested)
 
 	_show_screen(_guild_hall_controller)
 	_guild_hall_controller.set_expedition_manager(_expedition_manager)
+	_guild_hall_controller.set_resources(_resources)
 
 
 func _show_expedition_board() -> void:
@@ -55,9 +65,24 @@ func _show_dispatch_screen(expedition_data: Dictionary) -> void:
 	_show_screen(_dispatch_controller)
 	_dispatch_controller.set_expedition_data(expedition_data)
 	_dispatch_controller.set_dispatch_blocked(
-		_expedition_manager.has_active_expedition(),
+		not _expedition_manager.can_start_expedition(),
 		_expedition_manager.get_active_expedition()
 	)
+
+
+func _show_report_screen() -> void:
+	if _report_controller == null:
+		_report_controller = EXPEDITION_REPORT_SCENE.instantiate() as ReportController
+		_report_controller.collect_requested.connect(_on_report_collect_requested)
+		_report_controller.close_requested.connect(_on_report_close_requested)
+
+	var report := _expedition_manager.get_pending_report()
+	if report.is_empty():
+		_show_guild_hall()
+		return
+
+	_report_controller.set_report_data(report)
+	_show_screen(_report_controller)
 
 
 func _show_screen(screen: Control) -> void:
@@ -84,6 +109,17 @@ func _show_screen(screen: Control) -> void:
 
 func _on_open_expedition_board_requested() -> void:
 	_show_expedition_board()
+
+
+func _on_open_report_requested() -> void:
+	_show_report_screen()
+
+
+func _on_debug_finish_requested() -> void:
+	# This calls the same completion path used by natural timer completion.
+	_expedition_manager.complete_active_expedition()
+	if _expedition_manager.has_pending_report():
+		_show_report_screen()
 
 
 func _on_return_to_guild_hall_requested() -> void:
@@ -115,3 +151,20 @@ func _on_dispatch_confirmed(expedition_data: Dictionary) -> void:
 
 func _on_dispatch_canceled() -> void:
 	_show_expedition_board()
+
+
+func _on_report_collect_requested() -> void:
+	# Reward collection is one-time and clears both report + completed expedition.
+	var rewards := _expedition_manager.collect_pending_report()
+	if rewards.is_empty():
+		_show_guild_hall()
+		return
+
+	_resources["gold"] = int(_resources.get("gold", 0)) + int(rewards.get("gold", 0))
+	_resources["relic_fragments"] = int(_resources.get("relic_fragments", 0)) + int(rewards.get("relic_fragments", 0))
+	_resources["codex_entries"] = int(_resources.get("codex_entries", 0)) + int(rewards.get("codex_entries", 0))
+	_show_guild_hall()
+
+
+func _on_report_close_requested() -> void:
+	_show_guild_hall()

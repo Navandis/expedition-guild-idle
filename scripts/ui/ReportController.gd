@@ -1,0 +1,47 @@
+extends Control
+class_name ReportController
+
+# ReportController displays one pending expedition report and emits a collect
+# request. GameManager handles actual reward application so this UI stays focused
+# on showing data and forwarding button events.
+
+signal collect_requested
+signal close_requested
+
+@onready var _expedition_name_label: Label = $SafeArea/RootColumn/ReportPanel/Rows/ExpeditionNameLabel
+@onready var _outcome_label: Label = $SafeArea/RootColumn/ReportPanel/Rows/OutcomeLabel
+@onready var _summary_label: Label = $SafeArea/RootColumn/ReportPanel/Rows/SummaryLabel
+@onready var _gold_label: Label = $SafeArea/RootColumn/ReportPanel/Rows/Rewards/GoldLabel
+@onready var _relic_label: Label = $SafeArea/RootColumn/ReportPanel/Rows/Rewards/RelicFragmentsLabel
+@onready var _codex_label: Label = $SafeArea/RootColumn/ReportPanel/Rows/Rewards/CodexEntriesLabel
+@onready var _collect_button: Button = $SafeArea/RootColumn/ButtonsRow/CollectButton
+
+
+func _ready() -> void:
+	_collect_button.pressed.connect(_on_collect_pressed)
+	$SafeArea/RootColumn/ButtonsRow/CloseButton.pressed.connect(_on_close_pressed)
+
+
+func set_report_data(report: Dictionary) -> void:
+	# All text is set here so scene defaults are only placeholders.
+	_expedition_name_label.text = "Expedition: %s" % str(report.get("expedition_display_name", "Unknown Expedition"))
+	_outcome_label.text = "Outcome: %s" % str(report.get("outcome_label", "Unknown"))
+	_summary_label.text = "Summary: %s" % str(report.get("summary", "No report summary."))
+
+	var rewards := report.get("rewards", {})
+	_gold_label.text = "Gold: +%d" % int(rewards.get("gold", 0))
+	_relic_label.text = "Relic Fragments: +%d" % int(rewards.get("relic_fragments", 0))
+	_codex_label.text = "Codex Entries: +%d" % int(rewards.get("codex_entries", 0))
+
+	# Once a report is collected, keep button disabled so it cannot be claimed twice.
+	_collect_button.disabled = bool(report.get("collected", false))
+
+
+func _on_collect_pressed() -> void:
+	if _collect_button.disabled:
+		return
+	collect_requested.emit()
+
+
+func _on_close_pressed() -> void:
+	close_requested.emit()

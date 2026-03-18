@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ca4nismuvcpik"]
 ; Guild Hall is the home screen shell.
-; It exposes the board entry button and a live active-expedition summary panel.
+; It now also exposes report/debug actions for the expedition completion loop.
 
 [ext_resource type="Script" uid="uid://bky2lwy64owpe" path="res://scripts/ui/GuildHallController.gd" id="1_72fw3"]
 
@@ -43,24 +43,36 @@ theme_override_constants/separation = 8
 
 [node name="ResourcesHeader" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows" unique_id=1210295991]
 layout_mode = 2
-text = "Resources (Placeholder)"
+text = "Resources"
 
 [node name="GoldLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows" unique_id=553301898]
 layout_mode = 2
-text = "Gold: 1,250"
+text = "Gold: 0"
 
-[node name="SuppliesLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows" unique_id=245117355]
+[node name="RelicFragmentsLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows"]
 layout_mode = 2
-text = "Supplies: 80"
+text = "Relic Fragments: 0"
 
-[node name="MoraleLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows" unique_id=1026819009]
+[node name="CodexEntriesLabel" type="Label" parent="SafeArea/RootColumn/ResourcesPanel/ResourceRows"]
 layout_mode = 2
-text = "Guild Morale: Stable"
+text = "Codex Entries: 0"
 
 [node name="OpenBoardButton" type="Button" parent="SafeArea/RootColumn" unique_id=2015018345]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "Open Expedition Board"
+
+[node name="OpenReportButton" type="Button" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "Open Expedition Report"
+visible = false
+
+[node name="DebugFinishButton" type="Button" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "Finish Active Expedition (Test)"
+visible = false
 
 [node name="ActiveExpeditionPanel" type="PanelContainer" parent="SafeArea/RootColumn" unique_id=1205453616]
 custom_minimum_size = Vector2(0, 140)
