@@ -17,13 +17,16 @@ func has_active_expedition() -> bool:
 
 
 func start_expedition(expedition_offer: Dictionary) -> bool:
+	# One active expedition at a time keeps UX/state simple in this milestone.
 	if has_active_expedition():
 		return false
 
+	# Clamp duration so malformed content cannot create a zero-length timer.
 	var duration_minutes := int(expedition_offer.get("duration_minutes", 0))
 	if duration_minutes <= 0:
 		duration_minutes = 1
 
+	# Track wall-clock timestamps in unix seconds for cheap runtime checks.
 	var start_unix := Time.get_unix_time_from_system()
 	var finish_unix := start_unix + (duration_minutes * 60)
 
@@ -40,6 +43,7 @@ func start_expedition(expedition_offer: Dictionary) -> bool:
 
 func get_active_expedition() -> Dictionary:
 	_update_runtime_status()
+	# Defensive copy prevents callers from mutating manager-owned state.
 	return _active_expedition.duplicate(true)
 
 
@@ -88,4 +92,5 @@ func _update_runtime_status() -> void:
 		return
 
 	if _compute_remaining_seconds() <= 0:
+		# Completion is auto-derived from time; no explicit "complete" action yet.
 		_active_expedition["status"] = STATUS_COMPLETED
