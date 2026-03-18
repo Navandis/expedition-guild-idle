@@ -45,7 +45,7 @@ func start_expedition(expedition_offer: Dictionary, upgrade_effects: Dictionary 
 	var base_success := float(expedition_offer.get("base_success", 0.75))
 	var success_bonus := float(upgrade_effects.get("success_bonus", 0.0))
 	var final_success := clampf(base_success + success_bonus, 0.05, 0.99)
-	var gold_multiplier := max(0.20, float(upgrade_effects.get("gold_multiplier", 1.0)))
+	var gold_multiplier: float = maxf(0.20, float(upgrade_effects.get("gold_multiplier", 1.0)))
 
 	# Track wall-clock timestamps in unix seconds for cheap runtime checks.
 	var start_unix := Time.get_unix_time_from_system()

@@ -47,7 +47,7 @@ static func _build_rewards(expedition: Dictionary, outcome: String) -> Dictionar
 	var duration_minutes: int = int(max(1, int(expedition.get("duration_minutes", 1))))
 	var base_gold: int = 20 + (duration_minutes * 4)
 	# UpgradeSystem can increase gold with a small multiplier applied here.
-	var gold_multiplier := max(0.20, float(expedition.get("gold_multiplier", 1.0)))
+	var gold_multiplier: float = maxf(0.20, float(expedition.get("gold_multiplier", 1.0)))
 	base_gold = int(round(base_gold * gold_multiplier))
 
 	match outcome:
