@@ -156,6 +156,25 @@ func _reload_upgrades() -> void:
 		})
 
 
+
+
+func get_owned_upgrade_ids() -> Array[String]:
+	var owned_ids: Array[String] = []
+	for upgrade_id in _owned_upgrade_ids.keys():
+		if bool(_owned_upgrade_ids.get(upgrade_id, false)):
+			owned_ids.append(str(upgrade_id))
+	owned_ids.sort()
+	return owned_ids
+
+
+func restore_owned_upgrade_ids(saved_ids: Array[String]) -> void:
+	# Load flow: only ids that still exist in current definitions are restored.
+	_owned_upgrade_ids.clear()
+	for upgrade_id in saved_ids:
+		if _get_upgrade_by_id(upgrade_id).is_empty():
+			continue
+		_owned_upgrade_ids[upgrade_id] = true
+
 func _get_upgrade_by_id(upgrade_id: String) -> Dictionary:
 	for upgrade in _upgrades:
 		if str(upgrade.get("id", "")) == upgrade_id:
