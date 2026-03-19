@@ -3,6 +3,8 @@ extends Node
 # GameManager owns high-level screen flow and shared runtime state.
 # For this milestone it coordinates the two-slot expedition loop:
 # dispatch -> wait/finish per slot -> queued reports -> collect one-by-one.
+# When multiple reports are queued, GameManager keeps the player on the report
+# screen and immediately shows the next pending report after each collect.
 # It also keeps upgrades/codex/save behavior wired to the same flow and provides
 # debug reset/finish hooks that reuse real expedition completion logic.
 
@@ -262,6 +264,14 @@ func _on_report_collect_requested() -> void:
 	# Record Codex discovery after a successful collect so the event is stable.
 	_codex_system.record_discovery_from_report(report_snapshot)
 	_save_runtime_state()
+
+	# Queue-driven report flow: stay in the report screen until queue is empty.
+	# This reuses the same report rendering path so queue labels/state stay in sync.
+	if _expedition_manager.has_pending_report():
+		_show_report_screen()
+		return
+
+	# Only return to Guild Hall after the last pending report is collected.
 	_show_guild_hall()
 
 
