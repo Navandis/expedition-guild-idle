@@ -22,6 +22,7 @@ var _resources := {
 	"relic_fragments": 0,
 	"codex_entries": 0
 }
+var _expedition_board_offers: Array[Dictionary] = []
 
 var _guild_hall_controller: GuildHallController
 var _expedition_board_controller: ExpeditionBoardController
@@ -63,9 +64,11 @@ func _show_expedition_board() -> void:
 		_expedition_board_controller = EXPEDITION_BOARD_SCENE.instantiate() as ExpeditionBoardController
 		_expedition_board_controller.expedition_dispatch_requested.connect(_on_expedition_dispatch_requested)
 		_expedition_board_controller.return_to_guild_hall_requested.connect(_on_return_to_guild_hall_requested)
+		_expedition_board_controller.set_initial_board_offers(_expedition_board_offers)
 
 	_expedition_board_controller.set_upgrade_effects(_upgrade_system.get_effects_summary())
 	_show_screen(_expedition_board_controller)
+	_capture_expedition_board_state()
 
 
 func _show_dispatch_screen(expedition_data: Dictionary) -> void:
@@ -193,6 +196,7 @@ func _on_dispatch_confirmed(expedition_data: Dictionary) -> void:
 			str(expedition_data.get("id", "")),
 			expedition_data
 		)
+		_capture_expedition_board_state()
 
 	_save_runtime_state()
 	_show_guild_hall()
@@ -273,6 +277,7 @@ func _load_runtime_state() -> void:
 		save_data.get("active_expedition", {}) as Dictionary,
 		save_data.get("pending_report", {}) as Dictionary
 	)
+	_expedition_board_offers = _sanitize_board_offers(save_data.get("expedition_board_offers", []))
 
 
 func _save_runtime_state() -> void:
@@ -282,7 +287,8 @@ func _save_runtime_state() -> void:
 		"owned_upgrades": _upgrade_system.get_owned_upgrade_ids(),
 		"codex_discoveries": _codex_system.get_discovered_entries(),
 		"active_expedition": _expedition_manager.get_active_expedition(),
-		"pending_report": _expedition_manager.get_pending_report()
+		"pending_report": _expedition_manager.get_pending_report(),
+		"expedition_board_offers": _expedition_board_offers
 	})
 
 
@@ -301,6 +307,24 @@ func _to_string_array(value: Variant) -> Array[String]:
 		for item in value:
 			result.append(str(item))
 	return result
+
+
+func _sanitize_board_offers(value: Variant) -> Array[Dictionary]:
+	var offers: Array[Dictionary] = []
+	if not (value is Array):
+		return offers
+
+	for item in value:
+		if not (item is Dictionary):
+			continue
+		offers.append((item as Dictionary).duplicate(true))
+	return offers
+
+
+func _capture_expedition_board_state() -> void:
+	if _expedition_board_controller == null:
+		return
+	_expedition_board_offers = _expedition_board_controller.get_board_offers()
 
 
 func _on_codex_back_requested() -> void:

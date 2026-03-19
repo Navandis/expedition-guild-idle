@@ -24,6 +24,7 @@ var _generator := ExpeditionGenerator.new()
 var _selected_expedition: Dictionary = {}
 var _card_views: Array[ExpeditionCardView] = []
 var _upgrade_effects: Dictionary = {}
+var _initial_board_offers: Array[Dictionary] = []
 
 
 func _ready() -> void:
@@ -32,7 +33,7 @@ func _ready() -> void:
 	_dispatch_button.disabled = true
 	_dispatch_button.pressed.connect(_on_dispatch_pressed)
 	_back_button.pressed.connect(_on_back_pressed)
-	_generate_board()
+	_generate_board(_initial_board_offers)
 
 
 func get_selected_expedition() -> Dictionary:
@@ -43,6 +44,17 @@ func set_upgrade_effects(upgrade_effects: Dictionary) -> void:
 	_upgrade_effects = upgrade_effects.duplicate(true)
 	for card in _card_views:
 		card.set_upgrade_effects(_upgrade_effects)
+
+
+func set_initial_board_offers(board_offers: Array[Dictionary]) -> void:
+	_initial_board_offers = board_offers.duplicate(true)
+
+
+func get_board_offers() -> Array[Dictionary]:
+	var offers: Array[Dictionary] = []
+	for card in _card_views:
+		offers.append(card.expedition_data.duplicate(true))
+	return offers
 
 
 func replace_expedition_by_id(expedition_id: String, dispatched_expedition: Dictionary) -> void:
@@ -66,11 +78,15 @@ func replace_expedition_by_id(expedition_id: String, dispatched_expedition: Dict
 	_selection_label.text = "Select an expedition to continue."
 
 
-func _generate_board() -> void:
+func _generate_board(existing_offers: Array[Dictionary] = []) -> void:
 	_clear_cards()
 
-	var desired_count := randi_range(MIN_EXPEDITIONS, MAX_EXPEDITIONS)
-	var expeditions := _generator.generate_expeditions(desired_count)
+	var expeditions: Array[Dictionary] = []
+	if _is_valid_board_offers(existing_offers):
+		expeditions = existing_offers.duplicate(true)
+	else:
+		var desired_count := randi_range(MIN_EXPEDITIONS, MAX_EXPEDITIONS)
+		expeditions = _generator.generate_expeditions(desired_count)
 
 	for expedition in expeditions:
 		_add_card(expedition)
@@ -116,6 +132,16 @@ func _remove_card_by_expedition_id(expedition_id: String) -> bool:
 		return true
 
 	return false
+
+
+func _is_valid_board_offers(board_offers: Array[Dictionary]) -> bool:
+	if board_offers.size() < MIN_EXPEDITIONS or board_offers.size() > MAX_EXPEDITIONS:
+		return false
+
+	for offer in board_offers:
+		if str(offer.get("id", "")).is_empty():
+			return false
+	return true
 
 
 func _on_card_selected(expedition_data: Dictionary) -> void:

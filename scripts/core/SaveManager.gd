@@ -47,7 +47,8 @@ func save_game_state(state: Dictionary) -> bool:
 		"owned_upgrades": _coerce_string_array(state.get("owned_upgrades", [])),
 		"codex_discoveries": _coerce_string_array(state.get("codex_discoveries", [])),
 		"active_expedition": _coerce_dictionary(state.get("active_expedition", {})),
-		"pending_report": _coerce_dictionary(state.get("pending_report", {}))
+		"pending_report": _coerce_dictionary(state.get("pending_report", {})),
+		"expedition_board_offers": _coerce_dictionary_array(state.get("expedition_board_offers", []))
 	}
 
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -86,3 +87,15 @@ func _coerce_dictionary(value: Variant) -> Dictionary:
 	if value is Dictionary:
 		return (value as Dictionary).duplicate(true)
 	return {}
+
+
+func _coerce_dictionary_array(value: Variant) -> Array[Dictionary]:
+	var output: Array[Dictionary] = []
+	if not (value is Array):
+		return output
+
+	for item in value:
+		if not (item is Dictionary):
+			continue
+		output.append((item as Dictionary).duplicate(true))
+	return output
