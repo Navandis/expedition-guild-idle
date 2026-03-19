@@ -2,8 +2,10 @@ extends Control
 class_name DispatchController
 
 # DispatchController shows a minimal confirmation step before final dispatch.
-# In the two-slot milestone, it also shows clear messaging when dispatch is
-# blocked because both expedition slots are already occupied.
+# It computes messaging from a provided available-slot count so the label works
+# for 1, 2, or more slots without hardcoded wording.
+# When confirm is successful, GameManager routes back to Expedition Board so
+# players can quickly plan or launch the next expedition.
 
 signal confirmed(expedition_data: Dictionary)
 signal canceled
@@ -16,6 +18,8 @@ signal canceled
 
 var _expedition_data: Dictionary = {}
 var _dispatch_blocked := false
+const _AVAILABLE_MESSAGE_COLOR := Color(0.38, 0.74, 0.34, 1.0)
+const _UNAVAILABLE_MESSAGE_COLOR := Color(0.86, 0.28, 0.2, 1.0)
 
 
 func _ready() -> void:
@@ -33,16 +37,26 @@ func set_expedition_data(expedition_data: Dictionary) -> void:
 	_risk_label.text = "Risk: %s" % str(_expedition_data.get("risk_label", "Unknown"))
 
 
-func set_dispatch_blocked(is_blocked: bool, block_message: String = "") -> void:
-	_dispatch_blocked = is_blocked
+func set_dispatch_availability(available_slot_count: int, block_message: String = "") -> void:
+	# Dispatch is blocked only when no slot is available right now.
+	_dispatch_blocked = available_slot_count <= 0
 	if _dispatch_blocked:
 		var resolved_message := block_message.strip_edges()
 		if resolved_message.is_empty():
-			resolved_message = "Dispatch blocked: both expedition slots are occupied. Collect a pending report to free a slot."
+			resolved_message = "Dispatch blocked: all expedition slots are full."
 		_block_reason_label.text = resolved_message
+		_block_reason_label.add_theme_color_override("font_color", _UNAVAILABLE_MESSAGE_COLOR)
 	else:
-		_block_reason_label.text = "Both slots are available. Confirm to start this expedition."
+		_block_reason_label.text = build_dispatch_availability_message(available_slot_count)
+		_block_reason_label.add_theme_color_override("font_color", _AVAILABLE_MESSAGE_COLOR)
 	_refresh_block_state()
+
+
+func build_dispatch_availability_message(count: int) -> String:
+	# Singular/plural formatting keeps the UX accurate for any slot count.
+	if count == 1:
+		return "1 slot is available. Confirm to start this expedition"
+	return "%d slots are available. Confirm to start this expedition" % count
 
 
 func _refresh_block_state() -> void:
