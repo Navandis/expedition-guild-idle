@@ -60,12 +60,12 @@ custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 text = "Open Expedition Board"
 
-[node name="OpenUpgradesButton" type="Button" parent="SafeArea/RootColumn"]
+[node name="OpenUpgradesButton" type="Button" parent="SafeArea/RootColumn" unique_id=774331471]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Open Guild Upgrades"
 
-[node name="OpenCodexButton" type="Button" parent="SafeArea/RootColumn"]
+[node name="OpenCodexButton" type="Button" parent="SafeArea/RootColumn" unique_id=22295093]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Open Codex"
@@ -76,7 +76,7 @@ custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Open Expedition Report"
 
-[node name="PendingReportsLabel" type="Label" parent="SafeArea/RootColumn"]
+[node name="PendingReportsLabel" type="Label" parent="SafeArea/RootColumn" unique_id=43135772]
 layout_mode = 2
 text = "Pending Reports: 0"
 
@@ -86,7 +86,7 @@ custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Finish Active Expedition (Test)"
 
-[node name="DebugResetButton" type="Button" parent="SafeArea/RootColumn"]
+[node name="DebugResetButton" type="Button" parent="SafeArea/RootColumn" unique_id=143407976]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Reset Progress (Debug - Temporary)"
@@ -104,17 +104,17 @@ theme_override_constants/separation = 8
 layout_mode = 2
 text = "Expedition Slots (2 Max)"
 
-[node name="SlotOneLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
+[node name="SlotOneLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=980786867]
 layout_mode = 2
 text = "Slot 1: Empty"
 autowrap_mode = 3
 
-[node name="SlotTwoLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
+[node name="SlotTwoLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=1361604704]
 layout_mode = 2
 text = "Slot 2: Empty"
 autowrap_mode = 3
 
-[node name="SlotsHintLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
+[node name="SlotsHintLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=830968625]
 layout_mode = 2
 text = "Active slots run timers. Completed slots wait for report collection."
 autowrap_mode = 3

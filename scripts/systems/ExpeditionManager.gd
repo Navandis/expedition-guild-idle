@@ -211,7 +211,7 @@ func get_dispatch_block_message() -> String:
 	_update_runtime_status()
 	if can_start_expedition():
 		return ""
-	return "Dispatch blocked: both expedition slots are full."
+	return "Dispatch blocked: all expedition slots are full."
 
 
 func _compute_remaining_seconds_for(expedition_data: Dictionary) -> int:
