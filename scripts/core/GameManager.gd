@@ -3,17 +3,19 @@ extends Node
 # GameManager owns high-level screen flow and shared runtime state.
 # For this milestone it closes the first loop by coordinating:
 # dispatch -> wait/finish -> report -> collect -> resource update.
-# Day-3 extends this flow with the Guild Upgrades screen and applies purchased
-# upgrade effects to newly started expeditions and reward calculations.
+# Day-3 extends this flow with Guild Upgrades and a lightweight Codex,
+# so Home can open each screen while state stays in one place.
 
 const GUILD_HALL_SCENE := preload("res://scenes/guild_hall/GuildHall.tscn")
 const EXPEDITION_BOARD_SCENE := preload("res://scenes/expedition_board/ExpeditionBoard.tscn")
 const DISPATCH_SCREEN_SCENE := preload("res://scenes/dispatch/DispatchScreen.tscn")
 const EXPEDITION_REPORT_SCENE := preload("res://scenes/report/ExpeditionReport.tscn")
 const GUILD_UPGRADES_SCENE := preload("res://scenes/upgrades/GuildUpgrades.tscn")
+const CODEX_SCREEN_SCENE := preload("res://scenes/codex/CodexScreen.tscn")
 
 var _expedition_manager := ExpeditionManager.new()
 var _upgrade_system := UpgradeSystem.new()
+var _codex_system := CodexSystem.new()
 var _resources := {
 	"gold": 1250,
 	"relic_fragments": 0,
@@ -25,6 +27,7 @@ var _expedition_board_controller: ExpeditionBoardController
 var _dispatch_controller: DispatchController
 var _report_controller: ReportController
 var _upgrades_controller: UpgradesController
+var _codex_controller: CodexController
 var _mounted_screen: Control
 
 @onready var _ui_root: Control = $CanvasLayer/UIRoot
@@ -45,6 +48,7 @@ func _show_guild_hall() -> void:
 		_guild_hall_controller.open_expedition_board_requested.connect(_on_open_expedition_board_requested)
 		_guild_hall_controller.open_report_requested.connect(_on_open_report_requested)
 		_guild_hall_controller.open_upgrades_requested.connect(_on_open_upgrades_requested)
+		_guild_hall_controller.open_codex_requested.connect(_on_open_codex_requested)
 		_guild_hall_controller.debug_finish_requested.connect(_on_debug_finish_requested)
 
 	_show_screen(_guild_hall_controller)
@@ -103,6 +107,19 @@ func _show_upgrades_screen() -> void:
 	_refresh_upgrades_view()
 
 
+func _show_codex_screen() -> void:
+	if _codex_controller == null:
+		_codex_controller = CODEX_SCREEN_SCENE.instantiate() as CodexController
+		_codex_controller.back_requested.connect(_on_codex_back_requested)
+
+	_show_screen(_codex_controller)
+	# Codex screen reads a snapshot so it can render text without touching core state.
+	_codex_controller.set_codex_data(
+		_codex_system.get_total_discoveries(),
+		_codex_system.get_discovered_entries()
+	)
+
+
 func _show_screen(screen: Control) -> void:
 	if screen == null:
 		return
@@ -135,6 +152,10 @@ func _on_open_report_requested() -> void:
 
 func _on_open_upgrades_requested() -> void:
 	_show_upgrades_screen()
+
+
+func _on_open_codex_requested() -> void:
+	_show_codex_screen()
 
 
 func _on_debug_finish_requested() -> void:
@@ -179,6 +200,8 @@ func _on_dispatch_canceled() -> void:
 
 
 func _on_report_collect_requested() -> void:
+	var report_snapshot := _expedition_manager.get_pending_report()
+
 	# Reward collection is one-time and clears both report + completed expedition.
 	var rewards := _expedition_manager.collect_pending_report()
 	if rewards.is_empty():
@@ -188,6 +211,9 @@ func _on_report_collect_requested() -> void:
 	_resources["gold"] = int(_resources.get("gold", 0)) + int(rewards.get("gold", 0))
 	_resources["relic_fragments"] = int(_resources.get("relic_fragments", 0)) + int(rewards.get("relic_fragments", 0))
 	_resources["codex_entries"] = int(_resources.get("codex_entries", 0)) + int(rewards.get("codex_entries", 0))
+
+	# Record Codex discovery after a successful collect so the event is stable.
+	_codex_system.record_discovery_from_report(report_snapshot)
 	_show_guild_hall()
 
 
@@ -225,4 +251,8 @@ func _refresh_upgrades_view() -> void:
 
 
 func _on_report_close_requested() -> void:
+	_show_guild_hall()
+
+
+func _on_codex_back_requested() -> void:
 	_show_guild_hall()

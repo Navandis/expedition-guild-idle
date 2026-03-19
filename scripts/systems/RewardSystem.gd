@@ -6,6 +6,8 @@ class_name RewardSystem
 # loop is easy to follow and tweak while features are still minimal.
 # For day-3 progression, this includes tiny upgrade-aware modifiers for
 # success chance and gold rewards.
+# It now also forwards minimal expedition identity data so Codex discovery
+# tracking can be recorded when players collect finished reports.
 
 const OUTCOME_SUCCESS := "success"
 const OUTCOME_PARTIAL_SUCCESS := "partial_success"
@@ -19,6 +21,7 @@ static func create_report_for_expedition(expedition: Dictionary) -> Dictionary:
 	return {
 		"expedition_id": str(expedition.get("id", "")),
 		"expedition_display_name": str(expedition.get("display_name", "Unknown Expedition")),
+		"site_type": str(expedition.get("site_type", "unknown_site")),
 		"outcome": outcome,
 		"outcome_label": _to_outcome_label(outcome),
 		"rewards": rewards,
