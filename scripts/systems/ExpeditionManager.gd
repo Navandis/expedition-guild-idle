@@ -170,6 +170,13 @@ func restore_runtime_state(active_expedition: Dictionary, pending_report: Dictio
 	if not _pending_report.is_empty() and not _is_valid_pending_report(_pending_report):
 		_pending_report = {}
 
+	# A completed active expedition without a valid pending report is impossible in
+	# runtime and can soft-lock dispatch. Malformed/partial saves should fall back
+	# to no active state instead of preserving an uncollectable completion.
+	if not _active_expedition.is_empty() and _pending_report.is_empty():
+		if str(_active_expedition.get("status", STATUS_IDLE)) == STATUS_COMPLETED:
+			_active_expedition = {}
+
 	# If both are present, pending report takes priority and active run is discarded.
 	if not _pending_report.is_empty() and not _active_expedition.is_empty():
 		_active_expedition = {}
@@ -187,4 +194,8 @@ func _is_valid_active_expedition(data: Dictionary) -> bool:
 func _is_valid_pending_report(data: Dictionary) -> bool:
 	if str(data.get("expedition_id", "")).is_empty():
 		return false
-	return data.get("rewards", {}) is Dictionary
+	if not (data.get("rewards", {}) is Dictionary):
+		return false
+	# Restored reports must still be collectable; an already-collected report would
+	# block dispatch forever because collect_pending_report() returns early.
+	return not bool(data.get("collected", false))
