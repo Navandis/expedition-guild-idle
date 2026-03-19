@@ -26,7 +26,7 @@ func _ready() -> void:
 func set_report_data(report: Dictionary) -> void:
 	# All text is set here so scene defaults are only placeholders.
 	var pending_index := int(report.get("queue_index", 0)) + 1
-	var pending_total := max(1, int(report.get("queue_total", 1)))
+	var pending_total: int = maxi(1, int(report.get("queue_total", 1)))
 	_queue_label.text = "Report %d of %d" % [pending_index, pending_total]
 
 	_expedition_name_label.text = "Expedition: %s" % str(report.get("expedition_display_name", "Unknown Expedition"))
