@@ -58,6 +58,7 @@ func _show_expedition_board() -> void:
 		_expedition_board_controller.expedition_dispatch_requested.connect(_on_expedition_dispatch_requested)
 		_expedition_board_controller.return_to_guild_hall_requested.connect(_on_return_to_guild_hall_requested)
 
+	_expedition_board_controller.set_duration_multiplier(float(_upgrade_system.get_effects_summary().get("duration_multiplier", 1.0)))
 	_show_screen(_expedition_board_controller)
 
 
@@ -198,6 +199,10 @@ func _on_upgrade_purchase_requested(upgrade_id: String) -> void:
 	var result := _upgrade_system.try_purchase_upgrade(upgrade_id, int(_resources.get("gold", 0)))
 	if bool(result.get("ok", false)):
 		_resources["gold"] = int(result.get("remaining_gold", int(_resources.get("gold", 0))))
+		if _expedition_board_controller != null:
+			_expedition_board_controller.set_duration_multiplier(
+				float(_upgrade_system.get_effects_summary().get("duration_multiplier", 1.0))
+			)
 
 	_refresh_upgrades_view()
 	if _upgrades_controller != null:

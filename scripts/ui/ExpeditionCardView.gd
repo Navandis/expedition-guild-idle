@@ -13,6 +13,7 @@ var _reward_label: Label
 var _hazard_label: Label
 
 var expedition_data: Dictionary = {}
+var _duration_multiplier: float = 1.0
 
 
 func _ready() -> void:
@@ -31,11 +32,16 @@ func set_expedition_data(data: Dictionary) -> void:
 	# Deep copy keeps the card's local state isolated from external changes.
 	expedition_data = data.duplicate(true)
 	_name_label.text = str(expedition_data.get("display_name", "Unknown Expedition"))
-	_duration_label.text = "Duration: %s min" % str(expedition_data.get("duration_minutes", "?"))
+	_update_duration_label()
 	_risk_label.text = "Risk: %s" % str(expedition_data.get("risk_label", "Unknown"))
 	# Player-facing text should use display names, not internal IDs.
 	_reward_label.text = "Reward: %s" % str(expedition_data.get("reward_profile_name", "Balanced"))
 	_hazard_label.text = "Hazard: %s" % str(expedition_data.get("hazard_name", "Unknown"))
+
+
+func set_duration_multiplier(duration_multiplier: float) -> void:
+	_duration_multiplier = maxf(0.20, duration_multiplier)
+	_update_duration_label()
 
 
 func set_selected(is_selected: bool) -> void:
@@ -64,3 +70,17 @@ func _resolve_labels() -> bool:
 		and _risk_label != null \
 		and _reward_label != null \
 		and _hazard_label != null
+
+
+func _update_duration_label() -> void:
+	if _duration_label == null:
+		return
+
+	var base_duration := int(expedition_data.get("duration_minutes", 0))
+	if base_duration <= 0:
+		_duration_label.text = "Duration: ? min"
+		return
+
+	var adjusted_duration := int(round(base_duration * _duration_multiplier))
+	adjusted_duration = max(1, adjusted_duration)
+	_duration_label.text = "Duration: %d min" % adjusted_duration
