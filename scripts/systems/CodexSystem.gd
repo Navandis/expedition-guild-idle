@@ -31,3 +31,15 @@ func get_total_discoveries() -> int:
 func get_discovered_entries() -> Array[String]:
 	# Return a copy so UI callers cannot mutate system-owned data by accident.
 	return _discovered_site_types.duplicate()
+
+
+
+func restore_discoveries(saved_entries: Array[String]) -> void:
+	# Load flow: normalize values and de-duplicate so malformed save data is safe.
+	_discovered_site_types.clear()
+	for entry in saved_entries:
+		var key := str(entry).strip_edges()
+		if key.is_empty() or _discovered_site_types.has(key):
+			continue
+		_discovered_site_types.append(key)
+	_discovered_site_types.sort()
