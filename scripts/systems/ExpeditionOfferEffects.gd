@@ -6,6 +6,7 @@ class_name ExpeditionOfferEffects
 # so dispatch/runtime systems can keep using canonical values.
 
 const MIN_MULTIPLIER := 0.20
+const UPGRADE_EFFECTS_APPLIED_KEY := "_upgrade_effects_applied"
 
 
 static func build_preview(expedition_offer: Dictionary, upgrade_effects: Dictionary) -> Dictionary:
@@ -13,6 +14,7 @@ static func build_preview(expedition_offer: Dictionary, upgrade_effects: Diction
 
 	_apply_duration_preview(preview, upgrade_effects)
 	_apply_risk_preview(preview, upgrade_effects)
+	preview[UPGRADE_EFFECTS_APPLIED_KEY] = true
 	return preview
 
 

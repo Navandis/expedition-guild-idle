@@ -45,7 +45,8 @@ func set_selected(is_selected: bool) -> void:
 
 
 func _on_pressed() -> void:
-	pressed_with_data.emit(expedition_data.duplicate(true))
+	var selected_preview := ExpeditionOfferEffects.build_preview(expedition_data, _upgrade_effects)
+	pressed_with_data.emit(selected_preview)
 
 
 func _resolve_labels() -> bool:

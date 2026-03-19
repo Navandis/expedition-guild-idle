@@ -35,16 +35,16 @@ func start_expedition(expedition_offer: Dictionary, upgrade_effects: Dictionary 
 	if not can_start_expedition():
 		return false
 
+	var effective_offer := expedition_offer.duplicate(true)
+	if not bool(effective_offer.get(ExpeditionOfferEffects.UPGRADE_EFFECTS_APPLIED_KEY, false)):
+		effective_offer = ExpeditionOfferEffects.build_preview(expedition_offer, upgrade_effects)
+
 	# Clamp duration so malformed content cannot create a zero-length timer.
-	var base_duration_minutes := int(expedition_offer.get("duration_minutes", 0))
-	var duration_multiplier := float(upgrade_effects.get("duration_multiplier", 1.0))
-	var duration_minutes := int(round(base_duration_minutes * duration_multiplier))
+	var duration_minutes := int(effective_offer.get("duration_minutes", 0))
 	if duration_minutes <= 0:
 		duration_minutes = 1
 
-	var base_success := float(expedition_offer.get("base_success", 0.75))
-	var success_bonus := float(upgrade_effects.get("success_bonus", 0.0))
-	var final_success := clampf(base_success + success_bonus, 0.05, 0.99)
+	var final_success := clampf(float(effective_offer.get("base_success", 0.75)), 0.05, 0.99)
 	var gold_multiplier: float = maxf(0.20, float(upgrade_effects.get("gold_multiplier", 1.0)))
 
 	# Track wall-clock timestamps in unix seconds for cheap runtime checks.
@@ -52,11 +52,11 @@ func start_expedition(expedition_offer: Dictionary, upgrade_effects: Dictionary 
 	var finish_unix := start_unix + (duration_minutes * 60)
 
 	_active_expedition = {
-		"id": str(expedition_offer.get("id", "")),
-		"display_name": str(expedition_offer.get("display_name", "Unknown Expedition")),
+		"id": str(effective_offer.get("id", "")),
+		"display_name": str(effective_offer.get("display_name", "Unknown Expedition")),
 		"duration_minutes": duration_minutes,
-		"base_duration_minutes": max(1, base_duration_minutes),
-		"risk_label": str(expedition_offer.get("risk_label", "Unknown")),
+		"base_duration_minutes": duration_minutes,
+		"risk_label": str(effective_offer.get("risk_label", "Unknown")),
 		# Store values used by RewardSystem to resolve upgraded outcomes/rewards.
 		"base_success": final_success,
 		"gold_multiplier": gold_multiplier,
