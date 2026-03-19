@@ -23,6 +23,7 @@ const MAX_EXPEDITIONS := 5
 var _generator := ExpeditionGenerator.new()
 var _selected_expedition: Dictionary = {}
 var _card_views: Array[ExpeditionCardView] = []
+var _upgrade_effects: Dictionary = {}
 
 
 func _ready() -> void:
@@ -36,6 +37,12 @@ func _ready() -> void:
 
 func get_selected_expedition() -> Dictionary:
 	return _selected_expedition.duplicate(true)
+
+
+func set_upgrade_effects(upgrade_effects: Dictionary) -> void:
+	_upgrade_effects = upgrade_effects.duplicate(true)
+	for card in _card_views:
+		card.set_upgrade_effects(_upgrade_effects)
 
 
 func replace_expedition_by_id(expedition_id: String, dispatched_expedition: Dictionary) -> void:
@@ -80,6 +87,7 @@ func _add_card(expedition: Dictionary) -> void:
 	# display fields and emit them back when clicked.
 	_cards_container.add_child(card)
 	card.set_expedition_data(expedition)
+	card.set_upgrade_effects(_upgrade_effects)
 	card.pressed_with_data.connect(_on_card_selected)
 	card.set_selected(false)
 	_card_views.append(card)
