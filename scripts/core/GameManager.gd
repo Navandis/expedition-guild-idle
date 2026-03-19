@@ -3,8 +3,8 @@ extends Node
 # GameManager owns high-level screen flow and shared runtime state.
 # For this milestone it closes the first loop by coordinating:
 # dispatch -> wait/finish -> report -> collect -> resource update.
-# Day-3 extends this flow with Guild Upgrades and a lightweight Codex,
-# so Home can open each screen while state stays in one place.
+# Day-3 extends this flow with Guild Upgrades, a lightweight Codex,
+# and plain-JSON persistence so restart testing keeps progress between sessions.
 
 const GUILD_HALL_SCENE := preload("res://scenes/guild_hall/GuildHall.tscn")
 const EXPEDITION_BOARD_SCENE := preload("res://scenes/expedition_board/ExpeditionBoard.tscn")
@@ -16,6 +16,7 @@ const CODEX_SCREEN_SCENE := preload("res://scenes/codex/CodexScreen.tscn")
 var _expedition_manager := ExpeditionManager.new()
 var _upgrade_system := UpgradeSystem.new()
 var _codex_system := CodexSystem.new()
+var _save_manager := SaveManager.new()
 var _resources := {
 	"gold": 1250,
 	"relic_fragments": 0,
@@ -34,6 +35,7 @@ var _mounted_screen: Control
 
 
 func _ready() -> void:
+	_load_runtime_state()
 	_show_guild_hall()
 
 
@@ -192,6 +194,7 @@ func _on_dispatch_confirmed(expedition_data: Dictionary) -> void:
 			expedition_data
 		)
 
+	_save_runtime_state()
 	_show_guild_hall()
 
 
@@ -214,6 +217,7 @@ func _on_report_collect_requested() -> void:
 
 	# Record Codex discovery after a successful collect so the event is stable.
 	_codex_system.record_discovery_from_report(report_snapshot)
+	_save_runtime_state()
 	_show_guild_hall()
 
 
@@ -227,6 +231,7 @@ func _on_upgrade_purchase_requested(upgrade_id: String) -> void:
 		_resources["gold"] = int(result.get("remaining_gold", int(_resources.get("gold", 0))))
 		if _expedition_board_controller != null:
 			_expedition_board_controller.set_upgrade_effects(_upgrade_system.get_effects_summary())
+		_save_runtime_state()
 
 	_refresh_upgrades_view()
 	if _upgrades_controller != null:
@@ -254,5 +259,55 @@ func _on_report_close_requested() -> void:
 	_show_guild_hall()
 
 
+func _load_runtime_state() -> void:
+	# Load flow: start from defaults, then apply any valid JSON save values.
+	var save_data := _save_manager.load_game_state()
+	if save_data.is_empty():
+		return
+
+	# Missing keys are safe: each system uses default fallback values.
+	_resources = _sanitize_resources(save_data.get("resources", {}))
+	_upgrade_system.restore_owned_upgrade_ids(_to_string_array(save_data.get("owned_upgrades", [])))
+	_codex_system.restore_discoveries(_to_string_array(save_data.get("codex_discoveries", [])))
+	_expedition_manager.restore_runtime_state(
+		save_data.get("active_expedition", {}) as Dictionary,
+		save_data.get("pending_report", {}) as Dictionary
+	)
+
+
+func _save_runtime_state() -> void:
+	# Save flow: capture a snapshot from owner systems and write plain JSON.
+	_save_manager.save_game_state({
+		"resources": _resources,
+		"owned_upgrades": _upgrade_system.get_owned_upgrade_ids(),
+		"codex_discoveries": _codex_system.get_discovered_entries(),
+		"active_expedition": _expedition_manager.get_active_expedition(),
+		"pending_report": _expedition_manager.get_pending_report()
+	})
+
+
+func _sanitize_resources(value: Variant) -> Dictionary:
+	var source := value as Dictionary if value is Dictionary else {}
+	return {
+		"gold": int(source.get("gold", int(_resources.get("gold", 0)))),
+		"relic_fragments": int(source.get("relic_fragments", int(_resources.get("relic_fragments", 0)))),
+		"codex_entries": int(source.get("codex_entries", int(_resources.get("codex_entries", 0))))
+	}
+
+
+func _to_string_array(value: Variant) -> Array[String]:
+	var result: Array[String] = []
+	if value is Array:
+		for item in value:
+			result.append(str(item))
+	return result
+
+
 func _on_codex_back_requested() -> void:
 	_show_guild_hall()
+
+
+func _notification(what: int) -> void:
+	# Save when the app exits so prototype testing survives restarts.
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_EXIT_TREE:
+		_save_runtime_state()
