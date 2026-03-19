@@ -1,90 +1,108 @@
-# Current Milestone — Day 3
+# Current Milestone — Multi-Slot Expeditions
 
 ## Milestone Name
-Light Progression + Persistence Layer
+Two-Slot Expedition Flow
 
 ## Goal
-Extend the working expedition loop with the first lightweight progression systems and a basic persistence layer.
+Expand the prototype from a single active expedition into a small multi-slot version of the core loop.
 
 This milestone is successful when the player can:
-- complete expeditions and earn resources
-- spend gold on visible guild upgrades
-- see simple discovery progress in a Codex screen
-- close and reopen the game without losing core prototype progress
+- run up to 2 expeditions at the same time
+- see both slots clearly from the Home / Guild Hall screen
+- dispatch new expeditions while another slot is already active
+- handle multiple completed expeditions safely through pending reports
+- save/load this multi-slot state correctly
 
-This milestone should deepen the current loop without widening the project scope.
+This milestone is intended to improve the feel of the loop without widening the game design.
 
 ---
 
 ## Current Repo State
 Already working:
-- main screen flow and runtime screen hosting
-- expedition board generation and selection
+- expedition generation and expedition board
 - dispatch confirmation flow
-- one active expedition at a time
-- expedition completion and report generation
+- expedition completion and reports
 - reward collection
-- visible runtime resource totals
+- resources
+- upgrades
+- codex/discoveries
+- save/load persistence
+- debug reset and debug complete tools
 
-Not yet implemented:
-- purchasable guild upgrades
-- codex / discovery tracking
-- save/load persistence across game restarts
+Current limitation:
+- only one expedition can be active at a time
+- one pending report blocks further dispatch
 
 ---
 
 ## In Scope
 
 ### Systems in scope
-- JSON-driven guild upgrades
-- visible upgrade purchasing with gold
-- applying simple upgrade effects to future expeditions where relevant
-- codex tracking for completed discoveries using a deliberately simple rule
-- codex screen for viewing discoveries
-- basic save/load using plain JSON
-- restoring prototype state on restart
+- support exactly 2 active expedition slots
+- replace single active expedition state with a 2-slot structure
+- replace single pending report state with a queue or list of pending reports
+- keep expedition completion logic per slot
+- keep reward collection one-time and safe
+- preserve existing upgrade effects, codex discovery recording, and save/load behavior
 
 ### UI in scope
-- Guild Upgrades screen
-- Codex / Discoveries screen
-- basic buttons/navigation from Home to Upgrades and Codex
-- simple save/load integration that does not require a dedicated save UI
+- Home / Guild Hall must show 2 expedition slots clearly
+- each slot should show:
+  - empty / active / completed state
+  - expedition name when occupied
+  - remaining time when active
+- pending reports should be visible as a count or list
+- opening reports should work cleanly when multiple reports exist
+- Expedition Board should allow dispatch while at least one slot is free
+- Dispatch flow should clearly explain when all slots are full
 
 ### Save data in scope
-- resources
-- purchased upgrades
-- codex discoveries
-- active expedition state
-- pending report state if practical
+- 2 active expedition slots
+- pending reports queue/list
+- all current resource / upgrade / codex state
 
 ---
 
 ## Explicitly Out of Scope
 Do not implement any of the following during this milestone:
 
+- more than 2 expedition slots
+- specialist assignment per slot
+- team composition
+- slot-specific upgrades
+- report comparison screen
+- bulk collect all reports
+- offline catch-up redesign
 - prestige
-- specialists
-- multiple simultaneous expeditions
-- deep collection set bonuses
-- artifact crafting or item inventories
-- offline progress / catch-up
-- migration/versioning beyond a simple safe prototype approach
-- backend / online systems
-- monetization
-- polish animations
-- broad architecture refactors unless required for correctness
+- contracts
+- events
+- inventory systems
+- deeper codex mechanics
+- refactoring unrelated systems unless required for correctness
 
 ---
 
 ## Design Constraints
 - Godot 4
 - GDScript only
-- keep implementation simple, readable, and prototype-friendly
-- use plain JSON for content and save data
-- keep upgrade effects intentionally small and understandable
-- codex discovery logic should be intentionally simple
-- no speculative architecture
-- do not reorganize the repo structure
+- keep implementation simple and readable
+- prefer explicit data structures over clever abstractions
+- preserve current screen flow where possible
+- do not redesign the prototype around party/team systems yet
+- keep this milestone focused on “2 concurrent expeditions” only
+
+---
+
+## Core Design Decisions
+To keep complexity low, use these rules:
+
+1. The prototype supports exactly 2 expedition slots.
+2. Dispatch should use the first available free slot automatically.
+3. If both slots are full, dispatch is blocked with clear messaging.
+4. Completed expeditions should create pending reports in a queue/list.
+5. Reports should be opened and collected one at a time.
+6. Reward collection remains one-time only.
+7. Debug tools should continue to work with the new multi-slot model.
 
 ---
 
@@ -93,69 +111,69 @@ For every new or updated script in this milestone:
 
 - add a short file header comment at the top describing:
   - what the script is responsible for
-  - how it fits into the current day-3 flow
+  - how it fits into the multi-slot flow
 - add inline comments where helpful to explain:
-  - upgrade loading and application flow
-  - codex discovery recording flow
-  - save/load flow
-  - any key state transitions or edge-case handling
+  - slot assignment
+  - slot completion
+  - pending report queue handling
+  - save/load restore behavior for multiple slots
+  - how debug-complete behavior works with multiple active slots
 - write comments for a novice engineer
 - keep comments useful and concise; do not comment every trivial line
 
 For scenes:
 - use clear node names
 - keep hierarchy straightforward
-- put explanatory comments in the controller scripts where scene behavior needs explanation
+- put explanatory comments in controller scripts where scene behavior needs explanation
 
 ---
 
 ## Build Order
 Implement in this order:
 
-1. Guild upgrades
-2. Codex / discoveries
-3. Save/load
-
-Do not start save/load before upgrades and codex are stable enough to persist.
+1. runtime data model for 2 active slots + report queue
+2. Home / Guild Hall UI updates
+3. dispatch flow updates
+4. report queue handling
+5. save/load updates
+6. debug-tool compatibility
+7. edge-case cleanup
 
 ---
 
-## Day-3 Deliverables
+## Deliverables
 By the end of this milestone, the prototype should include:
 
-1. A JSON file for guild upgrades
-2. An UpgradeSystem that loads upgrades and applies simple effects
-3. A Guild Upgrades screen with visible purchasable upgrades
-4. A CodexSystem that records simple discoveries
-5. A Codex screen that displays discovery progress
-6. A SaveManager that saves and loads prototype state using plain JSON
-7. Startup restore of saved state
-8. Reasonable preservation of:
-   - resources
-   - purchased upgrades
-   - codex progress
-   - active expedition
-   - pending report (if practical)
+1. support for exactly 2 simultaneous active expeditions
+2. a Home / Guild Hall screen that clearly shows both slots
+3. dispatch flow that fills the first free slot automatically
+4. blocked dispatch messaging when all slots are occupied
+5. pending reports handled through a queue/list
+6. one-at-a-time report viewing and collection
+7. save/load support for 2 active slots and multiple pending reports
+8. compatibility with existing upgrades, codex, and debug tools
 
 ---
 
 ## Acceptance Criteria
 This milestone is complete when all of the following are true:
 
-- The player can open an Upgrades screen
-- The player can purchase at least 3 visible upgrades with gold
-- Purchased upgrades affect future expedition behavior where relevant
-- The player can open a Codex screen
-- Completed expeditions add discoverable entries using a simple rule
-- Codex progress is visible and updates correctly
-- Closing and reopening the project restores core prototype state well enough for continued testing
+- The player can dispatch an expedition into slot 1
+- The player can dispatch a second expedition while slot 1 is still active
+- The player cannot dispatch a third expedition
+- The Home screen clearly shows both slot states
+- Completed expeditions generate pending reports without breaking other active slots
+- Multiple pending reports can be opened and collected safely, one at a time
+- Reward collection still works once and only once
+- Save/load restores the 2-slot runtime state safely
+- Debug finish/reset tools still function correctly
 - New and updated scripts contain beginner-friendly comments
 
 ---
 
 ## Notes for Codex
 - Build only what is required for this milestone
-- Prefer simple and explicit implementations over clever abstractions
-- Keep upgrade math modest and easy to inspect
-- Keep codex logic intentionally shallow for v0.1
-- Keep save/load plain and prototype-safe
+- Keep the implementation explicit and prototype-friendly
+- Prefer a small queue/list model over a large manager hierarchy
+- Do not introduce team/party systems yet
+- Do not widen the design beyond 2 concurrent expeditions
