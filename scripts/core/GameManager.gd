@@ -170,6 +170,8 @@ func _on_open_codex_requested() -> void:
 func _on_debug_finish_requested() -> void:
 	# Debug-complete reuses ExpeditionManager's real slot completion path.
 	_expedition_manager.complete_all_active_expeditions_for_debug()
+	# Persist immediately so force-completed slots/reports survive app restarts.
+	_save_runtime_state()
 	if _expedition_manager.has_pending_report():
 		_show_report_screen()
 
@@ -345,9 +347,10 @@ func _save_runtime_state() -> void:
 func _sanitize_resources(value: Variant) -> Dictionary:
 	var source := value as Dictionary if value is Dictionary else {}
 	return {
-		"gold": int(source.get("gold", int(_resources.get("gold", 0)))),
-		"relic_fragments": int(source.get("relic_fragments", int(_resources.get("relic_fragments", 0)))),
-		"codex_entries": int(source.get("codex_entries", int(_resources.get("codex_entries", 0))))
+		# Clamp to 0 so malformed saves cannot create confusing negative totals.
+		"gold": maxi(0, int(source.get("gold", int(_resources.get("gold", 0))))),
+		"relic_fragments": maxi(0, int(source.get("relic_fragments", int(_resources.get("relic_fragments", 0))))),
+		"codex_entries": maxi(0, int(source.get("codex_entries", int(_resources.get("codex_entries", 0)))))
 	}
 
 

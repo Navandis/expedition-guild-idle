@@ -77,7 +77,7 @@ func _refresh_active_status() -> void:
 	if _expedition_manager == null:
 		_slot_one_label.text = "Slot 1: Empty"
 		_slot_two_label.text = "Slot 2: Empty"
-		_pending_reports_label.text = "Pending Reports: 0"
+		_pending_reports_label.text = "Pending Reports: 0 (none ready)"
 		_open_report_button.visible = false
 		_debug_finish_button.visible = false
 		return
@@ -87,14 +87,17 @@ func _refresh_active_status() -> void:
 	_slot_two_label.text = _build_slot_text(1, slots)
 
 	var pending_count := _expedition_manager.get_pending_report_count()
-	_pending_reports_label.text = "Pending Reports: %d" % pending_count
+	if pending_count > 0:
+		_pending_reports_label.text = "Pending Reports: %d ready to collect" % pending_count
+	else:
+		_pending_reports_label.text = "Pending Reports: 0 (none ready)"
 
 	# Show report button only when a completion report is waiting.
 	_open_report_button.visible = pending_count > 0
 	if pending_count > 0:
-		_open_report_button.text = "Open Expedition Report (%d)" % pending_count
+		_open_report_button.text = "View Pending Reports (%d)" % pending_count
 	else:
-		_open_report_button.text = "Open Expedition Report"
+		_open_report_button.text = "View Pending Reports"
 
 	# TEMPORARY DEBUG BUTTON: this is test-only and can be removed once QA no longer
 	# needs instant completion during development.
