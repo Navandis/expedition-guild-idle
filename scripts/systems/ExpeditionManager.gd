@@ -278,6 +278,17 @@ func restore_runtime_state(active_expeditions: Variant, pending_reports: Variant
 			report["slot_index"] = guessed_slot
 		_pending_reports[report_index] = report
 
+	# Recovery guard: a completed slot must have a matching queued report.
+	# If malformed save data restores STATUS_COMPLETED without its report,
+	# dispatch would stay blocked forever because nothing can clear that slot.
+	for slot_index in range(MAX_ACTIVE_SLOTS):
+		var slot_data := _active_expeditions[slot_index]
+		if str(slot_data.get("status", STATUS_IDLE)) != STATUS_COMPLETED:
+			continue
+		if _has_pending_report_for_completed_slot(slot_index, slot_data):
+			continue
+		_active_expeditions[slot_index] = {}
+
 
 func _is_valid_active_expedition(data: Dictionary) -> bool:
 	if str(data.get("id", "")).is_empty():
@@ -341,3 +352,14 @@ func _find_slot_index_for_report(report: Dictionary) -> int:
 		if str(slot_data.get("id", "")) == expedition_id:
 			return slot_index
 	return -1
+
+
+func _has_pending_report_for_completed_slot(slot_index: int, slot_data: Dictionary) -> bool:
+	var expedition_id := str(slot_data.get("id", ""))
+	for report in _pending_reports:
+		var report_slot := int(report.get("slot_index", -1))
+		if report_slot == slot_index:
+			return true
+		if not expedition_id.is_empty() and str(report.get("expedition_id", "")) == expedition_id:
+			return true
+	return false
