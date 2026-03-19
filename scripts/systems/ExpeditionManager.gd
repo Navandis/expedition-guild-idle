@@ -360,6 +360,9 @@ func _has_pending_report_for_completed_slot(slot_index: int, slot_data: Dictiona
 		var report_slot := int(report.get("slot_index", -1))
 		if report_slot == slot_index:
 			return true
+		var has_usable_slot_index := report_slot >= 0 and report_slot < MAX_ACTIVE_SLOTS
+		if has_usable_slot_index:
+			continue
 		if not expedition_id.is_empty() and str(report.get("expedition_id", "")) == expedition_id:
 			return true
 	return false
