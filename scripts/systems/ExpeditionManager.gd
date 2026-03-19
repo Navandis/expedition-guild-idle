@@ -155,3 +155,36 @@ func _update_runtime_status() -> void:
 	# Timer completion and debug completion both converge through this method.
 	if _compute_remaining_seconds() <= 0:
 		complete_active_expedition()
+
+
+func restore_runtime_state(active_expedition: Dictionary, pending_report: Dictionary) -> void:
+	# Load flow: copy raw dictionaries first, then sanitize required fields below.
+	_active_expedition = active_expedition.duplicate(true) if active_expedition is Dictionary else {}
+	_pending_report = pending_report.duplicate(true) if pending_report is Dictionary else {}
+
+	# Safe fallback for malformed active expedition payloads: clear invalid runs.
+	if not _active_expedition.is_empty() and not _is_valid_active_expedition(_active_expedition):
+		_active_expedition = {}
+
+	# Pending report is optional for prototype restore; invalid shapes are dropped.
+	if not _pending_report.is_empty() and not _is_valid_pending_report(_pending_report):
+		_pending_report = {}
+
+	# If both are present, pending report takes priority and active run is discarded.
+	if not _pending_report.is_empty() and not _active_expedition.is_empty():
+		_active_expedition = {}
+
+
+func _is_valid_active_expedition(data: Dictionary) -> bool:
+	if str(data.get("id", "")).is_empty():
+		return false
+	if int(data.get("expected_finish_time", 0)) <= 0:
+		return false
+	var status := str(data.get("status", STATUS_IDLE))
+	return status == STATUS_IN_PROGRESS or status == STATUS_COMPLETED
+
+
+func _is_valid_pending_report(data: Dictionary) -> bool:
+	if str(data.get("expedition_id", "")).is_empty():
+		return false
+	return data.get("rewards", {}) is Dictionary
