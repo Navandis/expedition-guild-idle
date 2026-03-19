@@ -2,10 +2,9 @@ extends Control
 class_name GuildHallController
 
 # GuildHallController is the home screen for the current gameplay loop.
-# It shows runtime resources, active expedition status, and entry points to
-# either start a run or review/collect a completed expedition report.
-# For day-3, it also exposes navigation into Guild Upgrades and the new
-# Codex Discoveries screen so collection progress is easy to check.
+# In the two-slot milestone it shows both expedition slots (empty/active/
+# completed), the pending report count, and entry points to dispatch/reports.
+# It also exposes Upgrades/Codex navigation and temporary debug controls.
 # This script also exposes temporary debug controls:
 # - finish active expedition instantly (test-only)
 # - reset all prototype progress through GameManager's shared baseline reset flow.
@@ -21,13 +20,13 @@ signal debug_reset_requested
 @onready var _relic_fragments_label: Label = $SafeArea/RootColumn/ResourcesPanel/ResourceRows/RelicFragmentsLabel
 @onready var _codex_entries_label: Label = $SafeArea/RootColumn/ResourcesPanel/ResourceRows/CodexEntriesLabel
 @onready var _open_report_button: Button = $SafeArea/RootColumn/OpenReportButton
+@onready var _pending_reports_label: Label = $SafeArea/RootColumn/PendingReportsLabel
 @onready var _open_upgrades_button: Button = $SafeArea/RootColumn/OpenUpgradesButton
 @onready var _open_codex_button: Button = $SafeArea/RootColumn/OpenCodexButton
 @onready var _debug_finish_button: Button = $SafeArea/RootColumn/DebugFinishButton
 @onready var _debug_reset_button: Button = $SafeArea/RootColumn/DebugResetButton
-@onready var _active_name_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/ActiveNameLabel
-@onready var _remaining_time_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/RemainingTimeLabel
-@onready var _active_status_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/StatusLabel
+@onready var _slot_one_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/SlotOneLabel
+@onready var _slot_two_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/SlotTwoLabel
 
 var _expedition_manager: ExpeditionManager
 var _resources := {
@@ -72,36 +71,30 @@ func _refresh_resource_labels() -> void:
 
 func _refresh_active_status() -> void:
 	# onready refs can be null during scene teardown/reparenting.
-	if _active_name_label == null or _remaining_time_label == null or _active_status_label == null:
+	if _slot_one_label == null or _slot_two_label == null:
 		return
 
 	if _expedition_manager == null:
-		_active_name_label.text = "Expedition: None"
-		_remaining_time_label.text = "Remaining: --:--"
-		_active_status_label.text = "Status: No active expedition"
+		_slot_one_label.text = "Slot 1: Empty"
+		_slot_two_label.text = "Slot 2: Empty"
+		_pending_reports_label.text = "Pending Reports: 0"
 		_open_report_button.visible = false
 		_debug_finish_button.visible = false
 		return
 
-	var expedition := _expedition_manager.get_active_expedition()
-	var has_report := _expedition_manager.has_pending_report()
+	var slots := _expedition_manager.get_active_expeditions()
+	_slot_one_label.text = _build_slot_text(0, slots)
+	_slot_two_label.text = _build_slot_text(1, slots)
 
-	if expedition.is_empty():
-		_active_name_label.text = "Expedition: None"
-		_remaining_time_label.text = "Remaining: --:--"
-		_active_status_label.text = "Status: No active expedition"
-	else:
-		# Names come from offer data; fallback text protects against malformed payloads.
-		_active_name_label.text = "Expedition: %s" % str(expedition.get("display_name", "Unknown Expedition"))
-		_active_status_label.text = "Status: %s" % _expedition_manager.get_status_label()
-
-		if _expedition_manager.has_active_expedition():
-			_remaining_time_label.text = "Remaining: %s" % _expedition_manager.get_remaining_time_text()
-		else:
-			_remaining_time_label.text = "Remaining: 00:00"
+	var pending_count := _expedition_manager.get_pending_report_count()
+	_pending_reports_label.text = "Pending Reports: %d" % pending_count
 
 	# Show report button only when a completion report is waiting.
-	_open_report_button.visible = has_report
+	_open_report_button.visible = pending_count > 0
+	if pending_count > 0:
+		_open_report_button.text = "Open Expedition Report (%d)" % pending_count
+	else:
+		_open_report_button.text = "Open Expedition Report"
 
 	# TEMPORARY DEBUG BUTTON: this is test-only and can be removed once QA no longer
 	# needs instant completion during development.
@@ -109,6 +102,22 @@ func _refresh_active_status() -> void:
 	# TEMPORARY DEBUG BUTTON: always available in Guild Hall so testers can quickly
 	# clear save + runtime state and return to a known clean baseline.
 	_debug_reset_button.visible = true
+
+
+func _build_slot_text(slot_index: int, slots: Array[Dictionary]) -> String:
+	if slot_index < 0 or slot_index >= slots.size():
+		return "Slot %d: Empty" % (slot_index + 1)
+
+	var slot_data := slots[slot_index]
+	if slot_data.is_empty():
+		return "Slot %d: Empty" % (slot_index + 1)
+
+	var expedition_name := str(slot_data.get("display_name", "Unknown Expedition"))
+	var status := str(slot_data.get("status", ExpeditionManager.STATUS_IDLE))
+	if status == ExpeditionManager.STATUS_IN_PROGRESS:
+		var remaining_text := _expedition_manager.get_remaining_time_text_for_slot(slot_index)
+		return "Slot %d: Active - %s (%s left)" % [slot_index + 1, expedition_name, remaining_text]
+	return "Slot %d: Completed - %s (Report queued)" % [slot_index + 1, expedition_name]
 
 
 func _on_open_board_pressed() -> void:
