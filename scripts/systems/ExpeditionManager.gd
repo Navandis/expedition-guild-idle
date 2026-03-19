@@ -5,7 +5,8 @@ class_name ExpeditionManager
 # In this milestone it supports exactly 2 expedition slots (not more), tracks
 # per-slot timer completion, and queues completed reports so they can be opened
 # and collected one at a time. It also keeps one-time reward collection rules,
-# applies upgrade effects at dispatch time, and exposes save/restore helpers.
+# applies upgrade effects at dispatch time, exposes save/restore helpers, and
+# provides slot-availability counts so UI can show future-proof dispatch text.
 
 const STATUS_IDLE := "idle"
 const STATUS_IN_PROGRESS := "in_progress"
@@ -36,6 +37,17 @@ func can_start_expedition() -> bool:
 	_update_runtime_status()
 	# Dispatch always uses the first free slot. Reports in queue do not block dispatch.
 	return _find_first_free_slot_index() >= 0
+
+
+func get_available_slot_count() -> int:
+	_update_runtime_status()
+	var available_slots := 0
+	# A slot is available only when the slot dictionary is empty.
+	# Completed expeditions with queued reports still occupy their slot.
+	for slot_index in range(MAX_ACTIVE_SLOTS):
+		if _active_expeditions[slot_index].is_empty():
+			available_slots += 1
+	return available_slots
 
 
 func start_expedition(expedition_offer: Dictionary, upgrade_effects: Dictionary = {}) -> bool:

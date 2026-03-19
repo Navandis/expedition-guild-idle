@@ -7,6 +7,10 @@ extends Node
 # screen and immediately shows the next pending report after each collect.
 # It also keeps upgrades/codex/save behavior wired to the same flow and provides
 # debug reset/finish hooks that reuse real expedition completion logic.
+# Dispatch UX details:
+# - DispatchScreen messaging is fed by ExpeditionManager's available-slot count.
+# - Successful dispatch confirmation returns to Expedition Board (not Guild Hall)
+#   so players can chain dispatches or continue planning on the same board.
 
 const GUILD_HALL_SCENE := preload("res://scenes/guild_hall/GuildHall.tscn")
 const EXPEDITION_BOARD_SCENE := preload("res://scenes/expedition_board/ExpeditionBoard.tscn")
@@ -84,8 +88,8 @@ func _show_dispatch_screen(expedition_data: Dictionary) -> void:
 	# Always route through the dispatch screen so it can explain why dispatch is blocked.
 	_show_screen(_dispatch_controller)
 	_dispatch_controller.set_expedition_data(expedition_data)
-	_dispatch_controller.set_dispatch_blocked(
-		not _expedition_manager.can_start_expedition(),
+	_dispatch_controller.set_dispatch_availability(
+		_expedition_manager.get_available_slot_count(),
 		_expedition_manager.get_dispatch_block_message()
 	)
 
@@ -230,7 +234,8 @@ func _on_dispatch_confirmed(expedition_data: Dictionary) -> void:
 	var effects := _upgrade_system.get_effects_summary()
 	var started := _expedition_manager.start_expedition(expedition_data, effects)
 	if not started:
-		_show_guild_hall()
+		# Safe failure path: keep player in dispatch flow with fresh slot messaging.
+		_show_dispatch_screen(expedition_data)
 		return
 
 	print("Dispatch confirmed: %s" % str(expedition_data.get("id", "unknown")))
@@ -243,7 +248,9 @@ func _on_dispatch_confirmed(expedition_data: Dictionary) -> void:
 		_capture_expedition_board_state()
 
 	_save_runtime_state()
-	_show_guild_hall()
+	# After a successful dispatch, return to the board so players can
+	# immediately start another run or inspect upcoming expeditions.
+	_show_expedition_board()
 
 
 func _on_dispatch_canceled() -> void:
