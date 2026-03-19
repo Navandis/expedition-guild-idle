@@ -190,6 +190,7 @@ func reset_to_debug_baseline() -> void:
 	_codex_system.restore_discoveries([])
 	_expedition_manager.restore_runtime_state({}, {})
 	_expedition_board_offers = []
+	_discard_expedition_board_controller()
 
 	# Clear persisted progress so app restarts also stay at baseline.
 	var save_cleared := _save_manager.clear_saved_game_state()
@@ -199,6 +200,17 @@ func reset_to_debug_baseline() -> void:
 
 	# Minimal refresh behavior: always return to Guild Hall with clean values.
 	_show_guild_hall()
+
+
+func _discard_expedition_board_controller() -> void:
+	if _expedition_board_controller == null:
+		return
+	if _mounted_screen == _expedition_board_controller:
+		_mounted_screen = null
+	if _expedition_board_controller.get_parent() != null:
+		_expedition_board_controller.get_parent().remove_child(_expedition_board_controller)
+	_expedition_board_controller.queue_free()
+	_expedition_board_controller = null
 
 
 func _on_return_to_guild_hall_requested() -> void:
