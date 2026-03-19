@@ -6,6 +6,8 @@ class_name ExpeditionManager
 # so the UI can stay simple: dispatch -> wait -> report -> collect.
 # For day-3 progression, it also applies UpgradeSystem effect values when a new
 # expedition starts, so only future runs receive those bonuses.
+# This file now also keeps basic expedition identity fields (like site_type) so
+# later systems such as the Codex can record simple discoveries safely.
 
 const STATUS_IDLE := "idle"
 const STATUS_IN_PROGRESS := "in_progress"
@@ -57,6 +59,7 @@ func start_expedition(expedition_offer: Dictionary, upgrade_effects: Dictionary 
 		"duration_minutes": duration_minutes,
 		"base_duration_minutes": duration_minutes,
 		"risk_label": str(effective_offer.get("risk_label", "Unknown")),
+		"site_type": str(effective_offer.get("site_type", "unknown_site")),
 		# Store values used by RewardSystem to resolve upgraded outcomes/rewards.
 		"base_success": final_success,
 		"gold_multiplier": gold_multiplier,

@@ -65,6 +65,11 @@ custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Open Guild Upgrades"
 
+[node name="OpenCodexButton" type="Button" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "Open Codex"
+
 [node name="OpenReportButton" type="Button" parent="SafeArea/RootColumn" unique_id=1348621159]
 visible = false
 custom_minimum_size = Vector2(0, 52)

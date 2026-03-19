@@ -4,11 +4,13 @@ class_name GuildHallController
 # GuildHallController is the home screen for the current gameplay loop.
 # It shows runtime resources, active expedition status, and entry points to
 # either start a run or review/collect a completed expedition report.
-# For day-3, it also exposes navigation into the new Guild Upgrades screen.
+# For day-3, it also exposes navigation into Guild Upgrades and the new
+# Codex Discoveries screen so collection progress is easy to check.
 
 signal open_expedition_board_requested
 signal open_report_requested
 signal open_upgrades_requested
+signal open_codex_requested
 signal debug_finish_requested
 
 @onready var _gold_label: Label = $SafeArea/RootColumn/ResourcesPanel/ResourceRows/GoldLabel
@@ -16,6 +18,7 @@ signal debug_finish_requested
 @onready var _codex_entries_label: Label = $SafeArea/RootColumn/ResourcesPanel/ResourceRows/CodexEntriesLabel
 @onready var _open_report_button: Button = $SafeArea/RootColumn/OpenReportButton
 @onready var _open_upgrades_button: Button = $SafeArea/RootColumn/OpenUpgradesButton
+@onready var _open_codex_button: Button = $SafeArea/RootColumn/OpenCodexButton
 @onready var _debug_finish_button: Button = $SafeArea/RootColumn/DebugFinishButton
 @onready var _active_name_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/ActiveNameLabel
 @onready var _remaining_time_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/RemainingTimeLabel
@@ -32,6 +35,7 @@ var _resources := {
 func _ready() -> void:
 	$SafeArea/RootColumn/OpenBoardButton.pressed.connect(_on_open_board_pressed)
 	_open_upgrades_button.pressed.connect(_on_open_upgrades_pressed)
+	_open_codex_button.pressed.connect(_on_open_codex_pressed)
 	_open_report_button.pressed.connect(_on_open_report_pressed)
 	_debug_finish_button.pressed.connect(_on_debug_finish_pressed)
 	# Polling each frame is acceptable for this prototype-sized status block.
@@ -84,7 +88,7 @@ func _refresh_active_status() -> void:
 		# Names come from offer data; fallback text protects against malformed payloads.
 		_active_name_label.text = "Expedition: %s" % str(expedition.get("display_name", "Unknown Expedition"))
 		_active_status_label.text = "Status: %s" % _expedition_manager.get_status_label()
-		
+
 		if _expedition_manager.has_active_expedition():
 			_remaining_time_label.text = "Remaining: %s" % _expedition_manager.get_remaining_time_text()
 		else:
@@ -108,6 +112,10 @@ func _on_open_report_pressed() -> void:
 
 func _on_open_upgrades_pressed() -> void:
 	open_upgrades_requested.emit()
+
+
+func _on_open_codex_pressed() -> void:
+	open_codex_requested.emit()
 
 
 func _on_debug_finish_pressed() -> void:
