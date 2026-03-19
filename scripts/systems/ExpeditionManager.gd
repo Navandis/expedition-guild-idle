@@ -236,6 +236,7 @@ func restore_runtime_state(active_expeditions: Variant, pending_reports: Variant
 	# Save/load restore behavior: sanitize each slot and each queued report.
 	_active_expeditions = [{}, {}]
 	_pending_reports = []
+	var queued_report_ids: Dictionary = {}
 
 	# Backward compatibility: accept old single-dictionary fields.
 	if active_expeditions is Dictionary:
@@ -259,7 +260,11 @@ func restore_runtime_state(active_expeditions: Variant, pending_reports: Variant
 	if pending_reports is Dictionary:
 		var legacy_report := pending_reports as Dictionary
 		if _is_valid_pending_report(legacy_report):
-			_pending_reports.append(legacy_report.duplicate(true))
+			var normalized_legacy := _normalize_report(legacy_report)
+			var legacy_id := str(normalized_legacy.get("expedition_id", ""))
+			if not queued_report_ids.has(legacy_id):
+				_pending_reports.append(normalized_legacy)
+				queued_report_ids[legacy_id] = true
 	elif pending_reports is Array:
 		for item in (pending_reports as Array):
 			if not (item is Dictionary):
@@ -267,7 +272,14 @@ func restore_runtime_state(active_expeditions: Variant, pending_reports: Variant
 			var report := (item as Dictionary).duplicate(true)
 			if not _is_valid_pending_report(report):
 				continue
+			report = _normalize_report(report)
+			var expedition_id := str(report.get("expedition_id", ""))
+			# Duplicate guard: malformed saves should not allow duplicate collection
+			# entries for the same expedition completion.
+			if queued_report_ids.has(expedition_id):
+				continue
 			_pending_reports.append(report)
+			queued_report_ids[expedition_id] = true
 
 	# Ensure each report has a safe slot index so collect can clear correct slot.
 	for report_index in range(_pending_reports.size()):
@@ -289,6 +301,19 @@ func restore_runtime_state(active_expeditions: Variant, pending_reports: Variant
 			continue
 		_active_expeditions[slot_index] = {}
 
+	# Final consistency pass: queued reports should map to real slot data when
+	# possible so collection remains deterministic across malformed saves.
+	for report_index in range(_pending_reports.size()):
+		var report := _pending_reports[report_index]
+		var slot_index := int(report.get("slot_index", -1))
+		if slot_index >= 0 and slot_index < MAX_ACTIVE_SLOTS:
+			_pending_reports[report_index] = report
+			continue
+
+		var recovered_slot := _find_slot_index_for_report(report)
+		report["slot_index"] = recovered_slot
+		_pending_reports[report_index] = report
+
 
 func _is_valid_active_expedition(data: Dictionary) -> bool:
 	if str(data.get("id", "")).is_empty():
@@ -307,6 +332,27 @@ func _is_valid_pending_report(data: Dictionary) -> bool:
 	# Restored reports must still be collectable; an already-collected report would
 	# block dispatch forever because collect_pending_report() returns early.
 	return not bool(data.get("collected", false))
+
+
+func _normalize_report(report: Dictionary) -> Dictionary:
+	# Normalize report payload to keep UI text and collection stable even if
+	# some save fields are missing or malformed.
+	var rewards := report.get("rewards", {}) as Dictionary
+	return {
+		"expedition_id": str(report.get("expedition_id", "")),
+		"expedition_display_name": str(report.get("expedition_display_name", "Unknown Expedition")),
+		"site_type": str(report.get("site_type", "unknown_site")),
+		"outcome": str(report.get("outcome", RewardSystem.OUTCOME_FAILURE)),
+		"outcome_label": str(report.get("outcome_label", "Failure")),
+		"summary": str(report.get("summary", "No report summary.")),
+		"slot_index": int(report.get("slot_index", -1)),
+		"collected": false,
+		"rewards": {
+			"gold": maxi(0, int(rewards.get("gold", 0))),
+			"relic_fragments": maxi(0, int(rewards.get("relic_fragments", 0))),
+			"codex_entries": maxi(0, int(rewards.get("codex_entries", 0)))
+		}
+	}
 
 
 func _find_first_free_slot_index() -> int:

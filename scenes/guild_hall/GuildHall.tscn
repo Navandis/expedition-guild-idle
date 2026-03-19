@@ -63,33 +63,33 @@ text = "Open Expedition Board"
 [node name="OpenUpgradesButton" type="Button" parent="SafeArea/RootColumn" unique_id=774331471]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-text = "Open Guild Upgrades"
+text = "Guild Upgrades"
 
 [node name="OpenCodexButton" type="Button" parent="SafeArea/RootColumn" unique_id=22295093]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-text = "Open Codex"
+text = "Codex"
 
 [node name="OpenReportButton" type="Button" parent="SafeArea/RootColumn" unique_id=1348621159]
 visible = false
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-text = "Open Expedition Report"
+text = "View Pending Reports"
 
 [node name="PendingReportsLabel" type="Label" parent="SafeArea/RootColumn" unique_id=43135772]
 layout_mode = 2
-text = "Pending Reports: 0"
+text = "Pending Reports: 0 (none ready)"
 
 [node name="DebugFinishButton" type="Button" parent="SafeArea/RootColumn" unique_id=1694514361]
 visible = false
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-text = "Finish Active Expedition (Test)"
+text = "[DEBUG] Finish Active Expeditions"
 
 [node name="DebugResetButton" type="Button" parent="SafeArea/RootColumn" unique_id=143407976]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-text = "Reset Progress (Debug - Temporary)"
+text = "[DEBUG] Reset Progress"
 
 [node name="ActiveExpeditionPanel" type="PanelContainer" parent="SafeArea/RootColumn" unique_id=1205453616]
 custom_minimum_size = Vector2(0, 140)

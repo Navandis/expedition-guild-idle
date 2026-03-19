@@ -36,9 +36,12 @@ func set_expedition_data(expedition_data: Dictionary) -> void:
 func set_dispatch_blocked(is_blocked: bool, block_message: String = "") -> void:
 	_dispatch_blocked = is_blocked
 	if _dispatch_blocked:
-		_block_reason_label.text = block_message
+		var resolved_message := block_message.strip_edges()
+		if resolved_message.is_empty():
+			resolved_message = "Dispatch blocked: both expedition slots are occupied. Collect a pending report to free a slot."
+		_block_reason_label.text = resolved_message
 	else:
-		_block_reason_label.text = ""
+		_block_reason_label.text = "Both slots are available. Confirm to start this expedition."
 	_refresh_block_state()
 
 

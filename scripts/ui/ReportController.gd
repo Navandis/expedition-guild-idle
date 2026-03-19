@@ -40,11 +40,18 @@ func set_report_data(report: Dictionary) -> void:
 
 	# Once a report is collected, keep button disabled so it cannot be claimed twice.
 	_collect_button.disabled = bool(report.get("collected", false))
+	if pending_total > pending_index:
+		_collect_button.text = "Collect & View Next"
+	else:
+		_collect_button.text = "Collect Rewards"
 
 
 func _on_collect_pressed() -> void:
 	if _collect_button.disabled:
 		return
+	# Disable immediately to guard against accidental double-taps collecting
+	# multiple queued reports before the screen re-renders.
+	_collect_button.disabled = true
 	collect_requested.emit()
 
 
