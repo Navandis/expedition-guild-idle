@@ -43,7 +43,7 @@ func show_purchase_result(result: Dictionary) -> void:
 
 func _add_upgrade_row(upgrade: Dictionary, owned_map: Dictionary, current_gold: int) -> void:
 	var row := VBoxContainer.new()
-	row.theme_override_constants.separation = 4
+	row.add_theme_constant_override("separation", 4)
 
 	var name_label := Label.new()
 	var upgrade_id := str(upgrade.get("id", ""))
@@ -57,7 +57,7 @@ func _add_upgrade_row(upgrade: Dictionary, owned_map: Dictionary, current_gold: 
 	row.add_child(description_label)
 
 	var purchase_row := HBoxContainer.new()
-	purchase_row.theme_override_constants.separation = 8
+	purchase_row.add_theme_constant_override("separation", 8)
 
 	var cost_label := Label.new()
 	cost_label.text = "Cost: %d gold" % int(upgrade.get("cost_gold", 0))
