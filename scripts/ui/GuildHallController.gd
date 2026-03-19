@@ -6,12 +6,16 @@ class_name GuildHallController
 # either start a run or review/collect a completed expedition report.
 # For day-3, it also exposes navigation into Guild Upgrades and the new
 # Codex Discoveries screen so collection progress is easy to check.
+# This script also exposes temporary debug controls:
+# - finish active expedition instantly (test-only)
+# - reset all prototype progress through GameManager's shared baseline reset flow.
 
 signal open_expedition_board_requested
 signal open_report_requested
 signal open_upgrades_requested
 signal open_codex_requested
 signal debug_finish_requested
+signal debug_reset_requested
 
 @onready var _gold_label: Label = $SafeArea/RootColumn/ResourcesPanel/ResourceRows/GoldLabel
 @onready var _relic_fragments_label: Label = $SafeArea/RootColumn/ResourcesPanel/ResourceRows/RelicFragmentsLabel
@@ -20,6 +24,7 @@ signal debug_finish_requested
 @onready var _open_upgrades_button: Button = $SafeArea/RootColumn/OpenUpgradesButton
 @onready var _open_codex_button: Button = $SafeArea/RootColumn/OpenCodexButton
 @onready var _debug_finish_button: Button = $SafeArea/RootColumn/DebugFinishButton
+@onready var _debug_reset_button: Button = $SafeArea/RootColumn/DebugResetButton
 @onready var _active_name_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/ActiveNameLabel
 @onready var _remaining_time_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/RemainingTimeLabel
 @onready var _active_status_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/StatusLabel
@@ -38,6 +43,7 @@ func _ready() -> void:
 	_open_codex_button.pressed.connect(_on_open_codex_pressed)
 	_open_report_button.pressed.connect(_on_open_report_pressed)
 	_debug_finish_button.pressed.connect(_on_debug_finish_pressed)
+	_debug_reset_button.pressed.connect(_on_debug_reset_pressed)
 	# Polling each frame is acceptable for this prototype-sized status block.
 	set_process(true)
 	_refresh_resource_labels()
@@ -100,6 +106,9 @@ func _refresh_active_status() -> void:
 	# TEMPORARY DEBUG BUTTON: this is test-only and can be removed once QA no longer
 	# needs instant completion during development.
 	_debug_finish_button.visible = _expedition_manager.has_active_expedition()
+	# TEMPORARY DEBUG BUTTON: always available in Guild Hall so testers can quickly
+	# clear save + runtime state and return to a known clean baseline.
+	_debug_reset_button.visible = true
 
 
 func _on_open_board_pressed() -> void:
@@ -120,3 +129,7 @@ func _on_open_codex_pressed() -> void:
 
 func _on_debug_finish_pressed() -> void:
 	debug_finish_requested.emit()
+
+
+func _on_debug_reset_pressed() -> void:
+	debug_reset_requested.emit()

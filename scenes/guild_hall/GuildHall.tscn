@@ -82,6 +82,11 @@ custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Finish Active Expedition (Test)"
 
+[node name="DebugResetButton" type="Button" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "Reset Progress (Debug - Temporary)"
+
 [node name="ActiveExpeditionPanel" type="PanelContainer" parent="SafeArea/RootColumn" unique_id=1205453616]
 custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
