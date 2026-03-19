@@ -13,6 +13,7 @@ var _reward_label: Label
 var _hazard_label: Label
 
 var expedition_data: Dictionary = {}
+var _upgrade_effects: Dictionary = {}
 
 
 func _ready() -> void:
@@ -30,12 +31,12 @@ func set_expedition_data(data: Dictionary) -> void:
 
 	# Deep copy keeps the card's local state isolated from external changes.
 	expedition_data = data.duplicate(true)
-	_name_label.text = str(expedition_data.get("display_name", "Unknown Expedition"))
-	_duration_label.text = "Duration: %s min" % str(expedition_data.get("duration_minutes", "?"))
-	_risk_label.text = "Risk: %s" % str(expedition_data.get("risk_label", "Unknown"))
-	# Player-facing text should use display names, not internal IDs.
-	_reward_label.text = "Reward: %s" % str(expedition_data.get("reward_profile_name", "Balanced"))
-	_hazard_label.text = "Hazard: %s" % str(expedition_data.get("hazard_name", "Unknown"))
+	_refresh_labels()
+
+
+func set_upgrade_effects(upgrade_effects: Dictionary) -> void:
+	_upgrade_effects = upgrade_effects.duplicate(true)
+	_refresh_labels()
 
 
 func set_selected(is_selected: bool) -> void:
@@ -64,3 +65,22 @@ func _resolve_labels() -> bool:
 		and _risk_label != null \
 		and _reward_label != null \
 		and _hazard_label != null
+
+
+func _refresh_labels() -> void:
+	if not _resolve_labels():
+		return
+
+	var preview := ExpeditionOfferEffects.build_preview(expedition_data, _upgrade_effects)
+
+	_name_label.text = str(preview.get("display_name", "Unknown Expedition"))
+	var duration_minutes := int(preview.get("duration_minutes", 0))
+	if duration_minutes <= 0:
+		_duration_label.text = "Duration: ? min"
+	else:
+		_duration_label.text = "Duration: %d min" % duration_minutes
+
+	_risk_label.text = "Risk: %s" % str(preview.get("risk_label", "Unknown"))
+	# Player-facing text should use display names, not internal IDs.
+	_reward_label.text = "Reward: %s" % str(preview.get("reward_profile_name", "Balanced"))
+	_hazard_label.text = "Hazard: %s" % str(preview.get("hazard_name", "Unknown"))
