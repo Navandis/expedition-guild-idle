@@ -5,6 +5,9 @@ extends Node
 # dispatch -> wait/finish -> report -> collect -> resource update.
 # Day-3 extends this flow with Guild Upgrades, a lightweight Codex,
 # and plain-JSON persistence so restart testing keeps progress between sessions.
+# It also now owns a temporary debug reset flow. The new
+# reset_to_debug_baseline() method is the single shared reset path used by the
+# Guild Hall debug button, runtime state clearing, save deletion, and UI refresh.
 
 const GUILD_HALL_SCENE := preload("res://scenes/guild_hall/GuildHall.tscn")
 const EXPEDITION_BOARD_SCENE := preload("res://scenes/expedition_board/ExpeditionBoard.tscn")
@@ -12,16 +15,17 @@ const DISPATCH_SCREEN_SCENE := preload("res://scenes/dispatch/DispatchScreen.tsc
 const EXPEDITION_REPORT_SCENE := preload("res://scenes/report/ExpeditionReport.tscn")
 const GUILD_UPGRADES_SCENE := preload("res://scenes/upgrades/GuildUpgrades.tscn")
 const CODEX_SCREEN_SCENE := preload("res://scenes/codex/CodexScreen.tscn")
+const DEFAULT_RESOURCES := {
+	"gold": 1250,
+	"relic_fragments": 0,
+	"codex_entries": 0
+}
 
 var _expedition_manager := ExpeditionManager.new()
 var _upgrade_system := UpgradeSystem.new()
 var _codex_system := CodexSystem.new()
 var _save_manager := SaveManager.new()
-var _resources := {
-	"gold": 1250,
-	"relic_fragments": 0,
-	"codex_entries": 0
-}
+var _resources := DEFAULT_RESOURCES.duplicate(true)
 var _expedition_board_offers: Array[Dictionary] = []
 
 var _guild_hall_controller: GuildHallController
@@ -53,6 +57,7 @@ func _show_guild_hall() -> void:
 		_guild_hall_controller.open_upgrades_requested.connect(_on_open_upgrades_requested)
 		_guild_hall_controller.open_codex_requested.connect(_on_open_codex_requested)
 		_guild_hall_controller.debug_finish_requested.connect(_on_debug_finish_requested)
+		_guild_hall_controller.debug_reset_requested.connect(_on_debug_reset_requested)
 
 	_show_screen(_guild_hall_controller)
 	_guild_hall_controller.set_expedition_manager(_expedition_manager)
@@ -168,6 +173,32 @@ func _on_debug_finish_requested() -> void:
 	_expedition_manager.complete_active_expedition()
 	if _expedition_manager.has_pending_report():
 		_show_report_screen()
+
+
+func _on_debug_reset_requested() -> void:
+	reset_to_debug_baseline()
+
+
+func reset_to_debug_baseline() -> void:
+	# TEMPORARY DEBUG RESET:
+	# This is a test-only helper that wipes prototype progression and runtime
+	# state in one place to avoid partial resets across multiple scripts.
+	_resources = DEFAULT_RESOURCES.duplicate(true)
+
+	# Clear progression systems back to fresh-start values.
+	_upgrade_system.restore_owned_upgrade_ids([])
+	_codex_system.restore_discoveries([])
+	_expedition_manager.restore_runtime_state({}, {})
+	_expedition_board_offers = []
+
+	# Clear persisted progress so app restarts also stay at baseline.
+	var save_cleared := _save_manager.clear_saved_game_state()
+	if not save_cleared:
+		# Fallback: overwrite with current baseline snapshot if file deletion fails.
+		_save_runtime_state()
+
+	# Minimal refresh behavior: always return to Guild Hall with clean values.
+	_show_guild_hall()
 
 
 func _on_return_to_guild_hall_requested() -> void:

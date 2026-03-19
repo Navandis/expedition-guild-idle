@@ -1,9 +1,11 @@
 extends RefCounted
 class_name SaveManager
 
-# SaveManager provides plain-JSON persistence for the day-3 prototype milestone.
-# It stores core runtime progress (resources, upgrades, codex, expedition state)
-# so restart testing is practical while systems are still intentionally simple.
+# SaveManager handles plain-JSON persistence for this prototype.
+# It saves and loads core progress (resources, upgrades, codex, expedition state)
+# and now also provides a debug-clear method used by the temporary reset button.
+# The reset flow is: GameManager clears runtime state -> SaveManager removes the
+# local save file -> UI returns to Guild Hall with default baseline values.
 
 const SAVE_PATH := "user://prototype_save.json"
 const SAVE_SCHEMA_VERSION := 1
@@ -58,6 +60,25 @@ func save_game_state(state: Dictionary) -> bool:
 
 	file.store_string(JSON.stringify(payload, "\t"))
 	file.close()
+	return true
+
+
+func clear_saved_game_state() -> bool:
+	# Debug reset path: deleting the file avoids stale keys and forces defaults
+	# on the next load. Missing files are treated as already-cleared.
+	if not FileAccess.file_exists(SAVE_PATH):
+		return true
+
+	var save_dir := DirAccess.open("user://")
+	if save_dir == null:
+		push_warning("SaveManager: failed to open user:// during debug reset.")
+		return false
+
+	var result := save_dir.remove("prototype_save.json")
+	if result != OK:
+		push_warning("SaveManager: failed to remove save file during debug reset.")
+		return false
+
 	return true
 
 
