@@ -35,9 +35,9 @@ func start_expedition(expedition_offer: Dictionary, upgrade_effects: Dictionary 
 	if not can_start_expedition():
 		return false
 
-	var effective_offer := expedition_offer.duplicate(true)
-	if not bool(effective_offer.get(ExpeditionOfferEffects.UPGRADE_EFFECTS_APPLIED_KEY, false)):
-		effective_offer = ExpeditionOfferEffects.build_preview(expedition_offer, upgrade_effects)
+	# Always rebuild from canonical base values so dispatch uses the latest
+	# upgrade effects even if the selected payload was generated earlier.
+	var effective_offer := ExpeditionOfferEffects.build_preview(expedition_offer, upgrade_effects)
 
 	# Clamp duration so malformed content cannot create a zero-length timer.
 	var duration_minutes := int(effective_offer.get("duration_minutes", 0))
