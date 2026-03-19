@@ -1,13 +1,10 @@
 extends Node
 
 # GameManager owns high-level screen flow and shared runtime state.
-# For this milestone it closes the first loop by coordinating:
-# dispatch -> wait/finish -> report -> collect -> resource update.
-# Day-3 extends this flow with Guild Upgrades, a lightweight Codex,
-# and plain-JSON persistence so restart testing keeps progress between sessions.
-# It also now owns a temporary debug reset flow. The new
-# reset_to_debug_baseline() method is the single shared reset path used by the
-# Guild Hall debug button, runtime state clearing, save deletion, and UI refresh.
+# For this milestone it coordinates the two-slot expedition loop:
+# dispatch -> wait/finish per slot -> queued reports -> collect one-by-one.
+# It also keeps upgrades/codex/save behavior wired to the same flow and provides
+# debug reset/finish hooks that reuse real expedition completion logic.
 
 const GUILD_HALL_SCENE := preload("res://scenes/guild_hall/GuildHall.tscn")
 const EXPEDITION_BOARD_SCENE := preload("res://scenes/expedition_board/ExpeditionBoard.tscn")
@@ -87,7 +84,7 @@ func _show_dispatch_screen(expedition_data: Dictionary) -> void:
 	_dispatch_controller.set_expedition_data(expedition_data)
 	_dispatch_controller.set_dispatch_blocked(
 		not _expedition_manager.can_start_expedition(),
-		_expedition_manager.get_active_expedition()
+		_expedition_manager.get_dispatch_block_message()
 	)
 
 
@@ -169,8 +166,8 @@ func _on_open_codex_requested() -> void:
 
 
 func _on_debug_finish_requested() -> void:
-	# This calls the same completion path used by natural timer completion.
-	_expedition_manager.complete_active_expedition()
+	# Debug-complete reuses ExpeditionManager's real slot completion path.
+	_expedition_manager.complete_all_active_expeditions_for_debug()
 	if _expedition_manager.has_pending_report():
 		_show_report_screen()
 
@@ -188,7 +185,7 @@ func reset_to_debug_baseline() -> void:
 	# Clear progression systems back to fresh-start values.
 	_upgrade_system.restore_owned_upgrade_ids([])
 	_codex_system.restore_discoveries([])
-	_expedition_manager.restore_runtime_state({}, {})
+	_expedition_manager.restore_runtime_state([], [])
 	_expedition_board_offers = []
 	_discard_expedition_board_controller()
 
@@ -317,8 +314,8 @@ func _load_runtime_state() -> void:
 	_upgrade_system.restore_owned_upgrade_ids(_to_string_array(save_data.get("owned_upgrades", [])))
 	_codex_system.restore_discoveries(_to_string_array(save_data.get("codex_discoveries", [])))
 	_expedition_manager.restore_runtime_state(
-		save_data.get("active_expedition", {}) as Dictionary,
-		save_data.get("pending_report", {}) as Dictionary
+		save_data.get("active_expeditions", save_data.get("active_expedition", [])),
+		save_data.get("pending_reports", save_data.get("pending_report", []))
 	)
 	_expedition_board_offers = _sanitize_board_offers(save_data.get("expedition_board_offers", []))
 
@@ -329,8 +326,8 @@ func _save_runtime_state() -> void:
 		"resources": _resources,
 		"owned_upgrades": _upgrade_system.get_owned_upgrade_ids(),
 		"codex_discoveries": _codex_system.get_discovered_entries(),
-		"active_expedition": _expedition_manager.get_active_expedition(),
-		"pending_report": _expedition_manager.get_pending_report(),
+		"active_expeditions": _expedition_manager.get_active_expeditions(),
+		"pending_reports": _expedition_manager.get_pending_reports(),
 		"expedition_board_offers": _expedition_board_offers
 	})
 

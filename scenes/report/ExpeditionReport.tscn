@@ -32,6 +32,11 @@ layout_mode = 2
 text = "Expedition Report"
 horizontal_alignment = 1
 
+[node name="QueueLabel" type="Label" parent="SafeArea/RootColumn"]
+layout_mode = 2
+text = "Report 1 of 1"
+horizontal_alignment = 1
+
 [node name="ReportPanel" type="PanelContainer" parent="SafeArea/RootColumn"]
 layout_mode = 2
 size_flags_vertical = 3

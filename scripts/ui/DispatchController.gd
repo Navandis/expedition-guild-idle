@@ -2,7 +2,8 @@ extends Control
 class_name DispatchController
 
 # DispatchController shows a minimal confirmation step before final dispatch.
-# This keeps accidental taps from immediately consuming an expedition offer.
+# In the two-slot milestone, it also shows clear messaging when dispatch is
+# blocked because both expedition slots are already occupied.
 
 signal confirmed(expedition_data: Dictionary)
 signal canceled
@@ -32,12 +33,10 @@ func set_expedition_data(expedition_data: Dictionary) -> void:
 	_risk_label.text = "Risk: %s" % str(_expedition_data.get("risk_label", "Unknown"))
 
 
-func set_dispatch_blocked(is_blocked: bool, active_expedition: Dictionary = {}) -> void:
+func set_dispatch_blocked(is_blocked: bool, block_message: String = "") -> void:
 	_dispatch_blocked = is_blocked
 	if _dispatch_blocked:
-		# Include the current expedition name to explain *which* run is blocking.
-		var active_name := str(active_expedition.get("display_name", "Unknown Expedition"))
-		_block_reason_label.text = "Dispatch blocked: %s is already in progress." % active_name
+		_block_reason_label.text = block_message
 	else:
 		_block_reason_label.text = ""
 	_refresh_block_state()

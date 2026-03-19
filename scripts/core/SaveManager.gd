@@ -2,13 +2,12 @@ extends RefCounted
 class_name SaveManager
 
 # SaveManager handles plain-JSON persistence for this prototype.
-# It saves and loads core progress (resources, upgrades, codex, expedition state)
-# and now also provides a debug-clear method used by the temporary reset button.
-# The reset flow is: GameManager clears runtime state -> SaveManager removes the
-# local save file -> UI returns to Guild Hall with default baseline values.
+# For the two-slot milestone it stores both expedition slots and the pending
+# report queue, while still allowing backward-compatible reads from older keys.
+# It also provides the debug-clear method used by the temporary reset button.
 
 const SAVE_PATH := "user://prototype_save.json"
-const SAVE_SCHEMA_VERSION := 1
+const SAVE_SCHEMA_VERSION := 2
 
 
 func load_game_state() -> Dictionary:
@@ -48,8 +47,8 @@ func save_game_state(state: Dictionary) -> bool:
 		"resources": _coerce_resources(state.get("resources", {})),
 		"owned_upgrades": _coerce_string_array(state.get("owned_upgrades", [])),
 		"codex_discoveries": _coerce_string_array(state.get("codex_discoveries", [])),
-		"active_expedition": _coerce_dictionary(state.get("active_expedition", {})),
-		"pending_report": _coerce_dictionary(state.get("pending_report", {})),
+		"active_expeditions": _coerce_dictionary_array(state.get("active_expeditions", [])),
+		"pending_reports": _coerce_dictionary_array(state.get("pending_reports", [])),
 		"expedition_board_offers": _coerce_dictionary_array(state.get("expedition_board_offers", []))
 	}
 

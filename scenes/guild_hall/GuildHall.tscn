@@ -76,6 +76,10 @@ custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Open Expedition Report"
 
+[node name="PendingReportsLabel" type="Label" parent="SafeArea/RootColumn"]
+layout_mode = 2
+text = "Pending Reports: 0"
+
 [node name="DebugFinishButton" type="Button" parent="SafeArea/RootColumn" unique_id=1694514361]
 visible = false
 custom_minimum_size = Vector2(0, 52)
@@ -98,18 +102,19 @@ theme_override_constants/separation = 8
 
 [node name="ActiveHeader" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=1411912238]
 layout_mode = 2
-text = "Active Expedition Status"
+text = "Expedition Slots (2 Max)"
 
-[node name="ActiveNameLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=1010654892]
+[node name="SlotOneLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
 layout_mode = 2
-text = "Expedition: None"
+text = "Slot 1: Empty"
 autowrap_mode = 3
 
-[node name="RemainingTimeLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=1273124495]
+[node name="SlotTwoLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
 layout_mode = 2
-text = "Remaining: --:--"
+text = "Slot 2: Empty"
+autowrap_mode = 3
 
-[node name="StatusLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows" unique_id=806509298]
+[node name="SlotsHintLabel" type="Label" parent="SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows"]
 layout_mode = 2
-text = "Status: No active expedition"
+text = "Active slots run timers. Completed slots wait for report collection."
 autowrap_mode = 3

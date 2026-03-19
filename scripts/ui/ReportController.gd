@@ -1,14 +1,15 @@
 extends Control
 class_name ReportController
 
-# ReportController displays one pending expedition report and emits a collect
-# request. GameManager handles actual reward application so this UI stays focused
-# on showing data and forwarding button events.
+# ReportController displays the current report at the front of the pending queue
+# and emits collect/close requests. In the two-slot milestone, reports are still
+# collected one at a time, so this screen shows queue position for clarity.
 
 signal collect_requested
 signal close_requested
 
 @onready var _expedition_name_label: Label = $SafeArea/RootColumn/ReportPanel/Rows/ExpeditionNameLabel
+@onready var _queue_label: Label = $SafeArea/RootColumn/QueueLabel
 @onready var _outcome_label: Label = $SafeArea/RootColumn/ReportPanel/Rows/OutcomeLabel
 @onready var _summary_label: Label = $SafeArea/RootColumn/ReportPanel/Rows/SummaryLabel
 @onready var _gold_label: Label = $SafeArea/RootColumn/ReportPanel/Rows/Rewards/GoldLabel
@@ -24,6 +25,10 @@ func _ready() -> void:
 
 func set_report_data(report: Dictionary) -> void:
 	# All text is set here so scene defaults are only placeholders.
+	var pending_index := int(report.get("queue_index", 0)) + 1
+	var pending_total := max(1, int(report.get("queue_total", 1)))
+	_queue_label.text = "Report %d of %d" % [pending_index, pending_total]
+
 	_expedition_name_label.text = "Expedition: %s" % str(report.get("expedition_display_name", "Unknown Expedition"))
 	_outcome_label.text = "Outcome: %s" % str(report.get("outcome_label", "Unknown"))
 	_summary_label.text = "Summary: %s" % str(report.get("summary", "No report summary."))
