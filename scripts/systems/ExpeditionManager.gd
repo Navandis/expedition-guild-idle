@@ -236,7 +236,7 @@ func restore_runtime_state(active_expeditions: Variant, pending_reports: Variant
 	# Save/load restore behavior: sanitize each slot and each queued report.
 	_active_expeditions = [{}, {}]
 	_pending_reports = []
-	var queued_report_ids: Dictionary = {}
+	var queued_report_signatures: Dictionary = {}
 
 	# Backward compatibility: accept old single-dictionary fields.
 	if active_expeditions is Dictionary:
@@ -261,10 +261,10 @@ func restore_runtime_state(active_expeditions: Variant, pending_reports: Variant
 		var legacy_report := pending_reports as Dictionary
 		if _is_valid_pending_report(legacy_report):
 			var normalized_legacy := _normalize_report(legacy_report)
-			var legacy_id := str(normalized_legacy.get("expedition_id", ""))
-			if not queued_report_ids.has(legacy_id):
+			var legacy_signature := _make_report_dedupe_signature(normalized_legacy)
+			if not queued_report_signatures.has(legacy_signature):
 				_pending_reports.append(normalized_legacy)
-				queued_report_ids[legacy_id] = true
+				queued_report_signatures[legacy_signature] = true
 	elif pending_reports is Array:
 		for item in (pending_reports as Array):
 			if not (item is Dictionary):
@@ -273,13 +273,13 @@ func restore_runtime_state(active_expeditions: Variant, pending_reports: Variant
 			if not _is_valid_pending_report(report):
 				continue
 			report = _normalize_report(report)
-			var expedition_id := str(report.get("expedition_id", ""))
-			# Duplicate guard: malformed saves should not allow duplicate collection
-			# entries for the same expedition completion.
-			if queued_report_ids.has(expedition_id):
+			var report_signature := _make_report_dedupe_signature(report)
+			# Duplicate guard: malformed saves should not allow exact duplicate
+			# collection entries for the same completion payload.
+			if queued_report_signatures.has(report_signature):
 				continue
 			_pending_reports.append(report)
-			queued_report_ids[expedition_id] = true
+			queued_report_signatures[report_signature] = true
 
 	# Ensure each report has a safe slot index so collect can clear correct slot.
 	for report_index in range(_pending_reports.size()):
@@ -353,6 +353,21 @@ func _normalize_report(report: Dictionary) -> Dictionary:
 			"codex_entries": maxi(0, int(rewards.get("codex_entries", 0)))
 		}
 	}
+
+
+func _make_report_dedupe_signature(report: Dictionary) -> String:
+	var rewards := report.get("rewards", {}) as Dictionary
+	return "%s|%s|%s|%s|%s|%d|%d|%d|%d" % [
+		str(report.get("expedition_id", "")),
+		str(report.get("expedition_display_name", "")),
+		str(report.get("site_type", "")),
+		str(report.get("outcome", "")),
+		str(report.get("summary", "")),
+		int(report.get("slot_index", -1)),
+		maxi(0, int(rewards.get("gold", 0))),
+		maxi(0, int(rewards.get("relic_fragments", 0))),
+		maxi(0, int(rewards.get("codex_entries", 0)))
+	]
 
 
 func _find_first_free_slot_index() -> int:
