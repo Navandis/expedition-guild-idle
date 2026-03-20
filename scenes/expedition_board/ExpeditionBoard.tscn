@@ -49,7 +49,7 @@ text = "Select an expedition to continue."
 autowrap_mode = 3
 
 [node name="CardScroll" type="ScrollContainer" parent="SafeArea/RootColumn" unique_id=1276735346]
-custom_minimum_size = Vector2(0, 420)
+custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
