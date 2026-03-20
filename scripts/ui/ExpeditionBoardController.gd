@@ -95,6 +95,9 @@ func replace_expedition_by_id(expedition_id: String, dispatched_expedition: Dict
 	signatures_to_exclude.append(_generator.build_signature(dispatched_expedition))
 	var replacement := _generator.generate_single_expedition(signatures_to_exclude, _generation_context)
 	if replacement.is_empty():
+		# Even without a replacement, persist the post-dispatch board shape so
+		# region switching does not restore a stale pre-dispatch cache snapshot.
+		_cache_current_region_offers()
 		_selected_expedition = {}
 		_dispatch_button.disabled = true
 		_selection_label.text = "Select an expedition to continue."
