@@ -9,7 +9,7 @@ const REGIONS_PATH := "res://data/expeditions/regions.json"
 
 # Required keys for each authored region entry. We keep this explicit so bad JSON
 # falls back safely instead of crashing runtime flow.
-const REQUIRED_REGION_KEYS := [
+const REQUIRED_REGION_KEYS: Array[String] = [
 	"id",
 	"display",
 	"theme",
@@ -68,7 +68,7 @@ const FALLBACK_REGION_DEFINITIONS := [
 ]
 
 # Save payload keys for per-region player progress.
-const PLAYER_PROGRESS_KEYS := [
+const PLAYER_PROGRESS_KEYS: Array[String] = [
 	"is_visible",
 	"is_unlocked",
 	"expeditions_completed",
