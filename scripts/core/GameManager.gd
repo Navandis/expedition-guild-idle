@@ -7,10 +7,12 @@ extends Node
 # screen and immediately shows the next pending report after each collect.
 # It also keeps upgrades/codex/save behavior wired to the same flow and provides
 # debug reset/finish hooks that reuse real expedition completion logic.
-# Dispatch UX details:
-# - DispatchScreen messaging is fed by ExpeditionManager's available-slot count.
-# - Successful dispatch confirmation returns to Expedition Board (not Guild Hall)
-#   so players can chain dispatches or continue planning on the same board.
+#
+# Region foundation slice:
+# - loads authored region definitions through RegionSystem,
+# - tracks selected region runtime state,
+# - persists per-region player progress + selected region id,
+# - passes selected-region constraints into expedition board generation.
 
 const GUILD_HALL_SCENE := preload("res://scenes/guild_hall/GuildHall.tscn")
 const EXPEDITION_BOARD_SCENE := preload("res://scenes/expedition_board/ExpeditionBoard.tscn")
@@ -27,6 +29,7 @@ const DEFAULT_RESOURCES := {
 var _expedition_manager := ExpeditionManager.new()
 var _upgrade_system := UpgradeSystem.new()
 var _codex_system := CodexSystem.new()
+var _region_system := RegionSystem.new()
 var _save_manager := SaveManager.new()
 var _resources := DEFAULT_RESOURCES.duplicate(true)
 var _expedition_board_offers: Array[Dictionary] = []
@@ -72,9 +75,14 @@ func _show_expedition_board() -> void:
 		_expedition_board_controller = EXPEDITION_BOARD_SCENE.instantiate() as ExpeditionBoardController
 		_expedition_board_controller.expedition_dispatch_requested.connect(_on_expedition_dispatch_requested)
 		_expedition_board_controller.return_to_guild_hall_requested.connect(_on_return_to_guild_hall_requested)
+		_expedition_board_controller.region_selected.connect(_on_region_selected)
 		_expedition_board_controller.set_initial_board_offers(_expedition_board_offers)
 
 	_expedition_board_controller.set_upgrade_effects(_upgrade_system.get_effects_summary())
+	_expedition_board_controller.set_region_data(
+		_region_system.get_region_list_for_ui(),
+		_region_system.get_generation_rules_for_selected_region()
+	)
 	_show_screen(_expedition_board_controller)
 	_capture_expedition_board_state()
 
@@ -193,6 +201,7 @@ func reset_to_debug_baseline() -> void:
 	# Clear progression systems back to fresh-start values.
 	_upgrade_system.restore_owned_upgrade_ids([])
 	_codex_system.restore_discoveries([])
+	_region_system.restore_player_state({}, "")
 	_expedition_manager.restore_runtime_state([], [])
 	_expedition_board_offers = []
 	_discard_expedition_board_controller()
@@ -326,12 +335,17 @@ func _load_runtime_state() -> void:
 	# Load flow: start from defaults, then apply any valid JSON save values.
 	var save_data := _save_manager.load_game_state()
 	if save_data.is_empty():
+		# Older/new save default behavior is handled by RegionSystem init defaults.
 		return
 
 	# Missing keys are safe: each system uses default fallback values.
 	_resources = _sanitize_resources(save_data.get("resources", {}))
 	_upgrade_system.restore_owned_upgrade_ids(_to_string_array(save_data.get("owned_upgrades", [])))
 	_codex_system.restore_discoveries(_to_string_array(save_data.get("codex_discoveries", [])))
+	_region_system.restore_player_state(
+		save_data.get("region_progress", {}),
+		save_data.get("selected_region_id", "")
+	)
 	_expedition_manager.restore_runtime_state(
 		save_data.get("active_expeditions", save_data.get("active_expedition", [])),
 		save_data.get("pending_reports", save_data.get("pending_report", []))
@@ -345,6 +359,8 @@ func _save_runtime_state() -> void:
 		"resources": _resources,
 		"owned_upgrades": _upgrade_system.get_owned_upgrade_ids(),
 		"codex_discoveries": _codex_system.get_discovered_entries(),
+		"region_progress": _region_system.build_save_progress_snapshot(),
+		"selected_region_id": _region_system.get_selected_region_id(),
 		"active_expeditions": _expedition_manager.get_active_expeditions(),
 		"pending_reports": _expedition_manager.get_pending_reports(),
 		"expedition_board_offers": _expedition_board_offers
@@ -385,6 +401,21 @@ func _capture_expedition_board_state() -> void:
 	if _expedition_board_controller == null:
 		return
 	_expedition_board_offers = _expedition_board_controller.get_board_offers()
+
+
+func _on_region_selected(region_id: String) -> void:
+	# Region selection state is owned by RegionSystem and persisted in saves.
+	if not _region_system.set_selected_region(region_id):
+		return
+	_expedition_board_offers = []
+	if _expedition_board_controller != null:
+		_expedition_board_controller.set_region_data(
+			_region_system.get_region_list_for_ui(),
+			_region_system.get_generation_rules_for_selected_region()
+		)
+		_expedition_board_controller.regenerate_board_for_selected_region()
+		_capture_expedition_board_state()
+	_save_runtime_state()
 
 
 func _on_codex_back_requested() -> void:

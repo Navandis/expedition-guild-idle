@@ -1,0 +1,222 @@
+[
+  {
+    "id": "greenhollow_reaches",
+    "display": {
+      "name": "Greenhollow Reaches",
+      "short_name": "Greenhollow",
+      "region_tier": 1,
+      "summary_text": "A moss-laden frontier of collapsed roads and vine-wrapped towers where novice guild crews learn safe routes.",
+      "codex_sketch_asset": "res://assets/codex/regions/greenhollow_sketch.png"
+    },
+    "theme": {
+      "region_role": "starter_frontier",
+      "allowed_biomes": ["plains", "jungle"],
+      "culture_families": ["marchwardens", "reed_clans"],
+      "art_motifs": ["moss_stone", "river_totems"],
+      "fantasy_level": "grounded"
+    },
+    "progression": {
+      "starts_visible": true,
+      "starts_unlocked": true,
+      "prerequisite_region_ids": [],
+      "prerequisite_clue_tags": [],
+      "prerequisite_research_tags": [],
+      "prerequisite_logistics_tags": []
+    },
+    "generation_rules": {
+      "route_types": ["scouting", "survey"],
+      "site_families": ["ruins", "watchtower", "library"],
+      "site_conditions": ["abandoned", "overgrown"],
+      "opportunity_profiles": ["balanced", "codex_heavy"],
+      "hazard_tags": ["traps", "hostile_fauna"]
+    },
+    "rewards_and_discoveries": {
+      "artifact_families": ["verdant_relics", "waystone_fragments"],
+      "clue_families": ["river_glyphs", "warden_routes"]
+    },
+    "codex": {
+      "page_order": 10,
+      "starts_as_unknown_page": false
+    },
+    "hooks": {
+      "chain_hook_tags": ["chain_greenhollow_intro"],
+      "legacy_hook_tags": ["legacy_moss_archive"]
+    }
+  },
+  {
+    "id": "emberwake_coast",
+    "display": {
+      "name": "Emberwake Coast",
+      "short_name": "Emberwake",
+      "region_tier": 1,
+      "summary_text": "Salt-fire cliffs and tide-lost shrines where crews race storms and recover heat-scorched relic caches.",
+      "codex_sketch_asset": "res://assets/codex/regions/emberwake_sketch.png"
+    },
+    "theme": {
+      "region_role": "starter_coastal",
+      "allowed_biomes": ["coast", "plains"],
+      "culture_families": ["ash_sailors", "breaker_keepers"],
+      "art_motifs": ["charred_banners", "lighthouse_runes"],
+      "fantasy_level": "grounded"
+    },
+    "progression": {
+      "starts_visible": true,
+      "starts_unlocked": true,
+      "prerequisite_region_ids": [],
+      "prerequisite_clue_tags": [],
+      "prerequisite_research_tags": [],
+      "prerequisite_logistics_tags": []
+    },
+    "generation_rules": {
+      "route_types": ["salvage", "patrol"],
+      "site_families": ["fort", "watchtower", "ruins"],
+      "site_conditions": ["flooded", "contested"],
+      "opportunity_profiles": ["salvage_heavy", "balanced"],
+      "hazard_tags": ["weather", "collapse"]
+    },
+    "rewards_and_discoveries": {
+      "artifact_families": ["ember_glass", "tide_crowns"],
+      "clue_families": ["storm_charts", "coastline_marks"]
+    },
+    "codex": {
+      "page_order": 20,
+      "starts_as_unknown_page": false
+    },
+    "hooks": {
+      "chain_hook_tags": ["chain_emberwake_tides"],
+      "legacy_hook_tags": ["legacy_breakwater_fire"]
+    }
+  },
+  {
+    "id": "greyfen_march",
+    "display": {
+      "name": "Greyfen March",
+      "short_name": "Greyfen",
+      "region_tier": 2,
+      "summary_text": "A drowned borderland of half-sunk bastions where shifting ground hides old war records and sinkholes.",
+      "codex_sketch_asset": "res://assets/codex/regions/greyfen_sketch.png"
+    },
+    "theme": {
+      "region_role": "mid_swamp_front",
+      "allowed_biomes": ["jungle", "plains"],
+      "culture_families": ["fen_sentinels", "bog_scribes"],
+      "art_motifs": ["peat_idols", "rusted_mail"],
+      "fantasy_level": "mythic"
+    },
+    "progression": {
+      "starts_visible": true,
+      "starts_unlocked": false,
+      "prerequisite_region_ids": ["greenhollow_reaches", "emberwake_coast"],
+      "prerequisite_clue_tags": ["clue_fen_maps"],
+      "prerequisite_research_tags": ["research_wetland_supply"],
+      "prerequisite_logistics_tags": ["logistics_marsh_routes"]
+    },
+    "generation_rules": {
+      "route_types": ["deep_scout", "recovery"],
+      "site_families": ["ruins", "temple_complex", "fort"],
+      "site_conditions": ["flooded", "contested", "overgrown"],
+      "opportunity_profiles": ["relic_rich", "balanced"],
+      "hazard_tags": ["disease", "hostile_fauna", "weather"]
+    },
+    "rewards_and_discoveries": {
+      "artifact_families": ["fen_ward_relics", "silted_tablets"],
+      "clue_families": ["march_battle_logs", "sunken_oaths"]
+    },
+    "codex": {
+      "page_order": 30,
+      "starts_as_unknown_page": true
+    },
+    "hooks": {
+      "chain_hook_tags": ["chain_greyfen_quagmire"],
+      "legacy_hook_tags": ["legacy_marsh_accord"]
+    }
+  },
+  {
+    "id": "sunscar_expanse",
+    "display": {
+      "name": "Sunscar Expanse",
+      "short_name": "Sunscar",
+      "region_tier": 3,
+      "summary_text": "A high-heat interior of broken observatories and dune-sealed vaults lit by unstable crystal mirages.",
+      "codex_sketch_asset": "res://assets/codex/regions/sunscar_sketch.png"
+    },
+    "theme": {
+      "region_role": "late_desert_push",
+      "allowed_biomes": ["desert", "mountains"],
+      "culture_families": ["sunforged_nomads", "cairn_masons"],
+      "art_motifs": ["sun_disks", "obsidian_inlays"],
+      "fantasy_level": "mythic"
+    },
+    "progression": {
+      "starts_visible": true,
+      "starts_unlocked": false,
+      "prerequisite_region_ids": ["greyfen_march"],
+      "prerequisite_clue_tags": ["clue_solar_keys"],
+      "prerequisite_research_tags": ["research_heat_warding"],
+      "prerequisite_logistics_tags": ["logistics_long_haul"]
+    },
+    "generation_rules": {
+      "route_types": ["caravan_guard", "vault_probe"],
+      "site_families": ["temple_complex", "library", "ruins"],
+      "site_conditions": ["buried", "contested"],
+      "opportunity_profiles": ["relic_rich", "codex_heavy"],
+      "hazard_tags": ["weather", "collapse", "traps"]
+    },
+    "rewards_and_discoveries": {
+      "artifact_families": ["sunscar_lenses", "glass_obelisks"],
+      "clue_families": ["heliograph_scripts", "dune_seals"]
+    },
+    "codex": {
+      "page_order": 40,
+      "starts_as_unknown_page": true
+    },
+    "hooks": {
+      "chain_hook_tags": ["chain_sunscar_mirage"],
+      "legacy_hook_tags": ["legacy_ember_scholars"]
+    }
+  },
+  {
+    "id": "hollowspire_uplands",
+    "display": {
+      "name": "Hollowspire Uplands",
+      "short_name": "Hollowspire",
+      "region_tier": 3,
+      "summary_text": "Wind-carved highlands of fractured spires where old signal towers still answer with ghost-light echoes.",
+      "codex_sketch_asset": "res://assets/codex/regions/hollowspire_sketch.png"
+    },
+    "theme": {
+      "region_role": "late_mountain_chain",
+      "allowed_biomes": ["mountains", "plains"],
+      "culture_families": ["spireward_orders", "aerie_families"],
+      "art_motifs": ["wind_chimes", "spiral_sigils"],
+      "fantasy_level": "mythic"
+    },
+    "progression": {
+      "starts_visible": true,
+      "starts_unlocked": false,
+      "prerequisite_region_ids": ["greyfen_march"],
+      "prerequisite_clue_tags": ["clue_spire_keys"],
+      "prerequisite_research_tags": ["research_altitude_gear"],
+      "prerequisite_logistics_tags": ["logistics_highland_paths"]
+    },
+    "generation_rules": {
+      "route_types": ["relay_repair", "summit_recon"],
+      "site_families": ["watchtower", "fort", "library"],
+      "site_conditions": ["abandoned", "contested", "buried"],
+      "opportunity_profiles": ["codex_heavy", "balanced"],
+      "hazard_tags": ["weather", "collapse", "hostile_fauna"]
+    },
+    "rewards_and_discoveries": {
+      "artifact_families": ["spire_resonators", "sky_anchors"],
+      "clue_families": ["upland_signals", "echo_ledger"]
+    },
+    "codex": {
+      "page_order": 50,
+      "starts_as_unknown_page": true
+    },
+    "hooks": {
+      "chain_hook_tags": ["chain_hollowspire_echo"],
+      "legacy_hook_tags": ["legacy_upland_concord"]
+    }
+  }
+]

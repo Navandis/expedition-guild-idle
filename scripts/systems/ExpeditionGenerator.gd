@@ -4,6 +4,10 @@ class_name ExpeditionGenerator
 # ExpeditionGenerator is the content "assembler" for expedition offers.
 # It loads JSON content pools, picks random combinations, and returns
 # normalized dictionaries that UI/gameplay systems can consume directly.
+#
+# Region slice note:
+# Callers can now pass region generation constraints. The generator keeps the
+# same output structure while filtering each content pool by selected region.
 
 const BIOMES_PATH := "res://data/expeditions/biomes.json"
 const SITE_TYPES_PATH := "res://data/expeditions/site_types.json"
@@ -51,14 +55,14 @@ func _init() -> void:
 	_reload_content()
 
 
-func generate_expeditions(count: int, excluded_signatures: Array[String] = []) -> Array[Dictionary]:
+func generate_expeditions(count: int, excluded_signatures: Array[String] = [], generation_context: Dictionary = {}) -> Array[Dictionary]:
 	# Clamp to board rules so callers cannot request impossible counts.
 	var expedition_count := clampi(count, 3, 5)
 	var expeditions: Array[Dictionary] = []
 	var reserved_signatures := excluded_signatures.duplicate()
 
 	for _i in expedition_count:
-		var expedition := generate_single_expedition(reserved_signatures)
+		var expedition := generate_single_expedition(reserved_signatures, generation_context)
 		if expedition.is_empty():
 			continue
 
@@ -68,15 +72,15 @@ func generate_expeditions(count: int, excluded_signatures: Array[String] = []) -
 	# Safe fallback if generation was interrupted by malformed/degraded content
 	# and uniqueness filtering cannot satisfy the requested board size.
 	if expeditions.size() < expedition_count:
-		return _generate_fallback_expeditions(expedition_count)
+		return _generate_fallback_expeditions(expedition_count, generation_context)
 
 	return expeditions
 
 
-func generate_single_expedition(excluded_signatures: Array[String] = []) -> Dictionary:
+func generate_single_expedition(excluded_signatures: Array[String] = [], generation_context: Dictionary = {}) -> Dictionary:
 	# Keep trying random combinations until we find one not already on the board.
 	for attempt in MAX_UNIQUE_ATTEMPTS:
-		var expedition := _build_random_expedition(attempt)
+		var expedition := _build_random_expedition(attempt, generation_context)
 		if expedition.is_empty():
 			continue
 
@@ -98,13 +102,14 @@ func build_signature(expedition: Dictionary) -> String:
 	]
 
 
-func _build_random_expedition(index: int) -> Dictionary:
+func _build_random_expedition(index: int, generation_context: Dictionary) -> Dictionary:
 	# Pick one record from each content category to build a full card.
-	var biome := _pick_random(_biomes)
-	var site_type := _pick_random(_site_types)
-	var state_modifier := _pick_random(_states)
-	var reward_profile := _pick_random(_reward_profiles)
-	var hazard := _pick_random(_hazards)
+	# Region constraints are optional and only filter pools by allowed IDs.
+	var biome := _pick_random(_filter_pool_by_allowed_ids(_biomes, _to_string_array(generation_context.get("allowed_biomes", []))))
+	var site_type := _pick_random(_filter_pool_by_allowed_ids(_site_types, _to_string_array(generation_context.get("site_families", []))))
+	var state_modifier := _pick_random(_filter_pool_by_allowed_ids(_states, _to_string_array(generation_context.get("site_conditions", []))))
+	var reward_profile := _pick_random(_filter_pool_by_allowed_ids(_reward_profiles, _to_string_array(generation_context.get("opportunity_profiles", []))))
+	var hazard := _pick_random(_filter_pool_by_allowed_ids(_hazards, _to_string_array(generation_context.get("hazard_tags", []))))
 	var difficulty_config := _pick_random(DIFFICULTY_CONFIG)
 
 	if biome.is_empty() or site_type.is_empty() or state_modifier.is_empty() or reward_profile.is_empty() or hazard.is_empty() or difficulty_config.is_empty():
@@ -122,6 +127,8 @@ func _build_random_expedition(index: int) -> Dictionary:
 
 	return {
 		"id": _build_expedition_id(biome, site_type, state_modifier, index),
+		"region_id": str(generation_context.get("region_id", "")),
+		"region_name": str(generation_context.get("region_name", "")),
 		"biome": str(biome.get("id", "unknown_biome")),
 		"site_type": str(site_type.get("id", "unknown_site")),
 		"state_modifier": str(state_modifier.get("id", "unknown_state")),
@@ -155,6 +162,24 @@ func _pick_random(pool: Array) -> Dictionary:
 	return pool[_rng.randi_range(0, pool.size() - 1)]
 
 
+func _filter_pool_by_allowed_ids(pool: Array, allowed_ids: Array[String]) -> Array:
+	# Constraint behavior:
+	# - Empty allowed_ids means "no region filter" (use full pool).
+	# - Unknown IDs are ignored; if no matches remain we fall back to full pool so
+	#   generation still works during content iteration.
+	if allowed_ids.is_empty():
+		return pool
+
+	var filtered: Array = []
+	for entry in pool:
+		if not (entry is Dictionary):
+			continue
+		if allowed_ids.has(str((entry as Dictionary).get("id", ""))):
+			filtered.append(entry)
+
+	return filtered if not filtered.is_empty() else pool
+
+
 func _build_expedition_id(biome: Dictionary, site_type: Dictionary, state_modifier: Dictionary, index: int) -> String:
 	return "exp_%s_%s_%s_%03d" % [
 		str(biome.get("id", "biome")),
@@ -173,12 +198,14 @@ func _build_flavor_summary(state_modifier: Dictionary, biome: Dictionary, site_t
 	]
 
 
-func _generate_fallback_expeditions(count: int) -> Array[Dictionary]:
+func _generate_fallback_expeditions(count: int, generation_context: Dictionary) -> Array[Dictionary]:
 	_reload_content()
 	var fallback_expeditions: Array[Dictionary] = []
 	for i in count:
 		fallback_expeditions.append({
 			"id": "exp_fallback_%03d" % i,
+			"region_id": str(generation_context.get("region_id", "")),
+			"region_name": str(generation_context.get("region_name", "")),
 			"biome": "plains",
 			"site_type": "ruins",
 			"state_modifier": "abandoned",
@@ -194,3 +221,16 @@ func _generate_fallback_expeditions(count: int) -> Array[Dictionary]:
 			"base_success": 0.85
 		})
 	return fallback_expeditions
+
+
+func _to_string_array(value: Variant) -> Array[String]:
+	var output: Array[String] = []
+	if value is Array:
+		for item in value:
+			var text := str(item).strip_edges()
+			if text.is_empty():
+				continue
+			if output.has(text):
+				continue
+			output.append(text)
+	return output

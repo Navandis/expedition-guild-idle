@@ -6,9 +6,15 @@ class_name ExpeditionBoardController
 # 2) Render one card per offer.
 # 3) Track which card is selected.
 # 4) Emit flow signals (dispatch request or return home).
+#
+# Region slice note:
+# The board now exposes a minimal region picker and shows which region is active.
+# Generation still happens in this controller, but pools are constrained via
+# generation_context provided by GameManager/RegionSystem.
 
 signal expedition_dispatch_requested(expedition_data: Dictionary)
 signal return_to_guild_hall_requested
+signal region_selected(region_id: String)
 
 const MIN_EXPEDITIONS := 3
 const MAX_EXPEDITIONS := 5
@@ -18,6 +24,8 @@ const MAX_EXPEDITIONS := 5
 @onready var _cards_container: VBoxContainer = $SafeArea/RootColumn/CardScroll/ExpeditionCardsContainer
 @onready var _dispatch_button: Button = $SafeArea/RootColumn/DispatchButton
 @onready var _selection_label: Label = $SafeArea/RootColumn/SelectionLabel
+@onready var _region_summary_label: Label = $SafeArea/RootColumn/RegionSummaryLabel
+@onready var _region_selector: OptionButton = $SafeArea/RootColumn/RegionSelector
 @onready var _back_button: Button = $SafeArea/RootColumn/BackButton
 
 var _generator := ExpeditionGenerator.new()
@@ -25,6 +33,8 @@ var _selected_expedition: Dictionary = {}
 var _card_views: Array[ExpeditionCardView] = []
 var _upgrade_effects: Dictionary = {}
 var _initial_board_offers: Array[Dictionary] = []
+var _generation_context: Dictionary = {}
+var _region_rows: Array[Dictionary] = []
 
 
 func _ready() -> void:
@@ -33,6 +43,8 @@ func _ready() -> void:
 	_dispatch_button.disabled = true
 	_dispatch_button.pressed.connect(_on_dispatch_pressed)
 	_back_button.pressed.connect(_on_back_pressed)
+	_region_selector.item_selected.connect(_on_region_selector_changed)
+	_refresh_region_selector()
 	_generate_board(_initial_board_offers)
 
 
@@ -50,6 +62,14 @@ func set_initial_board_offers(board_offers: Array[Dictionary]) -> void:
 	_initial_board_offers = board_offers.duplicate(true)
 
 
+func set_region_data(region_rows: Array[Dictionary], generation_context: Dictionary) -> void:
+	# Called by GameManager whenever region state changes.
+	_region_rows = region_rows.duplicate(true)
+	_generation_context = generation_context.duplicate(true)
+	if is_node_ready():
+		_refresh_region_selector()
+
+
 func get_board_offers() -> Array[Dictionary]:
 	var offers: Array[Dictionary] = []
 	for card in _card_views:
@@ -65,7 +85,7 @@ func replace_expedition_by_id(expedition_id: String, dispatched_expedition: Dict
 
 	var signatures_to_exclude := _get_current_board_signatures()
 	signatures_to_exclude.append(_generator.build_signature(dispatched_expedition))
-	var replacement := _generator.generate_single_expedition(signatures_to_exclude)
+	var replacement := _generator.generate_single_expedition(signatures_to_exclude, _generation_context)
 	if replacement.is_empty():
 		_selected_expedition = {}
 		_dispatch_button.disabled = true
@@ -78,6 +98,12 @@ func replace_expedition_by_id(expedition_id: String, dispatched_expedition: Dict
 	_selection_label.text = "Select an expedition to continue."
 
 
+func regenerate_board_for_selected_region() -> void:
+	# Region changes invalidate old offers, so rebuild with selected constraints.
+	_initial_board_offers = []
+	_generate_board([])
+
+
 func _generate_board(existing_offers: Array[Dictionary] = []) -> void:
 	_clear_cards()
 
@@ -86,7 +112,7 @@ func _generate_board(existing_offers: Array[Dictionary] = []) -> void:
 		expeditions = existing_offers.duplicate(true)
 	else:
 		var desired_count := randi_range(MIN_EXPEDITIONS, MAX_EXPEDITIONS)
-		expeditions = _generator.generate_expeditions(desired_count)
+		expeditions = _generator.generate_expeditions(desired_count, [], _generation_context)
 
 	for expedition in expeditions:
 		_add_card(expedition)
@@ -141,7 +167,63 @@ func _is_valid_board_offers(board_offers: Array[Dictionary]) -> bool:
 	for offer in board_offers:
 		if str(offer.get("id", "")).is_empty():
 			return false
+		# Save migration safety: if selected region changed, stale board offers from
+		# another region should not be reused.
+		if str(offer.get("region_id", "")) != str(_generation_context.get("region_id", "")):
+			return false
 	return true
+
+
+func _refresh_region_selector() -> void:
+	if _region_selector == null:
+		return
+
+	var previous_region_id := str(_generation_context.get("region_id", ""))
+	_region_selector.clear()
+	_region_selector.disabled = _region_rows.is_empty()
+
+	for row in _region_rows:
+		var region_id := str(row.get("id", ""))
+		var is_visible := bool(row.get("is_visible", false))
+		if not is_visible:
+			continue
+		var is_unlocked := bool(row.get("is_unlocked", false))
+		var label := str(row.get("name", region_id))
+		if not is_unlocked:
+			label = "%s (Locked)" % label
+		_region_selector.add_item(label)
+		var option_index := _region_selector.item_count - 1
+		_region_selector.set_item_metadata(option_index, region_id)
+		if not is_unlocked:
+			_region_selector.set_item_disabled(option_index, true)
+
+	if _region_selector.item_count <= 0:
+		_region_summary_label.text = "No visible regions."
+		return
+
+	var selected_index := 0
+	for i in range(_region_selector.item_count):
+		if str(_region_selector.get_item_metadata(i)) == previous_region_id:
+			selected_index = i
+			break
+
+	_region_selector.select(selected_index)
+	_refresh_region_summary_from_selector()
+
+
+func _refresh_region_summary_from_selector() -> void:
+	if _region_selector.item_count <= 0:
+		_region_summary_label.text = "Selected Region: None"
+		return
+	var selected_text := _region_selector.get_item_text(_region_selector.selected)
+	_region_summary_label.text = "Selected Region: %s" % selected_text
+
+
+func _on_region_selector_changed(index: int) -> void:
+	if index < 0 or index >= _region_selector.item_count:
+		return
+	_refresh_region_summary_from_selector()
+	region_selected.emit(str(_region_selector.get_item_metadata(index)))
 
 
 func _on_card_selected(expedition_data: Dictionary) -> void:
