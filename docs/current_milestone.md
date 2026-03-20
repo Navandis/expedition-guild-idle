@@ -1,179 +1,184 @@
-# Current Milestone — Multi-Slot Expeditions
+# Expedition Guild Idle — Region Foundation Slice
 
-## Milestone Name
-Two-Slot Expedition Flow
+## Purpose
+Introduce authored regions as the new expedition context layer without rebuilding the existing expedition loop.
+
+This milestone should establish the minimum viable foundations for:
+- region definitions
+- per-player region progress state
+- region-based expedition generation
+- minimal UI support for selecting a region and seeing region availability
+
+This is a foundation milestone, not a full feature pass. It should make the game feel different in one meaningful way while staying small, save-safe, and compatible with the existing architecture.
 
 ## Goal
-Expand the prototype from a single active expedition into a small multi-slot version of the core loop.
+Move expedition generation from:
+- global/random expedition offer pool
 
-This milestone is successful when the player can:
-- run up to 2 expeditions at the same time
-- see both slots clearly from the Home / Guild Hall screen
-- dispatch new expeditions while another slot is already active
-- handle multiple completed expeditions safely through pending reports
-- save/load this multi-slot state correctly
+to:
+- player selects a region, then expedition offers are generated inside that region’s authored constraints
 
-This milestone is intended to improve the feel of the loop without widening the game design.
+without yet adding:
+- logistics gameplay
+- chained discoveries
+- research
+- final Codex UI
+- backend/server systems
 
----
+## Design intent
+This milestone should establish these core truths in code:
+- Regions are authored content packs, not runtime-generated areas.
+- Region definition, player region progress, and generated expedition offers are separate data layers.
+- The game remains JSON-driven for authored content.
+- The new structure should be compatible with eventual backend/profile migration, but still use local save JSON for now.
+- UI changes should be minimal and structural, only enough to support region-based generation.
 
-## Current Repo State
-Already working:
-- expedition generation and expedition board
-- dispatch confirmation flow
-- expedition completion and reports
-- reward collection
-- resources
-- upgrades
-- codex/discoveries
-- save/load persistence
-- debug reset and debug complete tools
+## Scope
 
-Current limitation:
-- only one expedition can be active at a time
-- one pending report blocks further dispatch
+### In scope
+- Add authored region data definitions in JSON
+- Add region loading/parsing/validation plumbing
+- Add per-player region progress save data structure
+- Seed initial player region progress for the first 5 authored regions
+- Support visibility/unlock state per region
+- Allow the player to choose a region before browsing expeditions
+- Generate expedition offers only from the selected region’s allowed pools
+- Add a minimal Regions section or minimal Codex region view sufficient to inspect known/unknown regions
+- Keep existing dispatch/report/reward loop working
+- Keep debug tools compatible
 
----
+### Out of scope
+- No backend or database integration
+- No auth/cloud save
+- No asynchronous multiplayer systems
+- No logistics requirement gameplay yet
+- No chain discovery system yet
+- No final tome-style Codex redesign
+- No large Guild Hall redesign
+- No progression rebalance pass
+- No specialist/advisor systems
+- No major UI polish or theming pass
 
-## In Scope
+## Required authored region model
+For this milestone, each region should support at least these required fields:
+- `id`
+- `display.name`
+- `display.short_name`
+- `display.region_tier`
+- `display.summary_text`
+- `display.codex_sketch_asset`
+- `theme.region_role`
+- `theme.allowed_biomes`
+- `theme.culture_families`
+- `theme.art_motifs`
+- `theme.fantasy_level`
+- `progression.starts_visible`
+- `progression.starts_unlocked`
+- `progression.prerequisite_region_ids`
+- `progression.prerequisite_clue_tags`
+- `progression.prerequisite_research_tags`
+- `progression.prerequisite_logistics_tags`
+- `generation_rules.route_types`
+- `generation_rules.site_families`
+- `generation_rules.site_conditions`
+- `generation_rules.opportunity_profiles`
+- `generation_rules.hazard_tags`
+- `rewards_and_discoveries.artifact_families`
+- `rewards_and_discoveries.clue_families`
+- `codex.page_order`
+- `codex.starts_as_unknown_page`
+- `hooks.chain_hook_tags`
+- `hooks.legacy_hook_tags`
 
-### Systems in scope
-- support exactly 2 active expedition slots
-- replace single active expedition state with a 2-slot structure
-- replace single pending report state with a queue or list of pending reports
-- keep expedition completion logic per slot
-- keep reward collection one-time and safe
-- preserve existing upgrade effects, codex discovery recording, and save/load behavior
+The exact five starter regions to seed:
+- Greenhollow Reaches
+- Emberwake Coast
+- Greyfen March
+- Sunscar Expanse
+- Hollowspire Uplands
 
-### UI in scope
-- Home / Guild Hall must show 2 expedition slots clearly
-- each slot should show:
-  - empty / active / completed state
-  - expedition name when occupied
-  - remaining time when active
-- pending reports should be visible as a count or list
-- opening reports should work cleanly when multiple reports exist
-- Expedition Board should allow dispatch while at least one slot is free
-- Dispatch flow should clearly explain when all slots are full
+## Required per-player region progress save-state
+Each region should have player progress stored separately from authored region JSON.
 
-### Save data in scope
-- 2 active expedition slots
-- pending reports queue/list
-- all current resource / upgrade / codex state
+Required fields:
+- `is_visible`
+- `is_unlocked`
+- `expeditions_completed`
+- `region_discovery_points`
+- `codex_reveal_stage`
+- `artifact_families_seen`
+- `clue_tags_found`
+- `active_chain_ids`
+- `completion_flags`
 
----
+Important guardrail:
+- authored data must not store player state
+- player save data must not duplicate authored region rules unnecessarily
 
-## Explicitly Out of Scope
-Do not implement any of the following during this milestone:
+## Data / architecture guardrails for future backend migration
+This is important, but still intentionally light-weight for now.
 
-- more than 2 expedition slots
-- specialist assignment per slot
-- team composition
-- slot-specific upgrades
-- report comparison screen
-- bulk collect all reports
-- offline catch-up redesign
-- prestige
-- contracts
-- events
-- inventory systems
-- deeper codex mechanics
-- refactoring unrelated systems unless required for correctness
+### Required guardrails
+- Use stable string ids for regions and future-facing content tags
+- Keep authored content JSON separate from player save/profile JSON
+- Treat save-owned data conceptually as player profile state, even if still stored locally
+- Avoid screen-local ownership of important persistent state
+- Keep region unlock/progress logic in a gameplay/system layer, not buried inside UI scripts
+- Keep save/load shape explicit and easy to serialize later
+- If save versioning already exists, extend it cleanly; if not, add a simple save version field now only if straightforward
 
----
+### Explicit non-goals
+- Do not add a real database
+- Do not add network code
+- Do not add live-service scaffolding
+- Do not attempt production-ready backend architecture
 
-## Design Constraints
-- Godot 4
-- GDScript only
-- keep implementation simple and readable
-- prefer explicit data structures over clever abstractions
-- preserve current screen flow where possible
-- do not redesign the prototype around party/team systems yet
-- keep this milestone focused on “2 concurrent expeditions” only
+## UI guardrails
+Only minimal UI changes should be made in this milestone.
 
----
+### Allowed UI changes
+- Add a simple way to choose the active/selected region before browsing expedition offers
+- Show which regions are unlocked vs visible-but-locked
+- Show region name and summary context where expeditions are being generated
+- Add a minimal region info view in Codex or a minimal Regions subsection
+- Add simple unknown-region placeholder presentation where needed
 
-## Core Design Decisions
-To keep complexity low, use these rules:
+### Avoid in this milestone
+- no full Codex visual redesign
+- no decorative tome implementation
+- no large navigation rewrite
+- no full Guild Hall dashboard redesign
+- no skinning/theming pass
+- no animation pass
 
-1. The prototype supports exactly 2 expedition slots.
-2. Dispatch should use the first available free slot automatically.
-3. If both slots are full, dispatch is blocked with clear messaging.
-4. Completed expeditions should create pending reports in a queue/list.
-5. Reports should be opened and collected one at a time.
-6. Reward collection remains one-time only.
-7. Debug tools should continue to work with the new multi-slot model.
-
----
-
-## Code Clarity / Internal Comments Requirement
-For every new or updated script in this milestone:
-
-- add a short file header comment at the top describing:
-  - what the script is responsible for
-  - how it fits into the multi-slot flow
-- add inline comments where helpful to explain:
-  - slot assignment
-  - slot completion
-  - pending report queue handling
-  - save/load restore behavior for multiple slots
-  - how debug-complete behavior works with multiple active slots
-- write comments for a novice engineer
-- keep comments useful and concise; do not comment every trivial line
-
-For scenes:
-- use clear node names
-- keep hierarchy straightforward
-- put explanatory comments in controller scripts where scene behavior needs explanation
-
----
-
-## Build Order
-Implement in this order:
-
-1. runtime data model for 2 active slots + report queue
-2. Home / Guild Hall UI updates
-3. dispatch flow updates
-4. report queue handling
-5. save/load updates
-6. debug-tool compatibility
-7. edge-case cleanup
-
----
+## Suggested implementation shape
+This is not mandatory if the current repo suggests better naming, but the structure should roughly move toward:
+- region content JSON file(s)
+- region data loader/parser
+- region progress save structure
+- GameManager or a closely related system owning selected region + region access state
+- Expedition generation updated to accept region context
+- Expedition Board updated to use selected region context
+- Codex or minimal region screen updated to show known/unknown region information
 
 ## Deliverables
-By the end of this milestone, the prototype should include:
+- region JSON content file(s) with 5 starter regions
+- loading/parsing support for region definitions
+- save/load support for region player progress
+- active selected region support
+- expedition generation constrained by selected region
+- minimal region selection UI
+- minimal region information/Codex support
+- updated debug/reset flows as needed so the system remains testable
 
-1. support for exactly 2 simultaneous active expeditions
-2. a Home / Guild Hall screen that clearly shows both slots
-3. dispatch flow that fills the first free slot automatically
-4. blocked dispatch messaging when all slots are occupied
-5. pending reports handled through a queue/list
-6. one-at-a-time report viewing and collection
-7. save/load support for 2 active slots and multiple pending reports
-8. compatibility with existing upgrades, codex, and debug tools
-
----
-
-## Acceptance Criteria
-This milestone is complete when all of the following are true:
-
-- The player can dispatch an expedition into slot 1
-- The player can dispatch a second expedition while slot 1 is still active
-- The player cannot dispatch a third expedition
-- The Home screen clearly shows both slot states
-- Completed expeditions generate pending reports without breaking other active slots
-- Multiple pending reports can be opened and collected safely, one at a time
-- Reward collection still works once and only once
-- Save/load restores the 2-slot runtime state safely
-- Debug finish/reset tools still function correctly
-- New and updated scripts contain beginner-friendly comments
-
----
-
-## Notes for Codex
-- Build only what is required for this milestone
-- Keep the implementation explicit and prototype-friendly
-- Prefer a small queue/list model over a large manager hierarchy
-- Do not introduce team/party systems yet
-- Do not widen the design beyond 2 concurrent expeditions
+## Acceptance criteria
+- The game still boots and the existing core loop still works
+- At least 5 authored regions exist in data
+- A new save initializes with the intended initial visibility/unlock state for those regions
+- The player can select an unlocked region and see expedition offers generated only from that region’s authored rules
+- Locked-but-visible regions are shown as unavailable and cannot yet be selected for expedition generation
+- Existing dispatch, active slot, report, reward, and upgrade flows continue to work
+- Save/load persists selected region and per-region player progress correctly
+- Reset/debug flows still function without breaking the new region layer
+- No backend/network/database work is introduced
+- UI changes remain minimal and functional rather than becoming a broad redesign
