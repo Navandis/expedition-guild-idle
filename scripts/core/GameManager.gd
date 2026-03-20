@@ -407,13 +407,13 @@ func _on_region_selected(region_id: String) -> void:
 	# Region selection state is owned by RegionSystem and persisted in saves.
 	if not _region_system.set_selected_region(region_id):
 		return
-	_expedition_board_offers = []
 	if _expedition_board_controller != null:
+		# Re-send region context so the board can swap to that region's cached
+		# session offers (or generate once if this is first visit for that region).
 		_expedition_board_controller.set_region_data(
 			_region_system.get_region_list_for_ui(),
 			_region_system.get_generation_rules_for_selected_region()
 		)
-		_expedition_board_controller.regenerate_board_for_selected_region()
 		_capture_expedition_board_state()
 	_save_runtime_state()
 

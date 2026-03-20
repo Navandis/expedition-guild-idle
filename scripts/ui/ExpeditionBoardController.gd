@@ -1,6 +1,11 @@
 extends Control
 class_name ExpeditionBoardController
 
+# File role:
+# Handles Expedition Board UI behavior for offer generation, selection, and
+# region switching. The board now keeps per-region offers stable for one
+# screen visit by caching generated offers in-memory.
+#
 # ExpeditionBoardController manages the full board lifecycle:
 # 1) Generate expedition offers.
 # 2) Render one card per offer.
@@ -35,6 +40,7 @@ var _upgrade_effects: Dictionary = {}
 var _initial_board_offers: Array[Dictionary] = []
 var _generation_context: Dictionary = {}
 var _region_rows: Array[Dictionary] = []
+var _session_offers_by_region: Dictionary = {}
 
 
 func _ready() -> void:
@@ -45,7 +51,7 @@ func _ready() -> void:
 	_back_button.pressed.connect(_on_back_pressed)
 	_region_selector.item_selected.connect(_on_region_selector_changed)
 	_refresh_region_selector()
-	_generate_board(_initial_board_offers)
+	_show_board_for_selected_region()
 
 
 func get_selected_expedition() -> Dictionary:
@@ -68,9 +74,11 @@ func set_region_data(region_rows: Array[Dictionary], generation_context: Diction
 	_generation_context = generation_context.duplicate(true)
 	if is_node_ready():
 		_refresh_region_selector()
+		_show_board_for_selected_region()
 
 
 func get_board_offers() -> Array[Dictionary]:
+	# Save currently visible offers so GameManager can persist the active region.
 	var offers: Array[Dictionary] = []
 	for card in _card_views:
 		offers.append(card.expedition_data.duplicate(true))
@@ -87,21 +95,28 @@ func replace_expedition_by_id(expedition_id: String, dispatched_expedition: Dict
 	signatures_to_exclude.append(_generator.build_signature(dispatched_expedition))
 	var replacement := _generator.generate_single_expedition(signatures_to_exclude, _generation_context)
 	if replacement.is_empty():
+		# Even without a replacement, persist the post-dispatch board shape so
+		# region switching does not restore a stale pre-dispatch cache snapshot.
+		_cache_current_region_offers()
 		_selected_expedition = {}
 		_dispatch_button.disabled = true
 		_selection_label.text = "Select an expedition to continue."
 		return
 
 	_add_card(replacement)
+	_cache_current_region_offers()
 	_selected_expedition = {}
 	_dispatch_button.disabled = true
 	_selection_label.text = "Select an expedition to continue."
 
 
 func regenerate_board_for_selected_region() -> void:
-	# Region changes invalidate old offers, so rebuild with selected constraints.
-	_initial_board_offers = []
-	_generate_board([])
+	# Keep this method for compatibility with existing callers.
+	# It intentionally clears only the currently selected region cache entry.
+	var region_id := _get_selected_region_id()
+	if _session_offers_by_region.has(region_id):
+		_session_offers_by_region.erase(region_id)
+	_show_board_for_selected_region(true)
 
 
 func _generate_board(existing_offers: Array[Dictionary] = []) -> void:
@@ -118,6 +133,8 @@ func _generate_board(existing_offers: Array[Dictionary] = []) -> void:
 		_add_card(expedition)
 
 	_selection_label.text = "Select an expedition to continue."
+	_dispatch_button.disabled = true
+	_selected_expedition = {}
 
 
 func _add_card(expedition: Dictionary) -> void:
@@ -161,15 +178,18 @@ func _remove_card_by_expedition_id(expedition_id: String) -> bool:
 
 
 func _is_valid_board_offers(board_offers: Array[Dictionary]) -> bool:
+	return _is_valid_board_offers_for_region(board_offers, _get_selected_region_id())
+
+
+func _is_valid_board_offers_for_region(board_offers: Array[Dictionary], region_id: String) -> bool:
 	if board_offers.size() < MIN_EXPEDITIONS or board_offers.size() > MAX_EXPEDITIONS:
 		return false
 
 	for offer in board_offers:
 		if str(offer.get("id", "")).is_empty():
 			return false
-		# Save migration safety: if selected region changed, stale board offers from
-		# another region should not be reused.
-		if str(offer.get("region_id", "")) != str(_generation_context.get("region_id", "")):
+		# Safety guard: only use offers that belong to the target region.
+		if str(offer.get("region_id", "")) != region_id:
 			return false
 	return true
 
@@ -222,6 +242,9 @@ func _refresh_region_summary_from_selector() -> void:
 func _on_region_selector_changed(index: int) -> void:
 	if index < 0 or index >= _region_selector.item_count:
 		return
+	# Selection is region-scoped. Clear old selection so dispatch cannot carry
+	# a stale expedition from another region.
+	_clear_selected_expedition()
 	_refresh_region_summary_from_selector()
 	region_selected.emit(str(_region_selector.get_item_metadata(index)))
 
@@ -240,6 +263,11 @@ func _on_card_selected(expedition_data: Dictionary) -> void:
 func _on_dispatch_pressed() -> void:
 	if _selected_expedition.is_empty():
 		return
+	# Defensive check: only dispatch if selected expedition still belongs to
+	# the active region and still exists on the visible board.
+	if not _is_selected_expedition_dispatchable():
+		_clear_selected_expedition()
+		return
 
 	expedition_dispatch_requested.emit(_selected_expedition.duplicate(true))
 	print("Dispatch requested for: %s" % str(_selected_expedition.get("display_name", "Unknown Expedition")))
@@ -247,3 +275,67 @@ func _on_dispatch_pressed() -> void:
 
 func _on_back_pressed() -> void:
 	return_to_guild_hall_requested.emit()
+
+
+func _show_board_for_selected_region(force_regenerate: bool = false) -> void:
+	var region_id := _get_selected_region_id()
+	if region_id.is_empty():
+		_generate_board([])
+		return
+
+	var offers_for_region: Array[Dictionary] = []
+	var has_cached := _session_offers_by_region.has(region_id)
+	if has_cached:
+		offers_for_region = _duplicate_offer_array(_session_offers_by_region.get(region_id, []))
+	elif _is_valid_board_offers_for_region(_initial_board_offers, region_id):
+		# On first board load, reuse saved offers for this region if they exist.
+		offers_for_region = _initial_board_offers.duplicate(true)
+
+	if force_regenerate or not _is_valid_board_offers_for_region(offers_for_region, region_id):
+		# Generate once per region during this board visit, then keep cached.
+		var desired_count := randi_range(MIN_EXPEDITIONS, MAX_EXPEDITIONS)
+		offers_for_region = _generator.generate_expeditions(desired_count, [], _generation_context)
+
+	_session_offers_by_region[region_id] = _duplicate_offer_array(offers_for_region)
+	_generate_board(offers_for_region)
+
+
+func _clear_selected_expedition() -> void:
+	_selected_expedition = {}
+	_dispatch_button.disabled = true
+	_selection_label.text = "Select an expedition to continue."
+	for card in _card_views:
+		card.set_selected(false)
+
+
+func _get_selected_region_id() -> String:
+	return str(_generation_context.get("region_id", ""))
+
+
+func _cache_current_region_offers() -> void:
+	var region_id := _get_selected_region_id()
+	if region_id.is_empty():
+		return
+	_session_offers_by_region[region_id] = get_board_offers()
+
+
+func _duplicate_offer_array(value: Variant) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	if not (value is Array):
+		return result
+	for item in value:
+		if item is Dictionary:
+			result.append((item as Dictionary).duplicate(true))
+	return result
+
+
+func _is_selected_expedition_dispatchable() -> bool:
+	var selected_id := str(_selected_expedition.get("id", ""))
+	var selected_region := str(_selected_expedition.get("region_id", ""))
+	var active_region := _get_selected_region_id()
+	if selected_id.is_empty() or selected_region != active_region:
+		return false
+	for card in _card_views:
+		if str(card.expedition_data.get("id", "")) == selected_id:
+			return true
+	return false
