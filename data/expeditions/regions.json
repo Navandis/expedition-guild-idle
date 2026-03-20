@@ -5,7 +5,7 @@
       "name": "Greenhollow Reaches",
       "short_name": "Greenhollow",
       "region_tier": 1,
-      "summary_text": "A moss-laden frontier of collapsed roads and vine-wrapped towers where novice guild crews learn safe routes.",
+      "summary_text": "A moss-laden frontier of collapsed roads and vine-wrapped towers where novice guild crews hone their craft.",
       "codex_sketch_asset": "res://assets/codex/regions/greenhollow_sketch.png"
     },
     "theme": {
@@ -49,7 +49,7 @@
       "name": "Emberwake Coast",
       "short_name": "Emberwake",
       "region_tier": 1,
-      "summary_text": "Salt-fire cliffs and tide-lost shrines where crews race storms and recover heat-scorched relic caches.",
+      "summary_text": "Salty cliffs and tide-lost shrines where crews race storms in search for sun-scorched relic caches.",
       "codex_sketch_asset": "res://assets/codex/regions/emberwake_sketch.png"
     },
     "theme": {
@@ -93,7 +93,7 @@
       "name": "Greyfen March",
       "short_name": "Greyfen",
       "region_tier": 2,
-      "summary_text": "A drowned borderland of half-sunk bastions where shifting ground hides old war records and sinkholes.",
+      "summary_text": "A drowned borderland of half-sunk bastions where shifting ground hides old war traces and sinkholes.",
       "codex_sketch_asset": "res://assets/codex/regions/greyfen_sketch.png"
     },
     "theme": {
@@ -137,7 +137,7 @@
       "name": "Sunscar Expanse",
       "short_name": "Sunscar",
       "region_tier": 3,
-      "summary_text": "A high-heat interior of broken observatories and dune-sealed vaults lit by unstable crystal mirages.",
+      "summary_text": "A sweltering interior of broken observatories and dune-sealed vaults lit by unstable crystal mirages.",
       "codex_sketch_asset": "res://assets/codex/regions/sunscar_sketch.png"
     },
     "theme": {
@@ -181,7 +181,7 @@
       "name": "Hollowspire Uplands",
       "short_name": "Hollowspire",
       "region_tier": 3,
-      "summary_text": "Wind-carved highlands of fractured spires where old signal towers still answer with ghost-light echoes.",
+      "summary_text": "Wind sculpted highlands of fractured spires where old beacons still answer with ghost-light echoes.",
       "codex_sketch_asset": "res://assets/codex/regions/hollowspire_sketch.png"
     },
     "theme": {
