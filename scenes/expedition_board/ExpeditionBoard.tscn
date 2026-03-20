@@ -34,6 +34,15 @@ layout_mode = 2
 text = "Expedition Board"
 horizontal_alignment = 1
 
+[node name="RegionSummaryLabel" type="Label" parent="SafeArea/RootColumn"]
+layout_mode = 2
+text = "Selected Region:"
+autowrap_mode = 3
+
+[node name="RegionSelector" type="OptionButton" parent="SafeArea/RootColumn"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+
 [node name="SelectionLabel" type="Label" parent="SafeArea/RootColumn" unique_id=1866229231]
 layout_mode = 2
 text = "Select an expedition to continue."

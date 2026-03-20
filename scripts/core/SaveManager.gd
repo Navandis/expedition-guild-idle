@@ -2,12 +2,13 @@ extends RefCounted
 class_name SaveManager
 
 # SaveManager handles plain-JSON persistence for this prototype.
-# For the two-slot milestone it stores both expedition slots and the pending
-# report queue, while still allowing backward-compatible reads from older keys.
-# It also provides the debug-clear method used by the temporary reset button.
+# For the region-foundation milestone it now stores:
+# - authored-state references (selected_region_id),
+# - player-owned per-region progress (region_progress),
+# while keeping previous keys for expedition loop persistence.
 
 const SAVE_PATH := "user://prototype_save.json"
-const SAVE_SCHEMA_VERSION := 2
+const SAVE_SCHEMA_VERSION := 3
 
 
 func load_game_state() -> Dictionary:
@@ -47,6 +48,8 @@ func save_game_state(state: Dictionary) -> bool:
 		"resources": _coerce_resources(state.get("resources", {})),
 		"owned_upgrades": _coerce_string_array(state.get("owned_upgrades", [])),
 		"codex_discoveries": _coerce_string_array(state.get("codex_discoveries", [])),
+		"region_progress": _coerce_dictionary_of_dictionaries(state.get("region_progress", {})),
+		"selected_region_id": str(state.get("selected_region_id", "")),
 		"active_expeditions": _coerce_dictionary_array(state.get("active_expeditions", [])),
 		"pending_reports": _coerce_dictionary_array(state.get("pending_reports", [])),
 		"expedition_board_offers": _coerce_dictionary_array(state.get("expedition_board_offers", []))
@@ -118,4 +121,19 @@ func _coerce_dictionary_array(value: Variant) -> Array[Dictionary]:
 		if not (item is Dictionary):
 			continue
 		output.append((item as Dictionary).duplicate(true))
+	return output
+
+
+func _coerce_dictionary_of_dictionaries(value: Variant) -> Dictionary:
+	var output := {}
+	if not (value is Dictionary):
+		return output
+	for key in (value as Dictionary).keys():
+		var region_id := str(key).strip_edges()
+		if region_id.is_empty():
+			continue
+		var row := (value as Dictionary).get(key, {})
+		if not (row is Dictionary):
+			continue
+		output[region_id] = (row as Dictionary).duplicate(true)
 	return output
