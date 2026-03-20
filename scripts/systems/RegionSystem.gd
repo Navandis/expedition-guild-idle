@@ -103,9 +103,10 @@ func restore_player_state(saved_progress: Variant, saved_selected_region_id: Var
 			var region_id := str(region.get("id", ""))
 			if region_id.is_empty() or not (saved_progress as Dictionary).has(region_id):
 				continue
-			var incoming := (saved_progress as Dictionary).get(region_id, {})
-			if incoming is Dictionary:
-				_player_region_progress[region_id] = _sanitize_progress_entry(incoming as Dictionary, region)
+			var incoming_value: Variant = (saved_progress as Dictionary).get(region_id, {})
+			if incoming_value is Dictionary:
+				var incoming: Dictionary = incoming_value
+				_player_region_progress[region_id] = _sanitize_progress_entry(incoming, region)
 
 	_selected_region_id = str(saved_selected_region_id)
 	if not is_region_selectable(_selected_region_id):
