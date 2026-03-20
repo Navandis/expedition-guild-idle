@@ -184,8 +184,8 @@ func _refresh_region_selector() -> void:
 
 	for row in _region_rows:
 		var region_id := str(row.get("id", ""))
-		var is_visible := bool(row.get("is_visible", false))
-		if not is_visible:
+		var row_is_visible := bool(row.get("is_visible", false))
+		if not row_is_visible:
 			continue
 		var is_unlocked := bool(row.get("is_unlocked", false))
 		var label := str(row.get("name", region_id))
