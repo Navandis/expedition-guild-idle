@@ -129,7 +129,7 @@ func set_selected_region(region_id: String) -> bool:
 
 
 func is_region_selectable(region_id: String) -> bool:
-	var progress := _player_region_progress.get(region_id, {})
+	var progress: Variant = _player_region_progress.get(region_id, {})
 	if not (progress is Dictionary):
 		return false
 	return bool((progress as Dictionary).get("is_visible", false)) and bool((progress as Dictionary).get("is_unlocked", false))

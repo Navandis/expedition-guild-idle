@@ -125,14 +125,14 @@ func _coerce_dictionary_array(value: Variant) -> Array[Dictionary]:
 
 
 func _coerce_dictionary_of_dictionaries(value: Variant) -> Dictionary:
-	var output := {}
+	var output: Dictionary = {}
 	if not (value is Dictionary):
 		return output
 	for key in (value as Dictionary).keys():
 		var region_id := str(key).strip_edges()
 		if region_id.is_empty():
 			continue
-		var row := (value as Dictionary).get(key, {})
+		var row: Variant = (value as Dictionary).get(key, {})
 		if not (row is Dictionary):
 			continue
 		output[region_id] = (row as Dictionary).duplicate(true)
