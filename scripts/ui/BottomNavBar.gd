@@ -75,11 +75,11 @@ func _update_responsive_button_sizes() -> void:
 
 	# Keep side buttons square while scaling all seven buttons to fit width.
 	# The center Codex button stays larger/highlighted via a small bonus size.
-	var separation := _buttons_row.get_theme_constant("separation")
-	var center_bonus := 12.0
-	var usable_width := max(_buttons_row.size.x - float(separation * (all_buttons.size() - 1)), 1.0)
-	var side_size := clamp(floor((usable_width - center_bonus) / 7.0), 40.0, 56.0)
-	var center_size := clamp(side_size + center_bonus, 48.0, 72.0)
+	var separation: int = _buttons_row.get_theme_constant("separation")
+	var center_bonus: float = 12.0
+	var usable_width: float = maxf(_buttons_row.size.x - float(separation * (all_buttons.size() - 1)), 1.0)
+	var side_size: float = clampf(floor((usable_width - center_bonus) / 7.0), 40.0, 56.0)
+	var center_size: float = clampf(side_size + center_bonus, 48.0, 72.0)
 
 	for i in all_buttons.size():
 		var is_center := i == 3
