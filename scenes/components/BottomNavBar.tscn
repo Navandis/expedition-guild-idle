@@ -44,6 +44,7 @@ clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 
+; Icon container ignores mouse so button always receives taps/clicks.
 [node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/GHButton"]
 layout_mode = 1
 anchors_preset = 15
@@ -55,6 +56,7 @@ theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
+mouse_filter = 2
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/GHButton/IconMargin"]
 layout_mode = 2
@@ -63,6 +65,7 @@ size_flags_vertical = 4
 texture = ExtResource("2_gh_icon")
 expand_mode = 1
 stretch_mode = 5
+mouse_filter = 2
 
 [node name="EBButton" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(56, 56)
@@ -81,6 +84,7 @@ theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
+mouse_filter = 2
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/EBButton/IconMargin"]
 layout_mode = 2
@@ -89,6 +93,7 @@ size_flags_vertical = 4
 texture = ExtResource("3_eb_icon")
 expand_mode = 1
 stretch_mode = 5
+mouse_filter = 2
 
 [node name="GUButton" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(56, 56)
@@ -107,6 +112,7 @@ theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
+mouse_filter = 2
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/GUButton/IconMargin"]
 layout_mode = 2
@@ -115,6 +121,7 @@ size_flags_vertical = 4
 texture = ExtResource("4_gu_icon")
 expand_mode = 1
 stretch_mode = 5
+mouse_filter = 2
 
 [node name="CXButton" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(72, 72)
@@ -133,6 +140,7 @@ theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
+mouse_filter = 2
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/CXButton/IconMargin"]
 layout_mode = 2
@@ -141,6 +149,7 @@ size_flags_vertical = 4
 texture = ExtResource("5_cx_icon")
 expand_mode = 1
 stretch_mode = 5
+mouse_filter = 2
 
 [node name="XXButtonLeft" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(56, 56)
@@ -160,6 +169,7 @@ theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
+mouse_filter = 2
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/XXButtonLeft/IconMargin"]
 layout_mode = 2
@@ -168,6 +178,7 @@ size_flags_vertical = 4
 texture = ExtResource("6_xx_left_icon")
 expand_mode = 1
 stretch_mode = 5
+mouse_filter = 2
 
 [node name="XXButtonRight" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(56, 56)
@@ -187,6 +198,7 @@ theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
+mouse_filter = 2
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/XXButtonRight/IconMargin"]
 layout_mode = 2
@@ -195,6 +207,7 @@ size_flags_vertical = 4
 texture = ExtResource("7_xx_right_icon")
 expand_mode = 1
 stretch_mode = 5
+mouse_filter = 2
 
 [node name="SHButton" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(56, 56)
@@ -214,6 +227,7 @@ theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
+mouse_filter = 2
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/SHButton/IconMargin"]
 layout_mode = 2
@@ -222,3 +236,4 @@ size_flags_vertical = 4
 texture = ExtResource("8_shop_icon")
 expand_mode = 1
 stretch_mode = 5
+mouse_filter = 2
