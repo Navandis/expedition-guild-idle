@@ -27,43 +27,51 @@ theme_override_constants/margin_bottom = 8
 
 [node name="ButtonsRow" type="HBoxContainer" parent="Panel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
 alignment = 1
 
 [node name="GHButton" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "GH"
 
 [node name="EBButton" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "EB"
 
 [node name="GUButton" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "GU"
 
 [node name="CXButton" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "⬢\nCX"
 
 [node name="XXButtonLeft" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
+size_flags_horizontal = 3
 disabled = true
 text = "XX"
 
 [node name="XXButtonRight" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
+size_flags_horizontal = 3
 disabled = true
 text = "XX"
 
 [node name="SHButton" type="Button" parent="Panel/Margin/ButtonsRow"]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
+size_flags_horizontal = 3
 disabled = true
 text = "SH"
