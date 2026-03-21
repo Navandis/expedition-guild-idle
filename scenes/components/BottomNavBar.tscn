@@ -40,7 +40,7 @@ alignment = 1
 
 [node name="GHButton" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=638326191]
 clip_contents = true
-custom_minimum_size = Vector2(56, 56)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -58,9 +58,12 @@ theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/GHButton/IconMargin" unique_id=40661236]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("2_gh_icon")
 expand_mode = 1
@@ -68,7 +71,7 @@ stretch_mode = 5
 
 [node name="EBButton" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=1872899819]
 clip_contents = true
-custom_minimum_size = Vector2(56, 56)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -86,9 +89,12 @@ theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/EBButton/IconMargin" unique_id=1498448042]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("3_eb_icon")
 expand_mode = 1
@@ -96,7 +102,7 @@ stretch_mode = 5
 
 [node name="GUButton" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=2093062358]
 clip_contents = true
-custom_minimum_size = Vector2(56, 56)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -114,9 +120,12 @@ theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/GUButton/IconMargin" unique_id=1238604836]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("4_gu_icon")
 expand_mode = 1
@@ -124,7 +133,7 @@ stretch_mode = 5
 
 [node name="CXButton" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=787378681]
 clip_contents = true
-custom_minimum_size = Vector2(72, 72)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -142,9 +151,12 @@ theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/CXButton/IconMargin" unique_id=781104538]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("5_cx_icon")
 expand_mode = 1
@@ -152,7 +164,7 @@ stretch_mode = 5
 
 [node name="XXButtonLeft" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=688611344]
 clip_contents = true
-custom_minimum_size = Vector2(56, 56)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
@@ -171,9 +183,12 @@ theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/XXButtonLeft/IconMargin" unique_id=362992459]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("6_xx_left_icon")
 expand_mode = 1
@@ -181,7 +196,7 @@ stretch_mode = 5
 
 [node name="XXButtonRight" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=1210924912]
 clip_contents = true
-custom_minimum_size = Vector2(56, 56)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
@@ -200,9 +215,12 @@ theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/XXButtonRight/IconMargin" unique_id=2066329988]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("7_xx_right_icon")
 expand_mode = 1
@@ -210,7 +228,7 @@ stretch_mode = 5
 
 [node name="SHButton" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=2092965504]
 clip_contents = true
-custom_minimum_size = Vector2(56, 56)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
@@ -229,9 +247,12 @@ theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/SHButton/IconMargin" unique_id=1935695453]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("8_shop_icon")
 expand_mode = 1
