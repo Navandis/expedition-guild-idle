@@ -1,6 +1,7 @@
 extends Control
 class_name ExpeditionBoardController
 
+# File: ExpeditionBoardController.gd
 # File role:
 # Handles Expedition Board UI behavior for offer generation, selection, and
 # region switching. The board now keeps per-region offers stable for one
@@ -20,6 +21,7 @@ class_name ExpeditionBoardController
 signal expedition_dispatch_requested(expedition_data: Dictionary)
 signal return_to_guild_hall_requested
 signal region_selected(region_id: String)
+signal navigate_requested(target_screen: String)
 
 const MIN_EXPEDITIONS := 3
 const MAX_EXPEDITIONS := 5
@@ -32,6 +34,7 @@ const MAX_EXPEDITIONS := 5
 @onready var _region_summary_label: Label = $SafeArea/RootColumn/RegionSummaryLabel
 @onready var _region_selector: OptionButton = $SafeArea/RootColumn/RegionSelector
 @onready var _back_button: Button = $SafeArea/RootColumn/BackButton
+@onready var _bottom_nav: BottomNavBar = $SafeArea/RootColumn/BottomNavBar
 
 var _generator := ExpeditionGenerator.new()
 var _selected_expedition: Dictionary = {}
@@ -49,6 +52,9 @@ func _ready() -> void:
 	_dispatch_button.disabled = true
 	_dispatch_button.pressed.connect(_on_dispatch_pressed)
 	_back_button.pressed.connect(_on_back_pressed)
+	# Bottom nav is shared across major screens in this slice.
+	_bottom_nav.set_current_screen(BottomNavBar.TARGET_EXPEDITION_BOARD)
+	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
 	_region_selector.item_selected.connect(_on_region_selector_changed)
 	_refresh_region_selector()
 	_show_board_for_selected_region()
@@ -275,6 +281,10 @@ func _on_dispatch_pressed() -> void:
 
 func _on_back_pressed() -> void:
 	return_to_guild_hall_requested.emit()
+
+
+func _on_bottom_nav_requested(target_screen: String) -> void:
+	navigate_requested.emit(target_screen)
 
 
 func _show_board_for_selected_region(force_regenerate: bool = false) -> void:

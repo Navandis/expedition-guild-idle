@@ -62,6 +62,7 @@ func _show_guild_hall() -> void:
 		_guild_hall_controller.open_report_requested.connect(_on_open_report_requested)
 		_guild_hall_controller.open_upgrades_requested.connect(_on_open_upgrades_requested)
 		_guild_hall_controller.open_codex_requested.connect(_on_open_codex_requested)
+		_guild_hall_controller.navigate_requested.connect(_on_global_navigation_requested)
 		_guild_hall_controller.debug_finish_requested.connect(_on_debug_finish_requested)
 		_guild_hall_controller.debug_reset_requested.connect(_on_debug_reset_requested)
 
@@ -75,6 +76,7 @@ func _show_expedition_board() -> void:
 		_expedition_board_controller = EXPEDITION_BOARD_SCENE.instantiate() as ExpeditionBoardController
 		_expedition_board_controller.expedition_dispatch_requested.connect(_on_expedition_dispatch_requested)
 		_expedition_board_controller.return_to_guild_hall_requested.connect(_on_return_to_guild_hall_requested)
+		_expedition_board_controller.navigate_requested.connect(_on_global_navigation_requested)
 		_expedition_board_controller.region_selected.connect(_on_region_selected)
 		_expedition_board_controller.set_initial_board_offers(_expedition_board_offers)
 
@@ -122,6 +124,7 @@ func _show_upgrades_screen() -> void:
 	if _upgrades_controller == null:
 		_upgrades_controller = GUILD_UPGRADES_SCENE.instantiate() as UpgradesController
 		_upgrades_controller.back_requested.connect(_on_upgrades_back_requested)
+		_upgrades_controller.navigate_requested.connect(_on_global_navigation_requested)
 		_upgrades_controller.purchase_requested.connect(_on_upgrade_purchase_requested)
 
 	_show_screen(_upgrades_controller)
@@ -132,6 +135,7 @@ func _show_codex_screen() -> void:
 	if _codex_controller == null:
 		_codex_controller = CODEX_SCREEN_SCENE.instantiate() as CodexController
 		_codex_controller.back_requested.connect(_on_codex_back_requested)
+		_codex_controller.navigate_requested.connect(_on_global_navigation_requested)
 
 	_show_screen(_codex_controller)
 	# Codex screen reads a snapshot so it can render text without touching core state.
@@ -177,6 +181,20 @@ func _on_open_upgrades_requested() -> void:
 
 func _on_open_codex_requested() -> void:
 	_show_codex_screen()
+
+
+func _on_global_navigation_requested(target_screen: String) -> void:
+	# Shared bottom-nav routes for GH/EB/GU/CX.
+	# Placeholder buttons (XX/XX/SH) are intentionally inert and emit nothing.
+	match target_screen:
+		BottomNavBar.TARGET_GUILD_HALL:
+			_show_guild_hall()
+		BottomNavBar.TARGET_EXPEDITION_BOARD:
+			_show_expedition_board()
+		BottomNavBar.TARGET_GUILD_UPGRADES:
+			_show_upgrades_screen()
+		BottomNavBar.TARGET_CODEX:
+			_show_codex_screen()
 
 
 func _on_debug_finish_requested() -> void:
