@@ -56,21 +56,6 @@ text = "Relic Fragments: 0"
 layout_mode = 2
 text = "Codex Entries: 0"
 
-[node name="OpenBoardButton" type="Button" parent="SafeArea/RootColumn" unique_id=2015018345]
-custom_minimum_size = Vector2(0, 56)
-layout_mode = 2
-text = "Open Expedition Board"
-
-[node name="OpenUpgradesButton" type="Button" parent="SafeArea/RootColumn" unique_id=774331471]
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-text = "Guild Upgrades"
-
-[node name="OpenCodexButton" type="Button" parent="SafeArea/RootColumn" unique_id=22295093]
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-text = "Codex"
-
 [node name="OpenReportButton" type="Button" parent="SafeArea/RootColumn" unique_id=1348621159]
 visible = false
 custom_minimum_size = Vector2(0, 52)

@@ -5,15 +5,13 @@ class_name GuildHallController
 # GuildHallController is the home screen for the current gameplay loop.
 # In the two-slot milestone it shows both expedition slots (empty/active/
 # completed), the pending report count, and entry points to dispatch/reports.
-# It also exposes Upgrades/Codex navigation and temporary debug controls.
+# Guild Hall now relies on the shared bottom nav for cross-screen navigation,
+# so the old large "Open Board / Upgrades / Codex" buttons were removed.
 # This script also exposes temporary debug controls:
 # - finish active expedition instantly (test-only)
 # - reset all prototype progress through GameManager's shared baseline reset flow.
 
-signal open_expedition_board_requested
 signal open_report_requested
-signal open_upgrades_requested
-signal open_codex_requested
 signal navigate_requested(target_screen: String)
 signal debug_finish_requested
 signal debug_reset_requested
@@ -23,8 +21,6 @@ signal debug_reset_requested
 @onready var _codex_entries_label: Label = $SafeArea/RootColumn/ResourcesPanel/ResourceRows/CodexEntriesLabel
 @onready var _open_report_button: Button = $SafeArea/RootColumn/OpenReportButton
 @onready var _pending_reports_label: Label = $SafeArea/RootColumn/PendingReportsLabel
-@onready var _open_upgrades_button: Button = $SafeArea/RootColumn/OpenUpgradesButton
-@onready var _open_codex_button: Button = $SafeArea/RootColumn/OpenCodexButton
 @onready var _debug_finish_button: Button = $SafeArea/RootColumn/DebugFinishButton
 @onready var _debug_reset_button: Button = $SafeArea/RootColumn/DebugResetButton
 @onready var _slot_one_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/SlotOneLabel
@@ -40,9 +36,6 @@ var _resources := {
 
 
 func _ready() -> void:
-	$SafeArea/RootColumn/OpenBoardButton.pressed.connect(_on_open_board_pressed)
-	_open_upgrades_button.pressed.connect(_on_open_upgrades_pressed)
-	_open_codex_button.pressed.connect(_on_open_codex_pressed)
 	_open_report_button.pressed.connect(_on_open_report_pressed)
 	_debug_finish_button.pressed.connect(_on_debug_finish_pressed)
 	_debug_reset_button.pressed.connect(_on_debug_reset_pressed)
@@ -129,20 +122,8 @@ func _build_slot_text(slot_index: int, slots: Array[Dictionary]) -> String:
 	return "Slot %d: Completed - %s (Report queued)" % [slot_index + 1, expedition_name]
 
 
-func _on_open_board_pressed() -> void:
-	open_expedition_board_requested.emit()
-
-
 func _on_open_report_pressed() -> void:
 	open_report_requested.emit()
-
-
-func _on_open_upgrades_pressed() -> void:
-	open_upgrades_requested.emit()
-
-
-func _on_open_codex_pressed() -> void:
-	open_codex_requested.emit()
 
 
 func _on_bottom_nav_requested(target_screen: String) -> void:

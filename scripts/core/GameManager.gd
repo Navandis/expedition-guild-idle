@@ -58,10 +58,9 @@ func get_selected_expedition_for_activation() -> Dictionary:
 func _show_guild_hall() -> void:
 	if _guild_hall_controller == null:
 		_guild_hall_controller = GUILD_HALL_SCENE.instantiate() as GuildHallController
-		_guild_hall_controller.open_expedition_board_requested.connect(_on_open_expedition_board_requested)
+		# Guild Hall no longer owns big cross-screen nav buttons.
+		# Only report/debug actions are local; GH/EB/GU/CX routing is bottom-nav driven.
 		_guild_hall_controller.open_report_requested.connect(_on_open_report_requested)
-		_guild_hall_controller.open_upgrades_requested.connect(_on_open_upgrades_requested)
-		_guild_hall_controller.open_codex_requested.connect(_on_open_codex_requested)
 		_guild_hall_controller.navigate_requested.connect(_on_global_navigation_requested)
 		_guild_hall_controller.debug_finish_requested.connect(_on_debug_finish_requested)
 		_guild_hall_controller.debug_reset_requested.connect(_on_debug_reset_requested)
@@ -167,20 +166,8 @@ func _show_screen(screen: Control) -> void:
 	_mounted_screen = screen
 
 
-func _on_open_expedition_board_requested() -> void:
-	_show_expedition_board()
-
-
 func _on_open_report_requested() -> void:
 	_show_report_screen()
-
-
-func _on_open_upgrades_requested() -> void:
-	_show_upgrades_screen()
-
-
-func _on_open_codex_requested() -> void:
-	_show_codex_screen()
 
 
 func _on_global_navigation_requested(target_screen: String) -> void:
