@@ -5,13 +5,16 @@ class_name CodexController
 # CodexController renders the prototype Codex screen for the day-3 milestone.
 # It reads discovery data from CodexSystem and turns it into simple progress
 # text so players can quickly see what site types they have discovered.
+# Layout note: the discoveries block now lives inside a ScrollContainer so
+# long text scrolls within content space and cannot push the shared bottom nav
+# off-screen on shorter viewports.
 
 signal back_requested
 signal navigate_requested(target_screen: String)
 
 @onready var _summary_label: Label = $SafeArea/RootColumn/HeaderPanel/HeaderRows/SummaryLabel
 @onready var _hint_label: Label = $SafeArea/RootColumn/HeaderPanel/HeaderRows/HintLabel
-@onready var _entries_list_label: Label = $SafeArea/RootColumn/EntriesPanel/EntriesRows/EntriesListLabel
+@onready var _entries_list_label: Label = $SafeArea/RootColumn/EntriesScroll/EntriesPanel/EntriesRows/EntriesListLabel
 @onready var _bottom_nav: BottomNavBar = $SafeArea/RootColumn/BottomNavBar
 
 

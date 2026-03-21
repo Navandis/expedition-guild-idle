@@ -1,5 +1,8 @@
 [gd_scene format=3]
 
+; Codex screen layout keeps BottomNavBar as a fixed footer.
+; The scroll area above it absorbs tall discovery content so the nav never clips.
+
 [ext_resource type="Script" path="res://scripts/ui/CodexController.gd" id="1_codex"]
 [ext_resource type="PackedScene" path="res://scenes/components/BottomNavBar.tscn" id="2_nav"]
 
@@ -26,6 +29,7 @@ theme_override_constants/margin_bottom = 20
 
 [node name="RootColumn" type="VBoxContainer" parent="SafeArea"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 12
 
 [node name="TitleLabel" type="Label" parent="SafeArea/RootColumn"]
@@ -49,20 +53,23 @@ layout_mode = 2
 text = "Collect expedition rewards to discover site types."
 autowrap_mode = 3
 
-[node name="EntriesPanel" type="PanelContainer" parent="SafeArea/RootColumn"]
-custom_minimum_size = Vector2(0, 380)
+[node name="EntriesScroll" type="ScrollContainer" parent="SafeArea/RootColumn"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="EntriesRows" type="VBoxContainer" parent="SafeArea/RootColumn/EntriesPanel"]
+[node name="EntriesPanel" type="PanelContainer" parent="SafeArea/RootColumn/EntriesScroll"]
+layout_mode = 2
+
+[node name="EntriesRows" type="VBoxContainer" parent="SafeArea/RootColumn/EntriesScroll/EntriesPanel"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="EntriesHeader" type="Label" parent="SafeArea/RootColumn/EntriesPanel/EntriesRows"]
+[node name="EntriesHeader" type="Label" parent="SafeArea/RootColumn/EntriesScroll/EntriesPanel/EntriesRows"]
 layout_mode = 2
 text = "Discovered Site Types"
 
-[node name="EntriesListLabel" type="Label" parent="SafeArea/RootColumn/EntriesPanel/EntriesRows"]
+[node name="EntriesListLabel" type="Label" parent="SafeArea/RootColumn/EntriesScroll/EntriesPanel/EntriesRows"]
 layout_mode = 2
 text = "No discoveries yet."
 autowrap_mode = 3

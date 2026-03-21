@@ -1,5 +1,8 @@
 [gd_scene format=3]
 
+; Guild upgrades keeps BottomNavBar pinned as a fixed footer.
+; The upgrades ScrollContainer now yields to available height instead of forcing a tall minimum.
+
 [ext_resource type="Script" path="res://scripts/ui/UpgradesController.gd" id="1_upg"]
 [ext_resource type="PackedScene" path="res://scenes/components/BottomNavBar.tscn" id="2_nav"]
 
@@ -26,6 +29,7 @@ theme_override_constants/margin_bottom = 20
 
 [node name="RootColumn" type="VBoxContainer" parent="SafeArea"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 12
 
 [node name="TitleLabel" type="Label" parent="SafeArea/RootColumn"]
@@ -55,7 +59,6 @@ text = ""
 autowrap_mode = 3
 
 [node name="UpgradesScroll" type="ScrollContainer" parent="SafeArea/RootColumn"]
-custom_minimum_size = Vector2(0, 380)
 layout_mode = 2
 size_flags_vertical = 3
 
