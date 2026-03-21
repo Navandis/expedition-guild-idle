@@ -2,16 +2,12 @@ extends Control
 class_name GuildHallController
 
 # File: GuildHallController.gd
-# GuildHallController is the dashboard-style landing screen for the current
-# prototype loop. It now prioritizes:
-# - top resource strip (7 equal visual slots),
-# - compact expedition slot cards (empty/ongoing/completed),
-# - pending report state,
-# while cross-screen movement stays in the shared bottom nav.
-#
-# This script also exposes temporary debug controls:
-# - finish active expedition instantly (test-only)
-# - reset all prototype progress through GameManager's shared baseline reset flow.
+# Guild Hall is the dashboard landing screen for the prototype loop.
+# This controller keeps the screen lightweight by handling only:
+# - resource value text updates (icons are wired in the scene),
+# - two active expedition cards with compact status text,
+# - completed-card clicks as the report entry point,
+# - shared bottom-nav routing and test-only debug actions.
 
 signal open_report_requested
 signal navigate_requested(target_screen: String)
@@ -25,21 +21,18 @@ const _SLOT_VISUAL_EMPTY := "empty"
 const _SLOT_VISUAL_ONGOING := "ongoing"
 const _SLOT_VISUAL_COMPLETED := "completed"
 
-@onready var _gold_value_label: Label = $SafeArea/RootColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldValueSlot/Center/GoldValueLabel
-@onready var _relic_fragments_value_label: Label = $SafeArea/RootColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicValueSlot/Center/RelicFragmentsValueLabel
-@onready var _codex_entries_value_label: Label = $SafeArea/RootColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexValueSlot/Center/CodexEntriesValueLabel
-@onready var _open_report_button: Button = $SafeArea/RootColumn/OpenReportButton
+@onready var _gold_value_label: Label = $SafeArea/RootColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
+@onready var _relic_fragments_value_label: Label = $SafeArea/RootColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row/RelicFragmentsValueLabel
+@onready var _codex_entries_value_label: Label = $SafeArea/RootColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row/CodexEntriesValueLabel
 @onready var _pending_reports_label: Label = $SafeArea/RootColumn/PendingReportsLabel
-@onready var _debug_finish_button: Button = $SafeArea/RootColumn/DebugFinishButton
-@onready var _debug_reset_button: Button = $SafeArea/RootColumn/DebugResetButton
-@onready var _slot_one_card: Button = $SafeArea/RootColumn/ExpeditionSlotsColumn/SlotOneCard
-@onready var _slot_two_card: Button = $SafeArea/RootColumn/ExpeditionSlotsColumn/SlotTwoCard
-@onready var _slot_one_name_label: Label = $SafeArea/RootColumn/ExpeditionSlotsColumn/SlotOneCard/Margin/Content/TopRow/TextColumn/SlotOneNameLabel
-@onready var _slot_one_state_label: Label = $SafeArea/RootColumn/ExpeditionSlotsColumn/SlotOneCard/Margin/Content/TopRow/TextColumn/SlotOneStateLabel
-@onready var _slot_one_reward_label: Label = $SafeArea/RootColumn/ExpeditionSlotsColumn/SlotOneCard/Margin/Content/SlotOneRewardLabel
-@onready var _slot_two_name_label: Label = $SafeArea/RootColumn/ExpeditionSlotsColumn/SlotTwoCard/Margin/Content/TopRow/TextColumn/SlotTwoNameLabel
-@onready var _slot_two_state_label: Label = $SafeArea/RootColumn/ExpeditionSlotsColumn/SlotTwoCard/Margin/Content/TopRow/TextColumn/SlotTwoStateLabel
-@onready var _slot_two_reward_label: Label = $SafeArea/RootColumn/ExpeditionSlotsColumn/SlotTwoCard/Margin/Content/SlotTwoRewardLabel
+@onready var _debug_finish_button: Button = $SafeArea/RootColumn/TopRightToolsRow/DebugFinishButton
+@onready var _debug_reset_button: Button = $SafeArea/RootColumn/TopRightToolsRow/DebugResetButton
+@onready var _slot_one_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
+@onready var _slot_two_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
+@onready var _slot_one_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
+@onready var _slot_one_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
+@onready var _slot_two_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
+@onready var _slot_two_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
 @onready var _bottom_nav: BottomNavBar = $SafeArea/RootColumn/BottomNavBar
 
 var _expedition_manager: ExpeditionManager
@@ -54,7 +47,6 @@ var _cached_slot_styles: Dictionary = {}
 
 
 func _ready() -> void:
-	_open_report_button.pressed.connect(_on_open_report_pressed)
 	_debug_finish_button.pressed.connect(_on_debug_finish_pressed)
 	_debug_reset_button.pressed.connect(_on_debug_reset_pressed)
 	_slot_one_card.pressed.connect(func() -> void:
@@ -63,7 +55,7 @@ func _ready() -> void:
 	_slot_two_card.pressed.connect(func() -> void:
 		_on_slot_card_pressed(1)
 	)
-	# Shared bottom nav is now the primary cross-screen backbone.
+	# Shared bottom nav is the primary cross-screen backbone.
 	_bottom_nav.set_current_screen(BottomNavBar.TARGET_GUILD_HALL)
 	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
 	_build_cached_slot_styles()
@@ -88,11 +80,8 @@ func set_resources(resources: Dictionary) -> void:
 
 
 func _refresh_resource_labels() -> void:
-	# Resource row layout note:
-	# - slot 1 is PP placeholder
-	# - slots 2/3 are G + gold value
-	# - slots 4/5 are R + relic fragment value
-	# - slots 6/7 are C + codex entry value
+	# Icon textures are assigned in GuildHall.tscn.
+	# Keep this method focused on number updates only.
 	_gold_value_label.text = str(int(_resources.get("gold", 0)))
 	_relic_fragments_value_label.text = str(int(_resources.get("relic_fragments", 0)))
 	_codex_entries_value_label.text = str(int(_resources.get("codex_entries", 0)))
@@ -107,7 +96,6 @@ func _refresh_active_status() -> void:
 		_set_empty_slot_card(0)
 		_set_empty_slot_card(1)
 		_pending_reports_label.text = "Pending Reports: 0 (none ready)"
-		_open_report_button.visible = false
 		_debug_finish_button.visible = false
 		return
 
@@ -121,13 +109,6 @@ func _refresh_active_status() -> void:
 	else:
 		_pending_reports_label.text = "Pending Reports: 0 (none ready)"
 
-	# Show report button only when a completion report is waiting.
-	_open_report_button.visible = pending_count > 0
-	if pending_count > 0:
-		_open_report_button.text = "View Pending Reports (%d)" % pending_count
-	else:
-		_open_report_button.text = "View Pending Reports"
-
 	# TEMPORARY DEBUG BUTTON: this is test-only and can be removed once QA no longer
 	# needs instant completion during development.
 	_debug_finish_button.visible = _expedition_manager.has_active_expedition()
@@ -140,9 +121,8 @@ func _refresh_slot_card(slot_index: int, slots: Array[Dictionary]) -> void:
 	var card := _get_slot_card(slot_index)
 	var name_label := _get_slot_name_label(slot_index)
 	var state_label := _get_slot_state_label(slot_index)
-	var reward_label := _get_slot_reward_label(slot_index)
 
-	if card == null or name_label == null or state_label == null or reward_label == null:
+	if card == null or name_label == null or state_label == null:
 		return
 
 	if slot_index < 0 or slot_index >= slots.size():
@@ -154,29 +134,25 @@ func _refresh_slot_card(slot_index: int, slots: Array[Dictionary]) -> void:
 		_set_empty_slot_card(slot_index)
 		return
 
-	var expedition_name := str(slot_data.get("display_name", "Unknown Expedition"))
+	# Remove static "Slot X" prefix so each card reads as a compact expedition tile.
+	name_label.text = str(slot_data.get("display_name", "Unknown Expedition"))
 	var status := str(slot_data.get("status", ExpeditionManager.STATUS_IDLE))
-	name_label.text = "Slot %d: %s" % [slot_index + 1, expedition_name]
 
 	if status == ExpeditionManager.STATUS_IN_PROGRESS:
 		var remaining_text := _expedition_manager.get_remaining_time_text_for_slot(slot_index)
-		# Ongoing slot card behavior: compact summary + timer.
 		state_label.text = "In progress · %s left" % remaining_text
-		reward_label.visible = false
-		reward_label.text = ""
 		_slot_is_empty[slot_index] = false
 		card.disabled = true
 		card.focus_mode = Control.FOCUS_NONE
 		_apply_status_border(slot_index, card, _SLOT_VISUAL_ONGOING)
 		return
 
-	# Completed slot card behavior: compact summary + queued report hint.
-	state_label.text = "Completed · report ready"
-	reward_label.visible = true
-	reward_label.text = "Reward: collect from Pending Reports"
+	# Completed cards are now the report interaction entry, replacing the removed
+	# "View Pending Reports" button from the old layout.
+	state_label.text = "Completed · tap to collect report"
 	_slot_is_empty[slot_index] = false
-	card.disabled = true
-	card.focus_mode = Control.FOCUS_NONE
+	card.disabled = false
+	card.focus_mode = Control.FOCUS_ALL
 	_apply_status_border(slot_index, card, _SLOT_VISUAL_COMPLETED)
 
 
@@ -184,15 +160,11 @@ func _set_empty_slot_card(slot_index: int) -> void:
 	var card := _get_slot_card(slot_index)
 	var name_label := _get_slot_name_label(slot_index)
 	var state_label := _get_slot_state_label(slot_index)
-	var reward_label := _get_slot_reward_label(slot_index)
-	if card == null or name_label == null or state_label == null or reward_label == null:
+	if card == null or name_label == null or state_label == null:
 		return
 
-	name_label.text = "Slot %d: Empty" % (slot_index + 1)
-	# Empty slot behavior: pressing this card routes to Expedition Board.
+	name_label.text = "Empty Slot"
 	state_label.text = "Tap to open Expedition Board"
-	reward_label.visible = false
-	reward_label.text = ""
 	_slot_is_empty[slot_index] = true
 	card.disabled = false
 	card.focus_mode = Control.FOCUS_ALL
@@ -239,7 +211,7 @@ func _apply_status_border(slot_index: int, card: Button, visual_state: String) -
 		return
 
 	# We still override all button states so border color remains consistent
-	# even when the card is disabled for ongoing/completed slots.
+	# for enabled and disabled card states.
 	card.add_theme_stylebox_override("normal", base_style)
 	card.add_theme_stylebox_override("hover", base_style.duplicate())
 	card.add_theme_stylebox_override("pressed", base_style.duplicate())
@@ -271,30 +243,27 @@ func _get_slot_state_label(slot_index: int) -> Label:
 	return null
 
 
-func _get_slot_reward_label(slot_index: int) -> Label:
-	if slot_index == 0:
-		return _slot_one_reward_label
-	if slot_index == 1:
-		return _slot_two_reward_label
-	return null
-
-
-func _on_open_report_pressed() -> void:
-	open_report_requested.emit()
-
-
 func _on_bottom_nav_requested(target_screen: String) -> void:
 	# GH/EB/GU/CX are active routes; XX/XX/SH stay inert in the nav component.
 	navigate_requested.emit(target_screen)
 
 
 func _on_slot_card_pressed(slot_index: int) -> void:
-	# Only empty slots are clickable. They are direct shortcuts to Expedition Board.
+	# Empty card -> Expedition Board.
+	# Completed card -> Report flow entry (lightweight replacement for removed button).
 	if slot_index < 0 or slot_index >= _slot_is_empty.size():
 		return
-	if not _slot_is_empty[slot_index]:
+	if _slot_is_empty[slot_index]:
+		navigate_requested.emit(BottomNavBar.TARGET_EXPEDITION_BOARD)
 		return
-	navigate_requested.emit(BottomNavBar.TARGET_EXPEDITION_BOARD)
+	if _expedition_manager == null:
+		return
+	var slots := _expedition_manager.get_active_expeditions()
+	if slot_index < 0 or slot_index >= slots.size():
+		return
+	var slot_data := slots[slot_index]
+	if str(slot_data.get("status", "")) == ExpeditionManager.STATUS_COMPLETED:
+		open_report_requested.emit()
 
 
 func _on_debug_finish_pressed() -> void:
