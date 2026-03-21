@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ca4nismuvcpik"]
 
 [ext_resource type="Script" uid="uid://bky2lwy64owpe" path="res://scripts/ui/GuildHallController.gd" id="1_72fw3"]
-[ext_resource type="PackedScene" path="res://scenes/components/BottomNavBar.tscn" id="2_nav"]
+[ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="2_nav"]
 
 [node name="GuildHall" type="Control" unique_id=1458496136]
 layout_mode = 3
@@ -105,5 +105,5 @@ layout_mode = 2
 text = "Active slots run timers. Completed slots wait for report collection."
 autowrap_mode = 3
 
-[node name="BottomNavBar" parent="SafeArea/RootColumn" instance=ExtResource("2_nav")]
+[node name="BottomNavBar" parent="SafeArea/RootColumn" unique_id=1491293952 instance=ExtResource("2_nav")]
 layout_mode = 2

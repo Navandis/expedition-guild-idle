@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://dxy77rjcxh2v2"]
 
-[ext_resource type="Script" path="res://scripts/ui/BottomNavBar.gd" id="1_nav"]
-[ext_resource type="Texture2D" path="res://assets/UI/NavBar/guild_hall.png" id="2_gh_icon"]
-[ext_resource type="Texture2D" path="res://assets/UI/NavBar/expedition_board.png" id="3_eb_icon"]
-[ext_resource type="Texture2D" path="res://assets/UI/NavBar/guild_upgrades.png" id="4_gu_icon"]
-[ext_resource type="Texture2D" path="res://assets/UI/NavBar/codex.png" id="5_cx_icon"]
-[ext_resource type="Texture2D" path="res://assets/UI/NavBar/XX_1.png" id="6_xx_left_icon"]
-[ext_resource type="Texture2D" path="res://assets/UI/NavBar/XX_2.png" id="7_xx_right_icon"]
-[ext_resource type="Texture2D" path="res://assets/UI/NavBar/shop.png" id="8_shop_icon"]
+[ext_resource type="Script" uid="uid://irmgbcsyxnwi" path="res://scripts/ui/BottomNavBar.gd" id="1_nav"]
+[ext_resource type="Texture2D" uid="uid://d4iaj11yik1wv" path="res://assets/UI/NavBar/guild_hall.png" id="2_gh_icon"]
+[ext_resource type="Texture2D" uid="uid://ci2t6ftukddx8" path="res://assets/UI/NavBar/expedition_board.png" id="3_eb_icon"]
+[ext_resource type="Texture2D" uid="uid://eqitwu4klxiu" path="res://assets/UI/NavBar/guild_upgrades.png" id="4_gu_icon"]
+[ext_resource type="Texture2D" uid="uid://bk0poh2n1vs4r" path="res://assets/UI/NavBar/codex.png" id="5_cx_icon"]
+[ext_resource type="Texture2D" uid="uid://1we3ccas6wky" path="res://assets/UI/NavBar/XX_1.png" id="6_xx_left_icon"]
+[ext_resource type="Texture2D" uid="uid://c5ojpotmsuhhg" path="res://assets/UI/NavBar/XX_2.png" id="7_xx_right_icon"]
+[ext_resource type="Texture2D" uid="uid://ogcnemb8k5dk" path="res://assets/UI/NavBar/shop.png" id="8_shop_icon"]
 
-[node name="BottomNavBar" type="Control"]
+[node name="BottomNavBar" type="Control" unique_id=1711450795]
 custom_minimum_size = Vector2(0, 92)
 layout_mode = 3
 anchors_preset = 10
@@ -17,7 +17,7 @@ anchor_right = 1.0
 grow_horizontal = 2
 script = ExtResource("1_nav")
 
-[node name="Panel" type="PanelContainer" parent="."]
+[node name="Panel" type="PanelContainer" parent="." unique_id=1721807371]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,215 +25,214 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Margin" type="MarginContainer" parent="Panel"]
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=1685163945]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="ButtonsRow" type="HBoxContainer" parent="Panel/Margin"]
+[node name="ButtonsRow" type="HBoxContainer" parent="Panel/Margin" unique_id=352255736]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 3
 alignment = 1
 
-[node name="GHButton" type="Button" parent="Panel/Margin/ButtonsRow"]
-custom_minimum_size = Vector2(56, 56)
+[node name="GHButton" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=638326191]
 clip_contents = true
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 
-; Icon container ignores mouse so button always receives taps/clicks.
-[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/GHButton"]
+[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/GHButton" unique_id=876603441]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
-mouse_filter = 2
 
-[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/GHButton/IconMargin"]
+[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/GHButton/IconMargin" unique_id=40661236]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 2
 texture = ExtResource("2_gh_icon")
 expand_mode = 1
 stretch_mode = 5
-mouse_filter = 2
 
-[node name="EBButton" type="Button" parent="Panel/Margin/ButtonsRow"]
-custom_minimum_size = Vector2(56, 56)
+[node name="EBButton" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=1872899819]
 clip_contents = true
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/EBButton"]
+[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/EBButton" unique_id=146000860]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
-mouse_filter = 2
 
-[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/EBButton/IconMargin"]
+[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/EBButton/IconMargin" unique_id=1498448042]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 2
 texture = ExtResource("3_eb_icon")
 expand_mode = 1
 stretch_mode = 5
-mouse_filter = 2
 
-[node name="GUButton" type="Button" parent="Panel/Margin/ButtonsRow"]
-custom_minimum_size = Vector2(56, 56)
+[node name="GUButton" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=2093062358]
 clip_contents = true
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/GUButton"]
+[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/GUButton" unique_id=889293347]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
-mouse_filter = 2
 
-[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/GUButton/IconMargin"]
+[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/GUButton/IconMargin" unique_id=1238604836]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 2
 texture = ExtResource("4_gu_icon")
 expand_mode = 1
 stretch_mode = 5
-mouse_filter = 2
 
-[node name="CXButton" type="Button" parent="Panel/Margin/ButtonsRow"]
-custom_minimum_size = Vector2(72, 72)
+[node name="CXButton" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=787378681]
 clip_contents = true
+custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/CXButton"]
+[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/CXButton" unique_id=716340478]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
-mouse_filter = 2
 
-[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/CXButton/IconMargin"]
+[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/CXButton/IconMargin" unique_id=781104538]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 2
 texture = ExtResource("5_cx_icon")
 expand_mode = 1
 stretch_mode = 5
-mouse_filter = 2
 
-[node name="XXButtonLeft" type="Button" parent="Panel/Margin/ButtonsRow"]
-custom_minimum_size = Vector2(56, 56)
+[node name="XXButtonLeft" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=688611344]
 clip_contents = true
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
 
-[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/XXButtonLeft"]
+[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/XXButtonLeft" unique_id=358284808]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
-mouse_filter = 2
 
-[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/XXButtonLeft/IconMargin"]
+[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/XXButtonLeft/IconMargin" unique_id=362992459]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 2
 texture = ExtResource("6_xx_left_icon")
 expand_mode = 1
 stretch_mode = 5
-mouse_filter = 2
 
-[node name="XXButtonRight" type="Button" parent="Panel/Margin/ButtonsRow"]
-custom_minimum_size = Vector2(56, 56)
+[node name="XXButtonRight" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=1210924912]
 clip_contents = true
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
 
-[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/XXButtonRight"]
+[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/XXButtonRight" unique_id=1414679353]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
-mouse_filter = 2
 
-[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/XXButtonRight/IconMargin"]
+[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/XXButtonRight/IconMargin" unique_id=2066329988]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 2
 texture = ExtResource("7_xx_right_icon")
 expand_mode = 1
 stretch_mode = 5
-mouse_filter = 2
 
-[node name="SHButton" type="Button" parent="Panel/Margin/ButtonsRow"]
-custom_minimum_size = Vector2(56, 56)
+[node name="SHButton" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=2092965504]
 clip_contents = true
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
 
-[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/SHButton"]
+[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/SHButton" unique_id=1100482877]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
-mouse_filter = 2
 
-[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/SHButton/IconMargin"]
+[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/SHButton/IconMargin" unique_id=1935695453]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 2
 texture = ExtResource("8_shop_icon")
 expand_mode = 1
 stretch_mode = 5
-mouse_filter = 2
