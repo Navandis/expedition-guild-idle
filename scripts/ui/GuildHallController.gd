@@ -8,6 +8,18 @@ class_name GuildHallController
 # - two active expedition cards with compact status text,
 # - completed-card clicks as the report entry point,
 # - shared bottom-nav routing and test-only debug actions.
+# Note for beginners:
+# - the old "Pending Reports..." label was intentionally removed from the UI;
+#   completed slot cards are now the report-entry cue.
+# - the "PP" badge was moved into its own top-left panel in GuildHall.tscn so
+#   the resource row only shows real resource counters.
+# - major dashboard panels were snapped flush to screen edges in the scene file
+#   (SafeArea margins + panel margins reduced to zero) for tighter mobile use.
+# - the expedition scroller is now bounded by fixed minimum heights in the scene
+#   while the section itself still expands, which keeps BottomNav pinned as a
+#   footer on tall screens.
+# - expedition card labels now use word-wrap + smaller font sizes in the scene
+#   for compact, stable text even when expedition names are long.
 
 signal open_report_requested
 signal navigate_requested(target_screen: String)
@@ -21,18 +33,17 @@ const _SLOT_VISUAL_EMPTY := "empty"
 const _SLOT_VISUAL_ONGOING := "ongoing"
 const _SLOT_VISUAL_COMPLETED := "completed"
 
-@onready var _gold_value_label: Label = $SafeArea/RootColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
-@onready var _relic_fragments_value_label: Label = $SafeArea/RootColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row/RelicFragmentsValueLabel
-@onready var _codex_entries_value_label: Label = $SafeArea/RootColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row/CodexEntriesValueLabel
-@onready var _pending_reports_label: Label = $SafeArea/RootColumn/PendingReportsLabel
+@onready var _gold_value_label: Label = $SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
+@onready var _relic_fragments_value_label: Label = $SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row/RelicFragmentsValueLabel
+@onready var _codex_entries_value_label: Label = $SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row/CodexEntriesValueLabel
 @onready var _debug_finish_button: Button = $SafeArea/RootColumn/TopRightToolsRow/DebugFinishButton
 @onready var _debug_reset_button: Button = $SafeArea/RootColumn/TopRightToolsRow/DebugResetButton
-@onready var _slot_one_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
-@onready var _slot_two_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
-@onready var _slot_one_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
-@onready var _slot_one_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
-@onready var _slot_two_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
-@onready var _slot_two_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
+@onready var _slot_one_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
+@onready var _slot_two_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
+@onready var _slot_one_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
+@onready var _slot_one_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
+@onready var _slot_two_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
+@onready var _slot_two_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
 @onready var _bottom_nav: BottomNavBar = $SafeArea/RootColumn/BottomNavBar
 
 var _expedition_manager: ExpeditionManager
@@ -95,19 +106,12 @@ func _refresh_active_status() -> void:
 	if _expedition_manager == null:
 		_set_empty_slot_card(0)
 		_set_empty_slot_card(1)
-		_pending_reports_label.text = "Pending Reports: 0 (none ready)"
 		_debug_finish_button.visible = false
 		return
 
 	var slots := _expedition_manager.get_active_expeditions()
 	_refresh_slot_card(0, slots)
 	_refresh_slot_card(1, slots)
-
-	var pending_count := _expedition_manager.get_pending_report_count()
-	if pending_count > 0:
-		_pending_reports_label.text = "Pending Reports: %d ready to collect" % pending_count
-	else:
-		_pending_reports_label.text = "Pending Reports: 0 (none ready)"
 
 	# TEMPORARY DEBUG BUTTON: this is test-only and can be removed once QA no longer
 	# needs instant completion during development.
