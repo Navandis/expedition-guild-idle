@@ -3,7 +3,10 @@ class_name BottomNavBar
 
 # File: BottomNavBar.gd
 # Shared bottom navigation row used by major in-scope screens.
-# This keeps screen-to-screen navigation in one place and clearly marks
+# Text labels were intentionally removed from the scene buttons and replaced
+# with icon TextureRect children so label text no longer forces extra width
+# on smaller/mobile screens.
+# This script keeps screen-to-screen navigation in one place and clearly marks
 # which buttons are active routes versus placeholder slots.
 # It also recalculates button size on resize so the full bar stays usable
 # on narrow/mobile widths without adding internal scrolling.
@@ -74,6 +77,8 @@ func _update_responsive_button_sizes() -> void:
 	]
 
 	# Keep side buttons square while scaling all seven buttons to fit width.
+	# Each button has a TextureRect child icon in the scene so icon sizing is
+	# decoupled from click behavior and can safely scale inside button bounds.
 	# The center Codex button stays larger/highlighted via a small bonus size.
 	var separation: int = _buttons_row.get_theme_constant("separation")
 	var center_bonus: float = 12.0
