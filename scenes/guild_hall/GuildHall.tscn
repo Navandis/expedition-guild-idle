@@ -15,67 +15,92 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_72fw3")
 
-[node name="SafeArea" type="MarginContainer" parent="." unique_id=2084556186]
+[node name="TopSafeArea" type="MarginContainer" parent="." unique_id=2084556186]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 0
+
+[node name="TopStack" type="VBoxContainer" parent="TopSafeArea" unique_id=845488305]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ExpeditionSectionPanel" type="PanelContainer" parent="." unique_id=570001011]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 88.0
+offset_right = -8.0
+offset_bottom = -100.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 0
+
+[node name="BottomNavSafe" type="MarginContainer" parent="." unique_id=1491293952]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = -96.0
+offset_right = 0.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 0
-theme_override_constants/margin_bottom = 0
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
-[node name="RootColumn" type="VBoxContainer" parent="SafeArea" unique_id=845488305]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 0
-
-[node name="TopPanelsRow" type="HBoxContainer" parent="SafeArea/RootColumn" unique_id=1370000001]
+[node name="TopPanelsRow" type="HBoxContainer" parent="TopSafeArea/TopStack" unique_id=1370000001]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="ProfilePanel" type="PanelContainer" parent="SafeArea/RootColumn/TopPanelsRow" unique_id=1370000002]
+[node name="ProfilePanel" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow" unique_id=1370000002]
 custom_minimum_size = Vector2(44, 0)
 layout_mode = 2
 
-[node name="ProfilePanelMargin" type="MarginContainer" parent="SafeArea/RootColumn/TopPanelsRow/ProfilePanel" unique_id=1370000003]
+[node name="ProfilePanelMargin" type="MarginContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ProfilePanel" unique_id=1370000003]
 layout_mode = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
-[node name="ProfileLabel" type="Label" parent="SafeArea/RootColumn/TopPanelsRow/ProfilePanel/ProfilePanelMargin" unique_id=178163509]
+[node name="ProfileLabel" type="Label" parent="TopSafeArea/TopStack/TopPanelsRow/ProfilePanel/ProfilePanelMargin" unique_id=178163509]
 layout_mode = 2
 text = "PP"
 horizontal_alignment = 1
 
-[node name="ResourceRowPanel" type="PanelContainer" parent="SafeArea/RootColumn/TopPanelsRow" unique_id=620704676]
+[node name="ResourceRowPanel" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow" unique_id=620704676]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ResourceRowMargin" type="MarginContainer" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel" unique_id=1360772543]
+[node name="ResourceRowMargin" type="MarginContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel" unique_id=1360772543]
 layout_mode = 2
 theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
-[node name="ResourceSlots" type="HBoxContainer" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin" unique_id=1494783933]
+[node name="ResourceSlots" type="HBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin" unique_id=1494783933]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="GoldCounter" type="PanelContainer" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001001]
+[node name="GoldCounter" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001001]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Row" type="HBoxContainer" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter" unique_id=570001002]
+[node name="Row" type="HBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter" unique_id=570001002]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="GoldIcon" type="TextureRect" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row" unique_id=570001003]
+[node name="GoldIcon" type="TextureRect" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row" unique_id=570001003]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 mouse_filter = 2
@@ -83,21 +108,21 @@ texture = ExtResource("3_gold_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="GoldValueLabel" type="Label" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row" unique_id=553301898]
+[node name="GoldValueLabel" type="Label" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row" unique_id=553301898]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 text = "0"
 
-[node name="RelicCounter" type="PanelContainer" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001004]
+[node name="RelicCounter" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001004]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Row" type="HBoxContainer" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter" unique_id=570001005]
+[node name="Row" type="HBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter" unique_id=570001005]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="RelicIcon" type="TextureRect" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row" unique_id=570001006]
+[node name="RelicIcon" type="TextureRect" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row" unique_id=570001006]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 mouse_filter = 2
@@ -105,21 +130,21 @@ texture = ExtResource("4_relics_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="RelicFragmentsValueLabel" type="Label" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row" unique_id=462742622]
+[node name="RelicFragmentsValueLabel" type="Label" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row" unique_id=462742622]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 text = "0"
 
-[node name="CodexCounter" type="PanelContainer" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001007]
+[node name="CodexCounter" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001007]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Row" type="HBoxContainer" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter" unique_id=570001008]
+[node name="Row" type="HBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter" unique_id=570001008]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="CodexIcon" type="TextureRect" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row" unique_id=570001009]
+[node name="CodexIcon" type="TextureRect" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row" unique_id=570001009]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 mouse_filter = 2
@@ -127,62 +152,58 @@ texture = ExtResource("5_codex_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CodexEntriesValueLabel" type="Label" parent="SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row" unique_id=404869075]
+[node name="CodexEntriesValueLabel" type="Label" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row" unique_id=404869075]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 text = "0"
 
-[node name="TopRightToolsRow" type="HBoxContainer" parent="SafeArea/RootColumn" unique_id=570001010]
+[node name="TopRightToolsRow" type="HBoxContainer" parent="TopSafeArea/TopStack" unique_id=570001010]
 layout_mode = 2
 alignment = 2
 
-[node name="DebugFinishButton" type="Button" parent="SafeArea/RootColumn/TopRightToolsRow" unique_id=1694514361]
+[node name="DebugFinishButton" type="Button" parent="TopSafeArea/TopStack/TopRightToolsRow" unique_id=1694514361]
 visible = false
 custom_minimum_size = Vector2(74, 28)
 layout_mode = 2
 text = "DBG-FE"
 
-[node name="DebugResetButton" type="Button" parent="SafeArea/RootColumn/TopRightToolsRow" unique_id=143407976]
+[node name="DebugResetButton" type="Button" parent="TopSafeArea/TopStack/TopRightToolsRow" unique_id=143407976]
 custom_minimum_size = Vector2(74, 28)
 layout_mode = 2
 text = "DBG-RES"
 
-[node name="ExpeditionSectionPanel" type="PanelContainer" parent="SafeArea/RootColumn" unique_id=570001011]
-custom_minimum_size = Vector2(0, 220)
-layout_mode = 2
-size_flags_vertical = 3
 
-[node name="ExpeditionSectionMargin" type="MarginContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel" unique_id=570001012]
+[node name="ExpeditionSectionMargin" type="MarginContainer" parent="ExpeditionSectionPanel" unique_id=570001012]
 layout_mode = 2
 theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
-[node name="ExpeditionSectionColumn" type="VBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin" unique_id=1370000004]
+[node name="ExpeditionSectionColumn" type="VBoxContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin" unique_id=1370000004]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ExpeditionSlotsScroller" type="ScrollContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn" unique_id=570001013]
+[node name="ExpeditionSlotsScroller" type="ScrollContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn" unique_id=570001013]
 custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_scroll_mode = 1
 vertical_scroll_mode = 0
 
-[node name="ExpeditionSlotsRow" type="HBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller" unique_id=570001014]
+[node name="ExpeditionSlotsRow" type="HBoxContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller" unique_id=570001014]
 custom_minimum_size = Vector2(468, 0)
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="SlotOneCard" type="Button" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1205453616]
+[node name="SlotOneCard" type="Button" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1205453616]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Margin" type="MarginContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard" unique_id=1849938802]
+[node name="Margin" type="MarginContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard" unique_id=1849938802]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -195,13 +216,13 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin" unique_id=1742571574]
+[node name="Content" type="VBoxContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin" unique_id=1742571574]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SlotOneImagePlaceholder" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1361455259]
+[node name="SlotOneImagePlaceholder" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1361455259]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
@@ -210,7 +231,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SlotOneNameLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=980786867]
+[node name="SlotOneNameLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=980786867]
 layout_mode = 2
 mouse_filter = 2
 text = "Empty Slot"
@@ -219,7 +240,7 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 10
 max_lines_visible = 2
 
-[node name="SlotOneStateLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1411912238]
+[node name="SlotOneStateLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1411912238]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
@@ -230,13 +251,13 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 9
 max_lines_visible = 4
 
-[node name="SlotTwoCard" type="Button" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1241231002]
+[node name="SlotTwoCard" type="Button" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1241231002]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Margin" type="MarginContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard" unique_id=1880540343]
+[node name="Margin" type="MarginContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard" unique_id=1880540343]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -249,13 +270,13 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin" unique_id=2041278820]
+[node name="Content" type="VBoxContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin" unique_id=2041278820]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SlotTwoImagePlaceholder" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1948435946]
+[node name="SlotTwoImagePlaceholder" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1948435946]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
@@ -264,7 +285,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SlotTwoNameLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1361604704]
+[node name="SlotTwoNameLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1361604704]
 layout_mode = 2
 mouse_filter = 2
 text = "Empty Slot"
@@ -273,7 +294,7 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 10
 max_lines_visible = 2
 
-[node name="SlotTwoStateLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=760266556]
+[node name="SlotTwoStateLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=760266556]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
@@ -284,14 +305,14 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 9
 max_lines_visible = 4
 
-[node name="SlotThreeCard" type="Button" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=570001015]
+[node name="SlotThreeCard" type="Button" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=570001015]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 disabled = true
 
-[node name="Margin" type="MarginContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard" unique_id=570001016]
+[node name="Margin" type="MarginContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard" unique_id=570001016]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -304,13 +325,13 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin" unique_id=570001017]
+[node name="Content" type="VBoxContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin" unique_id=570001017]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SlotThreeImagePlaceholder" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001018]
+[node name="SlotThreeImagePlaceholder" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001018]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
@@ -319,7 +340,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SlotThreeNameLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001019]
+[node name="SlotThreeNameLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001019]
 layout_mode = 2
 mouse_filter = 2
 text = "Locked Slot"
@@ -328,7 +349,7 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 10
 max_lines_visible = 2
 
-[node name="SlotThreeStateLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001020]
+[node name="SlotThreeStateLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001020]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
@@ -339,9 +360,6 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 9
 max_lines_visible = 4
 
-[node name="BottomNavBar" parent="SafeArea/RootColumn" unique_id=1491293952 instance=ExtResource("2_nav")]
-layout_mode = 2
-
-[node name="ExpeditionSectionFill" type="Control" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn" unique_id=1370000005]
+[node name="BottomNavBar" parent="BottomNavSafe" instance=ExtResource("2_nav")]
 layout_mode = 2
 size_flags_vertical = 3
