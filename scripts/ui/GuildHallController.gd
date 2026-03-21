@@ -13,11 +13,15 @@ class_name GuildHallController
 #   completed slot cards are now the report-entry cue.
 # - the "PP" badge was moved into its own top-left panel in GuildHall.tscn so
 #   the resource row only shows real resource counters.
-# - major dashboard panels were snapped flush to screen edges in the scene file
-#   (SafeArea margins + panel margins reduced to zero) for tighter mobile use.
-# - the expedition scroller is now bounded by fixed minimum heights in the scene
-#   while the section itself still expands, which keeps BottomNav pinned as a
-#   footer on tall screens.
+# - GuildHall.tscn now uses section-level layout anchors instead of one giant
+#   global SafeArea wrapper. Top widgets, expedition cards, and bottom nav are
+#   now separate containers so they can be positioned independently.
+# - TopSafeArea is explicitly given a bottom offset in the scene so the top
+#   stack has guaranteed height (top-level Controls do not auto-size to children).
+# - ExpeditionSectionFill was removed from the scene because it only consumed
+#   vertical space and prevented expedition cards from using the intended area.
+# - Bottom nav now lives in its own bottom-anchored safe margin container so
+#   it stays visible while the expedition section remains bounded above it.
 # - expedition card labels now use word-wrap + smaller font sizes in the scene
 #   for compact, stable text even when expedition names are long.
 
@@ -33,18 +37,18 @@ const _SLOT_VISUAL_EMPTY := "empty"
 const _SLOT_VISUAL_ONGOING := "ongoing"
 const _SLOT_VISUAL_COMPLETED := "completed"
 
-@onready var _gold_value_label: Label = $SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
-@onready var _relic_fragments_value_label: Label = $SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row/RelicFragmentsValueLabel
-@onready var _codex_entries_value_label: Label = $SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row/CodexEntriesValueLabel
-@onready var _debug_finish_button: Button = $SafeArea/RootColumn/TopRightToolsRow/DebugFinishButton
-@onready var _debug_reset_button: Button = $SafeArea/RootColumn/TopRightToolsRow/DebugResetButton
-@onready var _slot_one_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
-@onready var _slot_two_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
-@onready var _slot_one_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
-@onready var _slot_one_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
-@onready var _slot_two_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
-@onready var _slot_two_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
-@onready var _bottom_nav: BottomNavBar = $SafeArea/RootColumn/BottomNavBar
+@onready var _gold_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
+@onready var _relic_fragments_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row/RelicFragmentsValueLabel
+@onready var _codex_entries_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row/CodexEntriesValueLabel
+@onready var _debug_finish_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugFinishButton
+@onready var _debug_reset_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugResetButton
+@onready var _slot_one_card: Button = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
+@onready var _slot_two_card: Button = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
+@onready var _slot_one_name_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
+@onready var _slot_one_state_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
+@onready var _slot_two_name_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
+@onready var _slot_two_state_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
+@onready var _bottom_nav: BottomNavBar = $BottomNavSafe/BottomNavBar
 
 var _expedition_manager: ExpeditionManager
 var _resources := {
