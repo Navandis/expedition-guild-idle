@@ -16,6 +16,8 @@ class_name GuildHallController
 # - GuildHall.tscn now uses section-level layout anchors instead of one giant
 #   global SafeArea wrapper. Top widgets, expedition cards, and bottom nav are
 #   now separate containers so they can be positioned independently.
+# - TopSafeArea is explicitly given a bottom offset in the scene so the top
+#   stack has guaranteed height (top-level Controls do not auto-size to children).
 # - ExpeditionSectionFill was removed from the scene because it only consumed
 #   vertical space and prevented expedition cards from using the intended area.
 # - Bottom nav now lives in its own bottom-anchored safe margin container so
