@@ -16,7 +16,8 @@ class_name GuildHallController
 # - major dashboard panels were snapped flush to screen edges in the scene file
 #   (SafeArea margins + panel margins reduced to zero) for tighter mobile use.
 # - the expedition scroller is now bounded by fixed minimum heights in the scene
-#   so it cannot consume all vertical space and hide top/bottom dashboard UI.
+#   while the section itself still expands, which keeps BottomNav pinned as a
+#   footer on tall screens.
 # - expedition card labels now use word-wrap + smaller font sizes in the scene
 #   for compact, stable text even when expedition names are long.
 
@@ -37,12 +38,12 @@ const _SLOT_VISUAL_COMPLETED := "completed"
 @onready var _codex_entries_value_label: Label = $SafeArea/RootColumn/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row/CodexEntriesValueLabel
 @onready var _debug_finish_button: Button = $SafeArea/RootColumn/TopRightToolsRow/DebugFinishButton
 @onready var _debug_reset_button: Button = $SafeArea/RootColumn/TopRightToolsRow/DebugResetButton
-@onready var _slot_one_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
-@onready var _slot_two_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
-@onready var _slot_one_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
-@onready var _slot_one_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
-@onready var _slot_two_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
-@onready var _slot_two_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
+@onready var _slot_one_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
+@onready var _slot_two_card: Button = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
+@onready var _slot_one_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
+@onready var _slot_one_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
+@onready var _slot_two_name_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
+@onready var _slot_two_state_label: Label = $SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
 @onready var _bottom_nav: BottomNavBar = $SafeArea/RootColumn/BottomNavBar
 
 var _expedition_manager: ExpeditionManager

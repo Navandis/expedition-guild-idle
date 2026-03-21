@@ -151,6 +151,7 @@ text = "DBG-RES"
 [node name="ExpeditionSectionPanel" type="PanelContainer" parent="SafeArea/RootColumn" unique_id=570001011]
 custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="ExpeditionSectionMargin" type="MarginContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel" unique_id=570001012]
 layout_mode = 2
@@ -159,26 +160,29 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
-[node name="ExpeditionSlotsScroller" type="ScrollContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin" unique_id=570001013]
+[node name="ExpeditionSectionColumn" type="VBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin" unique_id=1370000004]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ExpeditionSlotsScroller" type="ScrollContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn" unique_id=570001013]
 custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 1
 horizontal_scroll_mode = 1
 vertical_scroll_mode = 0
 
-[node name="ExpeditionSlotsRow" type="HBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller" unique_id=570001014]
+[node name="ExpeditionSlotsRow" type="HBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller" unique_id=570001014]
 custom_minimum_size = Vector2(468, 0)
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="SlotOneCard" type="Button" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1205453616]
+[node name="SlotOneCard" type="Button" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1205453616]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Margin" type="MarginContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard" unique_id=1849938802]
+[node name="Margin" type="MarginContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard" unique_id=1849938802]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -191,13 +195,13 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin" unique_id=1742571574]
+[node name="Content" type="VBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin" unique_id=1742571574]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SlotOneImagePlaceholder" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1361455259]
+[node name="SlotOneImagePlaceholder" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1361455259]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
@@ -206,7 +210,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SlotOneNameLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=980786867]
+[node name="SlotOneNameLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=980786867]
 layout_mode = 2
 mouse_filter = 2
 text = "Empty Slot"
@@ -215,7 +219,7 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 10
 max_lines_visible = 2
 
-[node name="SlotOneStateLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1411912238]
+[node name="SlotOneStateLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1411912238]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
@@ -226,13 +230,13 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 9
 max_lines_visible = 4
 
-[node name="SlotTwoCard" type="Button" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1241231002]
+[node name="SlotTwoCard" type="Button" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1241231002]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Margin" type="MarginContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard" unique_id=1880540343]
+[node name="Margin" type="MarginContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard" unique_id=1880540343]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -245,13 +249,13 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin" unique_id=2041278820]
+[node name="Content" type="VBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin" unique_id=2041278820]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SlotTwoImagePlaceholder" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1948435946]
+[node name="SlotTwoImagePlaceholder" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1948435946]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
@@ -260,7 +264,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SlotTwoNameLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1361604704]
+[node name="SlotTwoNameLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1361604704]
 layout_mode = 2
 mouse_filter = 2
 text = "Empty Slot"
@@ -269,7 +273,7 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 10
 max_lines_visible = 2
 
-[node name="SlotTwoStateLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=760266556]
+[node name="SlotTwoStateLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=760266556]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
@@ -280,14 +284,14 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 9
 max_lines_visible = 4
 
-[node name="SlotThreeCard" type="Button" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=570001015]
+[node name="SlotThreeCard" type="Button" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=570001015]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 disabled = true
 
-[node name="Margin" type="MarginContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard" unique_id=570001016]
+[node name="Margin" type="MarginContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard" unique_id=570001016]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -300,13 +304,13 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin" unique_id=570001017]
+[node name="Content" type="VBoxContainer" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin" unique_id=570001017]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SlotThreeImagePlaceholder" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001018]
+[node name="SlotThreeImagePlaceholder" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001018]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
@@ -315,7 +319,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SlotThreeNameLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001019]
+[node name="SlotThreeNameLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001019]
 layout_mode = 2
 mouse_filter = 2
 text = "Locked Slot"
@@ -324,7 +328,7 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 10
 max_lines_visible = 2
 
-[node name="SlotThreeStateLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001020]
+[node name="SlotThreeStateLabel" type="Label" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001020]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
@@ -337,3 +341,7 @@ max_lines_visible = 4
 
 [node name="BottomNavBar" parent="SafeArea/RootColumn" unique_id=1491293952 instance=ExtResource("2_nav")]
 layout_mode = 2
+
+[node name="ExpeditionSectionFill" type="Control" parent="SafeArea/RootColumn/ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn" unique_id=1370000005]
+layout_mode = 2
+size_flags_vertical = 3
