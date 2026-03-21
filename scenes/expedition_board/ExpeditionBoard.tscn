@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c31ng4ivfwgb4" path="res://scripts/ui/ExpeditionBoardController.gd" id="1_cx6e2"]
 [ext_resource type="PackedScene" path="res://scenes/components/ExpeditionCard.tscn" id="2_u0gmk"]
+[ext_resource type="PackedScene" path="res://scenes/components/BottomNavBar.tscn" id="3_nav"]
 
 [node name="ExpeditionBoard" type="Control" unique_id=2096162743]
 layout_mode = 3
@@ -68,3 +69,6 @@ text = "Dispatch Selected Expedition"
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 text = "Back to Guild Hall"
+
+[node name="BottomNavBar" parent="SafeArea/RootColumn" instance=ExtResource("3_nav")]
+layout_mode = 2

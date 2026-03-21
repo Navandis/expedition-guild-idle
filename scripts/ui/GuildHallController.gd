@@ -1,6 +1,7 @@
 extends Control
 class_name GuildHallController
 
+# File: GuildHallController.gd
 # GuildHallController is the home screen for the current gameplay loop.
 # In the two-slot milestone it shows both expedition slots (empty/active/
 # completed), the pending report count, and entry points to dispatch/reports.
@@ -13,6 +14,7 @@ signal open_expedition_board_requested
 signal open_report_requested
 signal open_upgrades_requested
 signal open_codex_requested
+signal navigate_requested(target_screen: String)
 signal debug_finish_requested
 signal debug_reset_requested
 
@@ -27,6 +29,7 @@ signal debug_reset_requested
 @onready var _debug_reset_button: Button = $SafeArea/RootColumn/DebugResetButton
 @onready var _slot_one_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/SlotOneLabel
 @onready var _slot_two_label: Label = $SafeArea/RootColumn/ActiveExpeditionPanel/ActiveRows/SlotTwoLabel
+@onready var _bottom_nav: BottomNavBar = $SafeArea/RootColumn/BottomNavBar
 
 var _expedition_manager: ExpeditionManager
 var _resources := {
@@ -43,6 +46,9 @@ func _ready() -> void:
 	_open_report_button.pressed.connect(_on_open_report_pressed)
 	_debug_finish_button.pressed.connect(_on_debug_finish_pressed)
 	_debug_reset_button.pressed.connect(_on_debug_reset_pressed)
+	# Shared bottom nav is now the primary cross-screen backbone.
+	_bottom_nav.set_current_screen(BottomNavBar.TARGET_GUILD_HALL)
+	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
 	# Polling each frame is acceptable for this prototype-sized status block.
 	set_process(true)
 	_refresh_resource_labels()
@@ -137,6 +143,11 @@ func _on_open_upgrades_pressed() -> void:
 
 func _on_open_codex_pressed() -> void:
 	open_codex_requested.emit()
+
+
+func _on_bottom_nav_requested(target_screen: String) -> void:
+	# GH/EB/GU/CX are active routes; XX/XX/SH stay inert in the nav component.
+	navigate_requested.emit(target_screen)
 
 
 func _on_debug_finish_pressed() -> void:

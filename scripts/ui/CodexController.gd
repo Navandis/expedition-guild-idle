@@ -1,19 +1,25 @@
 extends Control
 class_name CodexController
 
+# File: CodexController.gd
 # CodexController renders the prototype Codex screen for the day-3 milestone.
 # It reads discovery data from CodexSystem and turns it into simple progress
 # text so players can quickly see what site types they have discovered.
 
 signal back_requested
+signal navigate_requested(target_screen: String)
 
 @onready var _summary_label: Label = $SafeArea/RootColumn/HeaderPanel/HeaderRows/SummaryLabel
 @onready var _hint_label: Label = $SafeArea/RootColumn/HeaderPanel/HeaderRows/HintLabel
 @onready var _entries_list_label: Label = $SafeArea/RootColumn/EntriesPanel/EntriesRows/EntriesListLabel
+@onready var _bottom_nav: BottomNavBar = $SafeArea/RootColumn/BottomNavBar
 
 
 func _ready() -> void:
 	$SafeArea/RootColumn/BackButton.pressed.connect(_on_back_pressed)
+	# Bottom nav is shared; center CX is the active destination on this screen.
+	_bottom_nav.set_current_screen(BottomNavBar.TARGET_CODEX)
+	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
 
 
 func set_codex_data(total_discoveries: int, discovered_entries: Array[String]) -> void:
@@ -40,3 +46,7 @@ func _to_entry_label(site_type: String) -> String:
 
 func _on_back_pressed() -> void:
 	back_requested.emit()
+
+
+func _on_bottom_nav_requested(target_screen: String) -> void:
+	navigate_requested.emit(target_screen)
