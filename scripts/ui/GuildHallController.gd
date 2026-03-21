@@ -21,6 +21,9 @@ signal debug_reset_requested
 const _STATUS_BORDER_EMPTY := Color(0.95, 0.55, 0.20, 1.0)
 const _STATUS_BORDER_ONGOING := Color(0.95, 0.84, 0.20, 1.0)
 const _STATUS_BORDER_COMPLETED := Color(0.35, 0.85, 0.45, 1.0)
+const _SLOT_VISUAL_EMPTY := "empty"
+const _SLOT_VISUAL_ONGOING := "ongoing"
+const _SLOT_VISUAL_COMPLETED := "completed"
 
 @onready var _gold_value_label: Label = $SafeArea/RootColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldValueSlot/Center/GoldValueLabel
 @onready var _relic_fragments_value_label: Label = $SafeArea/RootColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicValueSlot/Center/RelicFragmentsValueLabel
@@ -46,6 +49,8 @@ var _resources := {
 	"codex_entries": 0
 }
 var _slot_is_empty: Array[bool] = [true, true]
+var _slot_visual_states: Array[String] = ["", ""]
+var _cached_slot_styles: Dictionary = {}
 
 
 func _ready() -> void:
@@ -61,6 +66,7 @@ func _ready() -> void:
 	# Shared bottom nav is now the primary cross-screen backbone.
 	_bottom_nav.set_current_screen(BottomNavBar.TARGET_GUILD_HALL)
 	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
+	_build_cached_slot_styles()
 	# Polling each frame is acceptable for this prototype-sized status block.
 	set_process(true)
 	_refresh_resource_labels()
@@ -161,7 +167,7 @@ func _refresh_slot_card(slot_index: int, slots: Array[Dictionary]) -> void:
 		_slot_is_empty[slot_index] = false
 		card.disabled = true
 		card.focus_mode = Control.FOCUS_NONE
-		_apply_status_border(card, _STATUS_BORDER_ONGOING)
+		_apply_status_border(slot_index, card, _SLOT_VISUAL_ONGOING)
 		return
 
 	# Completed slot card behavior: compact summary + queued report hint.
@@ -171,7 +177,7 @@ func _refresh_slot_card(slot_index: int, slots: Array[Dictionary]) -> void:
 	_slot_is_empty[slot_index] = false
 	card.disabled = true
 	card.focus_mode = Control.FOCUS_NONE
-	_apply_status_border(card, _STATUS_BORDER_COMPLETED)
+	_apply_status_border(slot_index, card, _SLOT_VISUAL_COMPLETED)
 
 
 func _set_empty_slot_card(slot_index: int) -> void:
@@ -190,13 +196,22 @@ func _set_empty_slot_card(slot_index: int) -> void:
 	_slot_is_empty[slot_index] = true
 	card.disabled = false
 	card.focus_mode = Control.FOCUS_ALL
-	_apply_status_border(card, _STATUS_BORDER_EMPTY)
+	_apply_status_border(slot_index, card, _SLOT_VISUAL_EMPTY)
 
 
-func _apply_status_border(card: Button, border_color: Color) -> void:
+func _build_cached_slot_styles() -> void:
+	# Build style resources once, then reuse them. This avoids allocating new
+	# StyleBoxFlat instances every frame while _process refreshes slot status.
+	_cached_slot_styles = {
+		_SLOT_VISUAL_EMPTY: _build_base_slot_style(_STATUS_BORDER_EMPTY),
+		_SLOT_VISUAL_ONGOING: _build_base_slot_style(_STATUS_BORDER_ONGOING),
+		_SLOT_VISUAL_COMPLETED: _build_base_slot_style(_STATUS_BORDER_COMPLETED)
+	}
+
+
+func _build_base_slot_style(border_color: Color) -> StyleBoxFlat:
 	# Temporary prototype border logic:
 	# - orange: empty, yellow: ongoing, green: completed.
-	# We override all button states so the same border appears even when disabled.
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.12, 0.12, 0.12, 0.92)
 	style.border_width_left = 2
@@ -208,10 +223,28 @@ func _apply_status_border(card: Button, border_color: Color) -> void:
 	style.corner_radius_top_right = 8
 	style.corner_radius_bottom_right = 8
 	style.corner_radius_bottom_left = 8
-	card.add_theme_stylebox_override("normal", style)
-	card.add_theme_stylebox_override("hover", style.duplicate())
-	card.add_theme_stylebox_override("pressed", style.duplicate())
-	card.add_theme_stylebox_override("disabled", style.duplicate())
+	return style
+
+
+func _apply_status_border(slot_index: int, card: Button, visual_state: String) -> void:
+	# Reapply only when visual state changed for this slot (empty/ongoing/completed).
+	# Timer text may update every frame, but border styles now stay stable.
+	if slot_index < 0 or slot_index >= _slot_visual_states.size():
+		return
+	if _slot_visual_states[slot_index] == visual_state:
+		return
+
+	var base_style := _cached_slot_styles.get(visual_state, null) as StyleBoxFlat
+	if base_style == null:
+		return
+
+	# We still override all button states so border color remains consistent
+	# even when the card is disabled for ongoing/completed slots.
+	card.add_theme_stylebox_override("normal", base_style)
+	card.add_theme_stylebox_override("hover", base_style.duplicate())
+	card.add_theme_stylebox_override("pressed", base_style.duplicate())
+	card.add_theme_stylebox_override("disabled", base_style.duplicate())
+	_slot_visual_states[slot_index] = visual_state
 
 
 func _get_slot_card(slot_index: int) -> Button:
