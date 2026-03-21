@@ -5,6 +5,9 @@ class_name UpgradesController
 # UpgradesController is the day-3 UI for visible guild progression.
 # It renders JSON-defined upgrades, lets players buy with gold, and marks owned
 # entries so the first progression loop is easy to test in-game.
+# Layout note: the upgrades list scroll area is the only expanding content
+# region, so long upgrade data scrolls there while the shared bottom nav stays
+# fully visible as a fixed footer.
 
 signal back_requested
 signal purchase_requested(upgrade_id: String)
