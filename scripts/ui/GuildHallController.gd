@@ -213,7 +213,7 @@ func _refresh_slot_card(slot_index: int, slots: Array[Dictionary]) -> void:
 
 	# Completed cards are now the report interaction entry, replacing the removed
 	# "View Pending Reports" button from the old layout.
-	state_label.text = "Completed · tap to collect report"
+	state_label.text = "Complete · Collect Reward"
 	_slot_is_empty[slot_index] = false
 	card.disabled = false
 	card.focus_mode = Control.FOCUS_ALL

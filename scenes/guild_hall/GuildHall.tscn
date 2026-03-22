@@ -4,7 +4,10 @@
 [ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="2_nav"]
 [ext_resource type="Texture2D" uid="uid://py6ohnws3tte" path="res://assets/UI/ResourceCounters/gold.png" id="3_gold_icon"]
 [ext_resource type="Texture2D" uid="uid://dxyg3vxg80kwd" path="res://assets/UI/ResourceCounters/relics.png" id="4_relics_icon"]
+[ext_resource type="Texture2D" uid="uid://ci2mmj6qfgl4r" path="res://assets/Regions/Emberwake Coast - upscaled.png" id="5_0pdko"]
+[ext_resource type="Texture2D" uid="uid://bv6gjkd8ihhnf" path="res://assets/Regions/Greyfen March - variant 6.png" id="5_513lt"]
 [ext_resource type="Texture2D" uid="uid://d0a672tahkdym" path="res://assets/UI/ResourceCounters/codex_fragment.png" id="5_codex_icon"]
+[ext_resource type="Texture2D" uid="uid://c8vu3rm352krs" path="res://assets/Regions/Hollowspire Uplands - v2.png" id="7_o7uwm"]
 
 [node name="GuildHall" type="Control" unique_id=1458496136]
 layout_mode = 3
@@ -19,10 +22,11 @@ script = ExtResource("1_72fw3")
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 72.0
+offset_top = 20.0
+offset_bottom = 92.0
 grow_horizontal = 2
 theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
+theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 0
 
@@ -151,10 +155,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 88.0
-offset_right = -8.0
-offset_bottom = -100.0
+offset_top = 261.0
+offset_bottom = -110.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -170,14 +172,14 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="ExpeditionSlotsScroller" type="ScrollContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn" unique_id=570001013]
-custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 vertical_scroll_mode = 0
 
 [node name="ExpeditionSlotsRow" type="HBoxContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller" unique_id=570001014]
-custom_minimum_size = Vector2(468, 0)
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="SlotOneCard" type="Button" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1205453616]
@@ -205,16 +207,24 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SlotOneImagePlaceholder" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1361455259]
-custom_minimum_size = Vector2(0, 56)
+[node name="TextureRect" type="TextureRect" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1597555090]
 layout_mode = 2
-size_flags_vertical = 1
+size_flags_vertical = 3
+texture = ExtResource("5_513lt")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="SlotOneImagePlaceholder" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1361455259]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
 text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="SlotOneNameLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=980786867]
 layout_mode = 2
+size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
 text = "Empty Slot"
 horizontal_alignment = 1
@@ -223,7 +233,7 @@ max_lines_visible = 2
 
 [node name="SlotOneStateLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1411912238]
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
 text = "Tap to open Expedition Board"
 horizontal_alignment = 1
@@ -256,7 +266,15 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
+[node name="TextureRect" type="TextureRect" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=221270952]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("5_0pdko")
+expand_mode = 1
+stretch_mode = 6
+
 [node name="SlotTwoImagePlaceholder" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1948435946]
+visible = false
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
@@ -266,6 +284,7 @@ vertical_alignment = 1
 
 [node name="SlotTwoNameLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1361604704]
 layout_mode = 2
+size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
 text = "Empty Slot"
 horizontal_alignment = 1
@@ -274,7 +293,7 @@ max_lines_visible = 2
 
 [node name="SlotTwoStateLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=760266556]
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
 text = "Tap to open Expedition Board"
 horizontal_alignment = 1
@@ -308,7 +327,15 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
+[node name="TextureRect" type="TextureRect" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=1641990942]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("7_o7uwm")
+expand_mode = 1
+stretch_mode = 6
+
 [node name="SlotThreeImagePlaceholder" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001018]
+visible = false
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
@@ -318,6 +345,7 @@ vertical_alignment = 1
 
 [node name="SlotThreeNameLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001019]
 layout_mode = 2
+size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
 text = "Locked Slot"
 horizontal_alignment = 1
@@ -326,7 +354,7 @@ max_lines_visible = 2
 
 [node name="SlotThreeStateLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001020]
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
 text = "Reserved for future expansion"
 horizontal_alignment = 1
@@ -340,7 +368,7 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -59.0
+offset_top = -50.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/margin_left = 0

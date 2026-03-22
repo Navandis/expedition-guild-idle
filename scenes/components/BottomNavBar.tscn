@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://ogcnemb8k5dk" path="res://assets/UI/NavBar/shop.png" id="8_shop_icon"]
 
 [node name="BottomNavBar" type="Control" unique_id=1711450795]
-custom_minimum_size = Vector2(0, 51)
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 3
 anchors_preset = 12
 anchor_top = 1.0
@@ -35,7 +35,7 @@ layout_mode = 2
 theme_override_constants/margin_left = 1
 theme_override_constants/margin_top = 1
 theme_override_constants/margin_right = 1
-theme_override_constants/margin_bottom = 1
+theme_override_constants/margin_bottom = 0
 
 [node name="ButtonsRow" type="HBoxContainer" parent="Panel/Margin" unique_id=352255736]
 layout_mode = 2
