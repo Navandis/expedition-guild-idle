@@ -9,13 +9,26 @@ class_name RegionCarouselCardView
 # - Moving that structure into a .tscn makes it editable in the Godot editor.
 # - The board controller now only instantiates this component and binds data.
 
-@onready var _image: TextureRect = $CardMargin/CardColumn/RegionImage
-@onready var _name_label: Label = $CardMargin/CardColumn/RegionNameLabel
+const _IMAGE_PATH := ^"CardMargin/CardColumn/RegionImage"
+const _NAME_LABEL_PATH := ^"CardMargin/CardColumn/RegionNameLabel"
+
+@onready var _image: TextureRect = get_node_or_null(_IMAGE_PATH)
+@onready var _name_label: Label = get_node_or_null(_NAME_LABEL_PATH)
 
 var _region_id := ""
 
 
 func setup(region_row: Dictionary, region_texture: Texture2D) -> void:
+	# setup() may run before this instance enters the scene tree.
+	# Resolve scene-authored children lazily so data binding is safe in either order.
+	if _image == null:
+		_image = get_node_or_null(_IMAGE_PATH)
+	if _name_label == null:
+		_name_label = get_node_or_null(_NAME_LABEL_PATH)
+	if _image == null or _name_label == null:
+		push_warning("RegionCarouselCardView missing expected child nodes; skipping setup.")
+		return
+
 	# Populate editor-authored child nodes with runtime data.
 	_region_id = str(region_row.get("id", ""))
 	var region_name := str(region_row.get("name", _region_id))
