@@ -14,61 +14,93 @@ grow_vertical = 2
 script = ExtResource("1_cx6e2")
 expedition_card_scene = ExtResource("2_u0gmk")
 
-[node name="SafeArea" type="MarginContainer" parent="." unique_id=1893651646]
+[node name="TopSection" type="PanelContainer" parent="." unique_id=1123168830]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 10
 anchor_right = 1.0
-anchor_bottom = 1.0
+offset_bottom = 320.0
 grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
 
-[node name="RootColumn" type="VBoxContainer" parent="SafeArea" unique_id=1123168830]
+[node name="TopMargin" type="MarginContainer" parent="TopSection"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
-[node name="TitleLabel" type="Label" parent="SafeArea/RootColumn" unique_id=1571198669]
+[node name="TopColumn" type="VBoxContainer" parent="TopSection/TopMargin"]
 layout_mode = 2
-text = "Expedition Board"
-horizontal_alignment = 1
+size_flags_vertical = 3
+theme_override_constants/separation = 8
 
-[node name="RegionSummaryLabel" type="Label" parent="SafeArea/RootColumn"]
+[node name="RegionHintLabel" type="Label" parent="TopSection/TopMargin/TopColumn"]
 layout_mode = 2
-text = "Selected Region:"
-autowrap_mode = 3
+text = "Choose a region"
 
-[node name="RegionSelector" type="OptionButton" parent="SafeArea/RootColumn"]
-custom_minimum_size = Vector2(0, 44)
+[node name="RegionCarouselScroll" type="ScrollContainer" parent="TopSection/TopMargin/TopColumn"]
 layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 1
+vertical_scroll_mode = 0
 
-[node name="SelectionLabel" type="Label" parent="SafeArea/RootColumn" unique_id=1866229231]
+[node name="RegionCarouselRow" type="HBoxContainer" parent="TopSection/TopMargin/TopColumn/RegionCarouselScroll"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MiddleSection" type="PanelContainer" parent="." unique_id=570001011]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 320.0
+offset_bottom = 520.0
+grow_horizontal = 2
+
+[node name="MiddleMargin" type="MarginContainer" parent="MiddleSection"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="MiddleColumn" type="VBoxContainer" parent="MiddleSection/MiddleMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="SelectionLabel" type="Label" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=1866229231]
 layout_mode = 2
 text = "Select an expedition to continue."
 autowrap_mode = 3
 
-[node name="CardScroll" type="ScrollContainer" parent="SafeArea/RootColumn" unique_id=1276735346]
-custom_minimum_size = Vector2(0, 220)
+[node name="CardScroll" type="ScrollContainer" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=1276735346]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="ExpeditionCardsContainer" type="VBoxContainer" parent="SafeArea/RootColumn/CardScroll" unique_id=983485744]
+[node name="ExpeditionCardsContainer" type="VBoxContainer" parent="MiddleSection/MiddleMargin/MiddleColumn/CardScroll" unique_id=983485744]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 10
+theme_override_constants/separation = 6
 
-[node name="DispatchButton" type="Button" parent="SafeArea/RootColumn" unique_id=726765546]
-custom_minimum_size = Vector2(0, 56)
+[node name="DispatchButton" type="Button" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=726765546]
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Dispatch Selected Expedition"
 
-[node name="BackButton" type="Button" parent="SafeArea/RootColumn"]
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-text = "Back to Guild Hall"
+[node name="BottomNavSafe" type="MarginContainer" parent="." unique_id=1491293952]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
 
-[node name="BottomNavBar" parent="SafeArea/RootColumn" instance=ExtResource("3_nav")]
+[node name="BottomNavBar" parent="BottomNavSafe" unique_id=1735187439 instance=ExtResource("3_nav")]
 layout_mode = 2
+size_flags_vertical = 3
