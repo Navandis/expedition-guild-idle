@@ -276,12 +276,13 @@ func _add_region_card(row: Dictionary) -> void:
 	if card == null:
 		return
 
+	# Ensure @onready nodes in RegionCarouselCardView are initialized before setup().
+	_region_carousel_row.add_child(card)
 	card.setup(row, _resolve_region_texture(region_id))
 	card.pressed.connect(func() -> void:
 		_on_region_card_pressed(region_id)
 	)
 
-	_region_carousel_row.add_child(card)
 	_region_card_views[region_id] = card
 
 
