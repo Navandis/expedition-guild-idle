@@ -36,6 +36,7 @@ const _REGION_TEXTURES := {
 }
 
 @export var expedition_card_scene: PackedScene
+@export var region_card_scene: PackedScene
 
 @onready var _top_section: PanelContainer = $TopSection
 @onready var _middle_section: PanelContainer = $MiddleSection
@@ -56,7 +57,7 @@ var _generation_context: Dictionary = {}
 var _region_rows: Array[Dictionary] = []
 var _session_offers_by_region: Dictionary = {}
 var _selected_region_id := ""
-var _region_card_buttons: Dictionary = {}
+var _region_card_views: Dictionary = {}
 
 
 func _ready() -> void:
@@ -235,7 +236,7 @@ func _is_valid_board_offers_for_region(board_offers: Array[Dictionary], region_i
 func _refresh_region_carousel() -> void:
 	for child in _region_carousel_row.get_children():
 		child.queue_free()
-	_region_card_buttons.clear()
+	_region_card_views.clear()
 
 	# Preserve last selected region if still valid; otherwise pick first unlocked.
 	if _selected_region_id.is_empty():
@@ -266,54 +267,22 @@ func _refresh_region_carousel() -> void:
 
 func _add_region_card(row: Dictionary) -> void:
 	var region_id := str(row.get("id", ""))
-	if region_id.is_empty():
+	if region_id.is_empty() or region_card_scene == null:
 		return
 
-	var button := Button.new()
-	button.custom_minimum_size = Vector2(168, 220)
-	button.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	button.text = ""
-	button.focus_mode = Control.FOCUS_ALL
+	# Region card visuals are now scene-authored for editor usability.
+	# The controller only instantiates the reusable card and binds data.
+	var card := region_card_scene.instantiate() as RegionCarouselCardView
+	if card == null:
+		return
 
-	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	margin.add_theme_constant_override("margin_left", 8)
-	margin.add_theme_constant_override("margin_top", 8)
-	margin.add_theme_constant_override("margin_right", 8)
-	margin.add_theme_constant_override("margin_bottom", 8)
-	button.add_child(margin)
-
-	var content := VBoxContainer.new()
-	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	content.alignment = BoxContainer.ALIGNMENT_BEGIN
-	content.add_theme_constant_override("separation", 6)
-	margin.add_child(content)
-
-	var image := TextureRect.new()
-	image.custom_minimum_size = Vector2(0, 150)
-	image.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	image.texture = _resolve_region_texture(region_id)
-	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	content.add_child(image)
-
-	var name_label := Label.new()
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	name_label.text = str(row.get("name", region_id))
-	if not bool(row.get("is_unlocked", false)):
-		name_label.text += " (Locked)"
-	content.add_child(name_label)
-
-	button.disabled = not bool(row.get("is_unlocked", false))
-	button.pressed.connect(func() -> void:
+	card.setup(row, _resolve_region_texture(region_id))
+	card.pressed.connect(func() -> void:
 		_on_region_card_pressed(region_id)
 	)
 
-	_region_carousel_row.add_child(button)
-	_region_card_buttons[region_id] = button
+	_region_carousel_row.add_child(card)
+	_region_card_views[region_id] = card
 
 
 func _resolve_region_texture(region_id: String) -> Texture2D:
@@ -334,30 +303,13 @@ func _on_region_card_pressed(region_id: String) -> void:
 
 func _update_region_card_highlights() -> void:
 	# Selection is indicated by a green border on the chosen region card.
-	for region_id in _region_card_buttons.keys():
-		var button := _region_card_buttons[region_id] as Button
-		if button == null:
+	# Locked/unlocked presentation is applied by RegionCarouselCardView.setup().
+	for region_id in _region_card_views.keys():
+		var card := _region_card_views[region_id] as RegionCarouselCardView
+		if card == null:
 			continue
 		var is_selected := str(region_id) == _selected_region_id
-		_apply_region_button_style(button, is_selected)
-
-
-func _apply_region_button_style(button: Button, is_selected: bool) -> void:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.11, 0.11, 0.11, 0.96)
-	style.border_color = _SELECTED_REGION_BORDER if is_selected else _UNSELECTED_REGION_BORDER
-	style.border_width_left = 3
-	style.border_width_top = 3
-	style.border_width_right = 3
-	style.border_width_bottom = 3
-	style.corner_radius_top_left = 10
-	style.corner_radius_top_right = 10
-	style.corner_radius_bottom_left = 10
-	style.corner_radius_bottom_right = 10
-	button.add_theme_stylebox_override("normal", style)
-	button.add_theme_stylebox_override("pressed", style)
-	button.add_theme_stylebox_override("focus", style)
-	button.add_theme_stylebox_override("hover", style)
+		card.apply_selected_style(is_selected, _SELECTED_REGION_BORDER, _UNSELECTED_REGION_BORDER)
 
 
 func _on_card_selected(expedition_data: Dictionary) -> void:

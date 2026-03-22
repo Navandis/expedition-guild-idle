@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://c31ng4ivfwgb4" path="res://scripts/ui/ExpeditionBoardController.gd" id="1_cx6e2"]
 [ext_resource type="PackedScene" path="res://scenes/components/ExpeditionCard.tscn" id="2_u0gmk"]
 [ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="3_nav"]
+[ext_resource type="PackedScene" path="res://scenes/components/RegionCarouselCard.tscn" id="3_8v7s6"]
 
 [node name="ExpeditionBoard" type="Control" unique_id=2096162743]
 layout_mode = 3
@@ -13,6 +14,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_cx6e2")
 expedition_card_scene = ExtResource("2_u0gmk")
+region_card_scene = ExtResource("3_8v7s6")
 
 [node name="TopSection" type="PanelContainer" parent="." unique_id=1123168830]
 layout_mode = 1
