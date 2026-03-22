@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c31ng4ivfwgb4" path="res://scripts/ui/ExpeditionBoardController.gd" id="1_cx6e2"]
 [ext_resource type="PackedScene" path="res://scenes/components/ExpeditionCard.tscn" id="2_u0gmk"]
-[ext_resource type="PackedScene" path="res://scenes/components/BottomNavBar.tscn" id="3_nav"]
+[ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="3_nav"]
 
 [node name="ExpeditionBoard" type="Control" unique_id=2096162743]
 layout_mode = 3
@@ -21,30 +21,30 @@ anchor_right = 1.0
 offset_bottom = 320.0
 grow_horizontal = 2
 
-[node name="TopMargin" type="MarginContainer" parent="TopSection"]
+[node name="TopMargin" type="MarginContainer" parent="TopSection" unique_id=572528609]
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
 
-[node name="TopColumn" type="VBoxContainer" parent="TopSection/TopMargin"]
+[node name="TopColumn" type="VBoxContainer" parent="TopSection/TopMargin" unique_id=1163415263]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="RegionHintLabel" type="Label" parent="TopSection/TopMargin/TopColumn"]
+[node name="RegionHintLabel" type="Label" parent="TopSection/TopMargin/TopColumn" unique_id=1435295267]
 layout_mode = 2
 text = "Choose a region"
 
-[node name="RegionCarouselScroll" type="ScrollContainer" parent="TopSection/TopMargin/TopColumn"]
+[node name="RegionCarouselScroll" type="ScrollContainer" parent="TopSection/TopMargin/TopColumn" unique_id=619514099]
 layout_mode = 2
 size_flags_vertical = 3
-horizontal_scroll_mode = 1
 vertical_scroll_mode = 0
 
-[node name="RegionCarouselRow" type="HBoxContainer" parent="TopSection/TopMargin/TopColumn/RegionCarouselScroll"]
+[node name="RegionCarouselRow" type="HBoxContainer" parent="TopSection/TopMargin/TopColumn/RegionCarouselScroll" unique_id=462995050]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 10
 
 [node name="MiddleSection" type="PanelContainer" parent="." unique_id=570001011]
@@ -55,19 +55,20 @@ offset_top = 320.0
 offset_bottom = 520.0
 grow_horizontal = 2
 
-[node name="MiddleMargin" type="MarginContainer" parent="MiddleSection"]
+[node name="MiddleMargin" type="MarginContainer" parent="MiddleSection" unique_id=1971464897]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="MiddleColumn" type="VBoxContainer" parent="MiddleSection/MiddleMargin"]
+[node name="MiddleColumn" type="VBoxContainer" parent="MiddleSection/MiddleMargin" unique_id=1309430938]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="SelectionLabel" type="Label" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=1866229231]
+visible = false
 layout_mode = 2
 text = "Select an expedition to continue."
 autowrap_mode = 3

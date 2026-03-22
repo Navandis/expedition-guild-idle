@@ -1,57 +1,54 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://y85yyywv7acc"]
 
-[ext_resource type="Script" path="res://scripts/ui/ExpeditionCardView.gd" id="1_kipng"]
+[ext_resource type="Script" uid="uid://dhs7q26omqxfi" path="res://scripts/ui/ExpeditionCardView.gd" id="1_kipng"]
 
-; Reusable expedition offer card for Expedition Board middle bucket.
-[node name="ExpeditionCard" type="Button"]
+[node name="ExpeditionCard" type="Button" unique_id=1611412042]
 custom_minimum_size = Vector2(0, 110)
 size_flags_horizontal = 3
-text = ""
 script = ExtResource("1_kipng")
 
-; Margin wrapper keeps content compact and readable.
-[node name="CardContent" type="MarginContainer" parent="."]
+[node name="CardContent" type="MarginContainer" parent="." unique_id=11652599]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 119.0
+offset_bottom = 75.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 8
-mouse_filter = 2
 
-[node name="Rows" type="VBoxContainer" parent="CardContent"]
+[node name="Rows" type="VBoxContainer" parent="CardContent" unique_id=342305149]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-; Placeholder site image zone keeps cards comparison-friendly while preserving
-; room for core text stats.
-[node name="SiteImage" type="TextureRect" parent="CardContent/Rows"]
+[node name="SiteImage" type="TextureRect" parent="CardContent/Rows" unique_id=446881102]
+texture_filter = 1
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
-texture_filter = 1
 expand_mode = 1
 stretch_mode = 5
 
-[node name="DisplayNameLabel" type="Label" parent="CardContent/Rows" unique_name_in_owner=true]
+[node name="DisplayNameLabel" type="Label" parent="CardContent/Rows" unique_id=1284674642]
 layout_mode = 2
 text = "Display Name"
 
-[node name="DurationLabel" type="Label" parent="CardContent/Rows" unique_name_in_owner=true]
+[node name="DurationLabel" type="Label" parent="CardContent/Rows" unique_id=1030342764]
 layout_mode = 2
 text = "Duration: --"
 
-[node name="RiskLabel" type="Label" parent="CardContent/Rows" unique_name_in_owner=true]
+[node name="RiskLabel" type="Label" parent="CardContent/Rows" unique_id=517774977]
 layout_mode = 2
 text = "Risk: --"
 
-[node name="RewardLabel" type="Label" parent="CardContent/Rows" unique_name_in_owner=true]
+[node name="RewardLabel" type="Label" parent="CardContent/Rows" unique_id=1171034410]
 layout_mode = 2
 text = "Reward: --"
 
-[node name="HazardLabel" type="Label" parent="CardContent/Rows" unique_name_in_owner=true]
+[node name="HazardLabel" type="Label" parent="CardContent/Rows" unique_id=913253240]
 layout_mode = 2
 text = "Hazard: --"
