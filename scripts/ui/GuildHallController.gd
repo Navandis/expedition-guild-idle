@@ -126,7 +126,7 @@ func _update_expedition_section_layout() -> void:
 
 	var midpoint_y := parent_height * 0.5
 	var bottom_nav_top_y := _bottom_nav_safe.position.y
-	var bounded_height := max(0.0, bottom_nav_top_y - midpoint_y)
+	var bounded_height: float = maxf(0.0, bottom_nav_top_y - midpoint_y)
 
 	# Keep horizontal behavior from the scene, but drive vertical bounds explicitly:
 	# top = viewport midpoint, bottom = top edge of BottomNavSafe.
