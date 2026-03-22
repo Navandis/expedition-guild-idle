@@ -101,6 +101,11 @@ func _process(_delta: float) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED:
 		# Theme/safe-area adjustments can move BottomNavSafe without a gameplay event.
+		# This notification can fire before @onready nodes are initialized while the
+		# control is still entering the tree, so defer until the node is ready.
+		if not is_node_ready():
+			call_deferred("_update_expedition_section_layout")
+			return
 		# Recompute the bounded expedition area at this safe layout point.
 		_update_expedition_section_layout()
 
