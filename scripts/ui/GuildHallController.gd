@@ -48,6 +48,8 @@ const _SLOT_VISUAL_COMPLETED := "completed"
 @onready var _slot_one_state_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
 @onready var _slot_two_name_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
 @onready var _slot_two_state_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
+@onready var _expedition_section_panel: PanelContainer = $ExpeditionSectionPanel
+@onready var _bottom_nav_safe: MarginContainer = $BottomNavSafe
 @onready var _bottom_nav: BottomNavBar = $BottomNavSafe/BottomNavBar
 
 var _expedition_manager: ExpeditionManager
@@ -59,6 +61,8 @@ var _resources := {
 var _slot_is_empty: Array[bool] = [true, true]
 var _slot_visual_states: Array[String] = ["", ""]
 var _cached_slot_styles: Dictionary = {}
+var _expedition_offset_left := 0.0
+var _expedition_offset_right := 0.0
 
 
 func _ready() -> void:
@@ -74,6 +78,16 @@ func _ready() -> void:
 	_bottom_nav.set_current_screen(BottomNavBar.TARGET_GUILD_HALL)
 	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
 	_build_cached_slot_styles()
+	# Preserve scene-authored horizontal padding so this script only owns vertical
+	# bounds for the middle section.
+	_expedition_offset_left = _expedition_section_panel.offset_left
+	_expedition_offset_right = _expedition_section_panel.offset_right
+	# Layout is updated at resize/layout events instead of in _process(). This keeps
+	# the middle section stable and avoids per-frame layout churn.
+	resized.connect(_on_layout_changed)
+	_bottom_nav_safe.resized.connect(_on_layout_changed)
+	# Defer the first pass so all Control nodes have their final initial size.
+	call_deferred("_update_expedition_section_layout")
 	# Polling each frame is acceptable for this prototype-sized status block.
 	set_process(true)
 	_refresh_resource_labels()
@@ -82,6 +96,43 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	_refresh_active_status()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		# Theme/safe-area adjustments can move BottomNavSafe without a gameplay event.
+		# Recompute the bounded expedition area at this safe layout point.
+		_update_expedition_section_layout()
+
+
+func _on_layout_changed() -> void:
+	_update_expedition_section_layout()
+
+
+func _update_expedition_section_layout() -> void:
+	# Coordinate-space note:
+	# - GuildHall (self), ExpeditionSectionPanel, and BottomNavSafe share the same
+	#   parent/local space, so we use local positions/sizes directly.
+	# - This avoids fragile global/local mixing and keeps math robust if hierarchy
+	#   internals change but these nodes remain siblings.
+	var parent_height := size.y
+	if parent_height <= 0.0:
+		return
+
+	var midpoint_y := parent_height * 0.5
+	var bottom_nav_top_y := _bottom_nav_safe.position.y
+	var bounded_height := max(0.0, bottom_nav_top_y - midpoint_y)
+
+	# Keep horizontal behavior from the scene, but drive vertical bounds explicitly:
+	# top = viewport midpoint, bottom = top edge of BottomNavSafe.
+	_expedition_section_panel.anchor_left = 0.0
+	_expedition_section_panel.anchor_right = 1.0
+	_expedition_section_panel.offset_left = _expedition_offset_left
+	_expedition_section_panel.offset_right = _expedition_offset_right
+	_expedition_section_panel.anchor_top = 0.0
+	_expedition_section_panel.anchor_bottom = 0.0
+	_expedition_section_panel.offset_top = midpoint_y
+	_expedition_section_panel.offset_bottom = midpoint_y + bounded_height
 
 
 func set_expedition_manager(expedition_manager: ExpeditionManager) -> void:
