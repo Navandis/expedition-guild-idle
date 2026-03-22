@@ -150,7 +150,7 @@ func _update_board_layout() -> void:
 	if size.y <= 0.0:
 		return
 
-	var top_height := floor(size.y * 0.5)
+	var top_height: float = floorf(size.y * 0.5)
 	var nav_top_y := _bottom_nav_safe.position.y
 	var middle_top_y := top_height
 	var middle_bottom_y := maxf(middle_top_y, nav_top_y)
