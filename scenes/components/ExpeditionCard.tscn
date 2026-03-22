@@ -2,16 +2,14 @@
 
 [ext_resource type="Script" path="res://scripts/ui/ExpeditionCardView.gd" id="1_kipng"]
 
-; Reusable expedition offer card.
-; The entire node is a Button so keyboard/gamepad/click all trigger selection.
+; Reusable expedition offer card for Expedition Board middle bucket.
 [node name="ExpeditionCard" type="Button"]
-custom_minimum_size = Vector2(0, 136)
+custom_minimum_size = Vector2(0, 110)
 size_flags_horizontal = 3
-alignment = 0
 text = ""
 script = ExtResource("1_kipng")
 
-; Margin wrapper keeps text away from button edges.
+; Margin wrapper keeps content compact and readable.
 [node name="CardContent" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -19,16 +17,24 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
 mouse_filter = 2
 
-; Rows are filled by ExpeditionCardView.gd based on expedition_data.
 [node name="Rows" type="VBoxContainer" parent="CardContent"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
+
+; Placeholder site image zone keeps cards comparison-friendly while preserving
+; room for core text stats.
+[node name="SiteImage" type="TextureRect" parent="CardContent/Rows"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
 
 [node name="DisplayNameLabel" type="Label" parent="CardContent/Rows" unique_name_in_owner=true]
 layout_mode = 2

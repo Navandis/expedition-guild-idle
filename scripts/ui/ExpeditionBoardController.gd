@@ -2,21 +2,20 @@ extends Control
 class_name ExpeditionBoardController
 
 # File: ExpeditionBoardController.gd
-# File role:
-# Handles Expedition Board UI behavior for offer generation, selection, and
-# region switching. The board now keeps per-region offers stable for one
-# screen visit by caching generated offers in-memory.
+# This controller drives the Expedition Board as a 3-bucket dispatch workspace:
+# 1) Top bucket (fixed 50%): region carousel only.
+# 2) Middle bucket (dynamic): offered expeditions + dispatch button.
+# 3) Bottom bucket: shared bottom nav in BottomNavSafe.
 #
-# ExpeditionBoardController manages the full board lifecycle:
-# 1) Generate expedition offers.
-# 2) Render one card per offer.
-# 3) Track which card is selected.
-# 4) Emit flow signals (dispatch request or return home).
-#
-# Region slice note:
-# The board now exposes a minimal region picker and shows which region is active.
-# Generation still happens in this controller, but pools are constrained via
-# generation_context provided by GameManager/RegionSystem.
+# Beginner notes for this pass:
+# - The old static "Expedition Board" heading, "Selected Region: ..." text,
+#   and "Back to Guild Hall" button were removed because global navigation now
+#   lives in the shared bottom nav.
+# - Layout bounds are recomputed from ready/resize/theme-safe hooks instead of
+#   _process() to avoid per-frame UI churn.
+# - Region selection is shown by a green border on the selected region card.
+# - Region choice is preserved through RegionSystem/GameManager, then restored
+#   here via generation_context + set_region_data.
 
 signal expedition_dispatch_requested(expedition_data: Dictionary)
 signal return_to_guild_hall_requested
@@ -24,17 +23,29 @@ signal region_selected(region_id: String)
 signal navigate_requested(target_screen: String)
 
 const MIN_EXPEDITIONS := 3
-const MAX_EXPEDITIONS := 5
+const MAX_EXPEDITIONS := 3
+const _SELECTED_REGION_BORDER := Color(0.25, 0.85, 0.35, 1.0)
+const _UNSELECTED_REGION_BORDER := Color(0.30, 0.30, 0.30, 1.0)
+
+const _REGION_TEXTURES := {
+	"greenhollow_reaches": preload("res://assets/Regions/Greenhollow Reaches - v8.png"),
+	"emberwake_coast": preload("res://assets/Regions/Emberwake Coast - v7.png"),
+	"greyfen_march": preload("res://assets/Regions/Greyfen March - variant 8.png"),
+	"sunscar_expanse": preload("res://assets/Regions/Sunscar Expanse - v11.png"),
+	"hollowspire_uplands": preload("res://assets/Regions/Hollowspire Uplands - v3.png")
+}
 
 @export var expedition_card_scene: PackedScene
 
-@onready var _cards_container: VBoxContainer = $SafeArea/RootColumn/CardScroll/ExpeditionCardsContainer
-@onready var _dispatch_button: Button = $SafeArea/RootColumn/DispatchButton
-@onready var _selection_label: Label = $SafeArea/RootColumn/SelectionLabel
-@onready var _region_summary_label: Label = $SafeArea/RootColumn/RegionSummaryLabel
-@onready var _region_selector: OptionButton = $SafeArea/RootColumn/RegionSelector
-@onready var _back_button: Button = $SafeArea/RootColumn/BackButton
-@onready var _bottom_nav: BottomNavBar = $SafeArea/RootColumn/BottomNavBar
+@onready var _top_section: PanelContainer = $TopSection
+@onready var _middle_section: PanelContainer = $MiddleSection
+@onready var _bottom_nav_safe: MarginContainer = $BottomNavSafe
+@onready var _region_hint_label: Label = $TopSection/TopMargin/TopColumn/RegionHintLabel
+@onready var _region_carousel_row: HBoxContainer = $TopSection/TopMargin/TopColumn/RegionCarouselScroll/RegionCarouselRow
+@onready var _cards_container: VBoxContainer = $MiddleSection/MiddleMargin/MiddleColumn/CardScroll/ExpeditionCardsContainer
+@onready var _dispatch_button: Button = $MiddleSection/MiddleMargin/MiddleColumn/DispatchButton
+@onready var _selection_label: Label = $MiddleSection/MiddleMargin/MiddleColumn/SelectionLabel
+@onready var _bottom_nav: BottomNavBar = $BottomNavSafe/BottomNavBar
 
 var _generator := ExpeditionGenerator.new()
 var _selected_expedition: Dictionary = {}
@@ -44,20 +55,31 @@ var _initial_board_offers: Array[Dictionary] = []
 var _generation_context: Dictionary = {}
 var _region_rows: Array[Dictionary] = []
 var _session_offers_by_region: Dictionary = {}
+var _selected_region_id := ""
+var _region_card_buttons: Dictionary = {}
 
 
 func _ready() -> void:
 	randomize()
-	# Players cannot dispatch until they choose a card.
 	_dispatch_button.disabled = true
 	_dispatch_button.pressed.connect(_on_dispatch_pressed)
-	_back_button.pressed.connect(_on_back_pressed)
-	# Bottom nav is shared across major screens in this slice.
 	_bottom_nav.set_current_screen(BottomNavBar.TARGET_EXPEDITION_BOARD)
 	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
-	_region_selector.item_selected.connect(_on_region_selector_changed)
-	_refresh_region_selector()
+	# Hook bounded layout updates to safe lifecycle points instead of _process().
+	resized.connect(_on_layout_changed)
+	_top_section.resized.connect(_on_layout_changed)
+	_bottom_nav_safe.resized.connect(_on_layout_changed)
+	call_deferred("_update_board_layout")
+	_refresh_region_carousel()
 	_show_board_for_selected_region()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		if not is_node_ready():
+			call_deferred("_update_board_layout")
+			return
+		_update_board_layout()
 
 
 func get_selected_expedition() -> Dictionary:
@@ -75,16 +97,15 @@ func set_initial_board_offers(board_offers: Array[Dictionary]) -> void:
 
 
 func set_region_data(region_rows: Array[Dictionary], generation_context: Dictionary) -> void:
-	# Called by GameManager whenever region state changes.
 	_region_rows = region_rows.duplicate(true)
 	_generation_context = generation_context.duplicate(true)
-	if is_node_ready():
-		_refresh_region_selector()
-		_show_board_for_selected_region()
+	if not is_node_ready():
+		return
+	_refresh_region_carousel()
+	_show_board_for_selected_region()
 
 
 func get_board_offers() -> Array[Dictionary]:
-	# Save currently visible offers so GameManager can persist the active region.
 	var offers: Array[Dictionary] = []
 	for card in _card_views:
 		offers.append(card.expedition_data.duplicate(true))
@@ -92,7 +113,6 @@ func get_board_offers() -> Array[Dictionary]:
 
 
 func replace_expedition_by_id(expedition_id: String, dispatched_expedition: Dictionary) -> void:
-	# Remove the dispatched card, then generate exactly one replacement offer.
 	var removed := _remove_card_by_expedition_id(expedition_id)
 	if not removed:
 		return
@@ -101,28 +121,49 @@ func replace_expedition_by_id(expedition_id: String, dispatched_expedition: Dict
 	signatures_to_exclude.append(_generator.build_signature(dispatched_expedition))
 	var replacement := _generator.generate_single_expedition(signatures_to_exclude, _generation_context)
 	if replacement.is_empty():
-		# Even without a replacement, persist the post-dispatch board shape so
-		# region switching does not restore a stale pre-dispatch cache snapshot.
 		_cache_current_region_offers()
-		_selected_expedition = {}
-		_dispatch_button.disabled = true
-		_selection_label.text = "Select an expedition to continue."
+		_clear_selected_expedition()
 		return
 
 	_add_card(replacement)
 	_cache_current_region_offers()
-	_selected_expedition = {}
-	_dispatch_button.disabled = true
-	_selection_label.text = "Select an expedition to continue."
+	_clear_selected_expedition()
 
 
 func regenerate_board_for_selected_region() -> void:
-	# Keep this method for compatibility with existing callers.
-	# It intentionally clears only the currently selected region cache entry.
 	var region_id := _get_selected_region_id()
 	if _session_offers_by_region.has(region_id):
 		_session_offers_by_region.erase(region_id)
 	_show_board_for_selected_region(true)
+
+
+func _on_layout_changed() -> void:
+	_update_board_layout()
+
+
+func _update_board_layout() -> void:
+	# 3-bucket layout math:
+	# - Top section uses exactly 50% of this screen's height.
+	# - Bottom section is whatever BottomNavSafe occupies.
+	# - Middle section fills the bounded gap between them.
+	# This avoids hard-coding nav heights and avoids _process().
+	if size.y <= 0.0:
+		return
+
+	var top_height := floor(size.y * 0.5)
+	var nav_top_y := _bottom_nav_safe.position.y
+	var middle_top_y := top_height
+	var middle_bottom_y := maxf(middle_top_y, nav_top_y)
+
+	_top_section.anchor_top = 0.0
+	_top_section.anchor_bottom = 0.0
+	_top_section.offset_top = 0.0
+	_top_section.offset_bottom = top_height
+
+	_middle_section.anchor_top = 0.0
+	_middle_section.anchor_bottom = 0.0
+	_middle_section.offset_top = middle_top_y
+	_middle_section.offset_bottom = middle_bottom_y
 
 
 func _generate_board(existing_offers: Array[Dictionary] = []) -> void:
@@ -132,15 +173,12 @@ func _generate_board(existing_offers: Array[Dictionary] = []) -> void:
 	if _is_valid_board_offers(existing_offers):
 		expeditions = existing_offers.duplicate(true)
 	else:
-		var desired_count := randi_range(MIN_EXPEDITIONS, MAX_EXPEDITIONS)
-		expeditions = _generator.generate_expeditions(desired_count, [], _generation_context)
+		expeditions = _generator.generate_expeditions(3, [], _generation_context)
 
 	for expedition in expeditions:
 		_add_card(expedition)
 
-	_selection_label.text = "Select an expedition to continue."
-	_dispatch_button.disabled = true
-	_selected_expedition = {}
+	_clear_selected_expedition()
 
 
 func _add_card(expedition: Dictionary) -> void:
@@ -148,8 +186,6 @@ func _add_card(expedition: Dictionary) -> void:
 	if card == null:
 		return
 
-	# Each card gets the full expedition dictionary so it can both
-	# display fields and emit them back when clicked.
 	_cards_container.add_child(card)
 	card.set_expedition_data(expedition)
 	card.set_upgrade_effects(_upgrade_effects)
@@ -175,11 +211,9 @@ func _remove_card_by_expedition_id(expedition_id: String) -> bool:
 	for card in _card_views:
 		if str(card.expedition_data.get("id", "")) != expedition_id:
 			continue
-
 		_card_views.erase(card)
 		card.queue_free()
 		return true
-
 	return false
 
 
@@ -190,73 +224,143 @@ func _is_valid_board_offers(board_offers: Array[Dictionary]) -> bool:
 func _is_valid_board_offers_for_region(board_offers: Array[Dictionary], region_id: String) -> bool:
 	if board_offers.size() < MIN_EXPEDITIONS or board_offers.size() > MAX_EXPEDITIONS:
 		return false
-
 	for offer in board_offers:
 		if str(offer.get("id", "")).is_empty():
 			return false
-		# Safety guard: only use offers that belong to the target region.
 		if str(offer.get("region_id", "")) != region_id:
 			return false
 	return true
 
 
-func _refresh_region_selector() -> void:
-	if _region_selector == null:
-		return
+func _refresh_region_carousel() -> void:
+	for child in _region_carousel_row.get_children():
+		child.queue_free()
+	_region_card_buttons.clear()
 
-	var previous_region_id := str(_generation_context.get("region_id", ""))
-	_region_selector.clear()
-	_region_selector.disabled = _region_rows.is_empty()
+	# Preserve last selected region if still valid; otherwise pick first unlocked.
+	if _selected_region_id.is_empty():
+		_selected_region_id = str(_generation_context.get("region_id", ""))
 
+	var selectable_region_ids: Array[String] = []
 	for row in _region_rows:
-		var region_id := str(row.get("id", ""))
-		var row_is_visible := bool(row.get("is_visible", false))
-		if not row_is_visible:
+		if not bool(row.get("is_visible", false)):
 			continue
+		var region_id := str(row.get("id", ""))
 		var is_unlocked := bool(row.get("is_unlocked", false))
-		var label := str(row.get("name", region_id))
-		if not is_unlocked:
-			label = "%s (Locked)" % label
-		_region_selector.add_item(label)
-		var option_index := _region_selector.item_count - 1
-		_region_selector.set_item_metadata(option_index, region_id)
-		if not is_unlocked:
-			_region_selector.set_item_disabled(option_index, true)
+		if is_unlocked:
+			selectable_region_ids.append(region_id)
+		_add_region_card(row)
 
-	if _region_selector.item_count <= 0:
-		_region_summary_label.text = "No visible regions."
+	if selectable_region_ids.is_empty():
+		_region_hint_label.text = "No visible regions."
+		_selected_region_id = ""
 		return
 
-	var selected_index := 0
-	for i in range(_region_selector.item_count):
-		if str(_region_selector.get_item_metadata(i)) == previous_region_id:
-			selected_index = i
-			break
+	if not selectable_region_ids.has(_selected_region_id):
+		# First-time fallback: first opened region.
+		_selected_region_id = selectable_region_ids[0]
 
-	_region_selector.select(selected_index)
-	_refresh_region_summary_from_selector()
+	_region_hint_label.text = "Choose a region"
+	_update_region_card_highlights()
 
 
-func _refresh_region_summary_from_selector() -> void:
-	if _region_selector.item_count <= 0:
-		_region_summary_label.text = "Selected Region: None"
+func _add_region_card(row: Dictionary) -> void:
+	var region_id := str(row.get("id", ""))
+	if region_id.is_empty():
 		return
-	var selected_text := _region_selector.get_item_text(_region_selector.selected)
-	_region_summary_label.text = "Selected Region: %s" % selected_text
+
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(168, 220)
+	button.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	button.text = ""
+	button.focus_mode = Control.FOCUS_ALL
+
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.add_theme_constant_override("margin_left", 8)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_right", 8)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	button.add_child(margin)
+
+	var content := VBoxContainer.new()
+	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content.alignment = BoxContainer.ALIGNMENT_BEGIN
+	content.add_theme_constant_override("separation", 6)
+	margin.add_child(content)
+
+	var image := TextureRect.new()
+	image.custom_minimum_size = Vector2(0, 150)
+	image.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	image.texture = _resolve_region_texture(region_id)
+	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_child(image)
+
+	var name_label := Label.new()
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_label.text = str(row.get("name", region_id))
+	if not bool(row.get("is_unlocked", false)):
+		name_label.text += " (Locked)"
+	content.add_child(name_label)
+
+	button.disabled = not bool(row.get("is_unlocked", false))
+	button.pressed.connect(func() -> void:
+		_on_region_card_pressed(region_id)
+	)
+
+	_region_carousel_row.add_child(button)
+	_region_card_buttons[region_id] = button
 
 
-func _on_region_selector_changed(index: int) -> void:
-	if index < 0 or index >= _region_selector.item_count:
+func _resolve_region_texture(region_id: String) -> Texture2D:
+	if _REGION_TEXTURES.has(region_id):
+		return _REGION_TEXTURES[region_id]
+	return null
+
+
+func _on_region_card_pressed(region_id: String) -> void:
+	if region_id.is_empty() or region_id == _selected_region_id:
 		return
-	# Selection is region-scoped. Clear old selection so dispatch cannot carry
-	# a stale expedition from another region.
+	_selected_region_id = region_id
 	_clear_selected_expedition()
-	_refresh_region_summary_from_selector()
-	region_selected.emit(str(_region_selector.get_item_metadata(index)))
+	_update_region_card_highlights()
+	# Emit to RegionSystem so last-selected region persists to save state.
+	region_selected.emit(region_id)
+
+
+func _update_region_card_highlights() -> void:
+	# Selection is indicated by a green border on the chosen region card.
+	for region_id in _region_card_buttons.keys():
+		var button := _region_card_buttons[region_id] as Button
+		if button == null:
+			continue
+		var is_selected := str(region_id) == _selected_region_id
+		_apply_region_button_style(button, is_selected)
+
+
+func _apply_region_button_style(button: Button, is_selected: bool) -> void:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.11, 0.11, 0.11, 0.96)
+	style.border_color = _SELECTED_REGION_BORDER if is_selected else _UNSELECTED_REGION_BORDER
+	style.border_width_left = 3
+	style.border_width_top = 3
+	style.border_width_right = 3
+	style.border_width_bottom = 3
+	style.corner_radius_top_left = 10
+	style.corner_radius_top_right = 10
+	style.corner_radius_bottom_left = 10
+	style.corner_radius_bottom_right = 10
+	button.add_theme_stylebox_override("normal", style)
+	button.add_theme_stylebox_override("pressed", style)
+	button.add_theme_stylebox_override("focus", style)
+	button.add_theme_stylebox_override("hover", style)
 
 
 func _on_card_selected(expedition_data: Dictionary) -> void:
-	# Duplicate to avoid accidental shared-mutation between UI and model data.
 	_selected_expedition = expedition_data.duplicate(true)
 	_dispatch_button.disabled = false
 	_selection_label.text = "Selected: %s" % str(_selected_expedition.get("display_name", "Unknown Expedition"))
@@ -269,18 +373,12 @@ func _on_card_selected(expedition_data: Dictionary) -> void:
 func _on_dispatch_pressed() -> void:
 	if _selected_expedition.is_empty():
 		return
-	# Defensive check: only dispatch if selected expedition still belongs to
-	# the active region and still exists on the visible board.
 	if not _is_selected_expedition_dispatchable():
 		_clear_selected_expedition()
 		return
 
 	expedition_dispatch_requested.emit(_selected_expedition.duplicate(true))
 	print("Dispatch requested for: %s" % str(_selected_expedition.get("display_name", "Unknown Expedition")))
-
-
-func _on_back_pressed() -> void:
-	return_to_guild_hall_requested.emit()
 
 
 func _on_bottom_nav_requested(target_screen: String) -> void:
@@ -294,17 +392,13 @@ func _show_board_for_selected_region(force_regenerate: bool = false) -> void:
 		return
 
 	var offers_for_region: Array[Dictionary] = []
-	var has_cached := _session_offers_by_region.has(region_id)
-	if has_cached:
+	if _session_offers_by_region.has(region_id):
 		offers_for_region = _duplicate_offer_array(_session_offers_by_region.get(region_id, []))
 	elif _is_valid_board_offers_for_region(_initial_board_offers, region_id):
-		# On first board load, reuse saved offers for this region if they exist.
 		offers_for_region = _initial_board_offers.duplicate(true)
 
 	if force_regenerate or not _is_valid_board_offers_for_region(offers_for_region, region_id):
-		# Generate once per region during this board visit, then keep cached.
-		var desired_count := randi_range(MIN_EXPEDITIONS, MAX_EXPEDITIONS)
-		offers_for_region = _generator.generate_expeditions(desired_count, [], _generation_context)
+		offers_for_region = _generator.generate_expeditions(3, [], _generation_context)
 
 	_session_offers_by_region[region_id] = _duplicate_offer_array(offers_for_region)
 	_generate_board(offers_for_region)
@@ -319,6 +413,8 @@ func _clear_selected_expedition() -> void:
 
 
 func _get_selected_region_id() -> String:
+	if not _selected_region_id.is_empty():
+		return _selected_region_id
 	return str(_generation_context.get("region_id", ""))
 
 
