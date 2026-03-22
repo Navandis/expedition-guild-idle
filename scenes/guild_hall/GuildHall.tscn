@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" uid="uid://bky2lwy64owpe" path="res://scripts/ui/GuildHallController.gd" id="1_72fw3"]
 [ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="2_nav"]
-[ext_resource type="Texture2D" uid="uid://badvnksndqnau" path="res://assets/UI/ResourceCounters/gold.png" id="3_gold_icon"]
-[ext_resource type="Texture2D" uid="uid://bqpck5gp1i7lh" path="res://assets/UI/ResourceCounters/relics.png" id="4_relics_icon"]
-[ext_resource type="Texture2D" uid="uid://2juga4bs17go" path="res://assets/UI/ResourceCounters/codex_fragment.png" id="5_codex_icon"]
+[ext_resource type="Texture2D" uid="uid://py6ohnws3tte" path="res://assets/UI/ResourceCounters/gold.png" id="3_gold_icon"]
+[ext_resource type="Texture2D" uid="uid://dxyg3vxg80kwd" path="res://assets/UI/ResourceCounters/relics.png" id="4_relics_icon"]
+[ext_resource type="Texture2D" uid="uid://d0a672tahkdym" path="res://assets/UI/ResourceCounters/codex_fragment.png" id="5_codex_icon"]
 
 [node name="GuildHall" type="Control" unique_id=1458496136]
 layout_mode = 3
@@ -29,34 +29,6 @@ theme_override_constants/margin_bottom = 0
 [node name="TopStack" type="VBoxContainer" parent="TopSafeArea" unique_id=845488305]
 layout_mode = 2
 theme_override_constants/separation = 4
-
-[node name="ExpeditionSectionPanel" type="PanelContainer" parent="." unique_id=570001011]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 88.0
-offset_right = -8.0
-offset_bottom = -100.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="BottomNavSafe" type="MarginContainer" parent="." unique_id=1491293952]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 0.0
-offset_top = -96.0
-offset_right = 0.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
 
 [node name="TopPanelsRow" type="HBoxContainer" parent="TopSafeArea/TopStack" unique_id=1370000001]
 layout_mode = 2
@@ -112,8 +84,8 @@ stretch_mode = 5
 [node name="GoldValueLabel" type="Label" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row" unique_id=553301898]
 layout_mode = 2
 size_flags_horizontal = 3
-horizontal_alignment = 2
 text = "0"
+horizontal_alignment = 2
 
 [node name="RelicCounter" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001004]
 layout_mode = 2
@@ -134,8 +106,8 @@ stretch_mode = 5
 [node name="RelicFragmentsValueLabel" type="Label" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row" unique_id=462742622]
 layout_mode = 2
 size_flags_horizontal = 3
-horizontal_alignment = 2
 text = "0"
+horizontal_alignment = 2
 
 [node name="CodexCounter" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001007]
 layout_mode = 2
@@ -156,8 +128,8 @@ stretch_mode = 5
 [node name="CodexEntriesValueLabel" type="Label" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row" unique_id=404869075]
 layout_mode = 2
 size_flags_horizontal = 3
-horizontal_alignment = 2
 text = "0"
+horizontal_alignment = 2
 
 [node name="TopRightToolsRow" type="HBoxContainer" parent="TopSafeArea/TopStack" unique_id=570001010]
 layout_mode = 2
@@ -174,6 +146,17 @@ custom_minimum_size = Vector2(74, 28)
 layout_mode = 2
 text = "DBG-RES"
 
+[node name="ExpeditionSectionPanel" type="PanelContainer" parent="." unique_id=570001011]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 88.0
+offset_right = -8.0
+offset_bottom = -100.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="ExpeditionSectionMargin" type="MarginContainer" parent="ExpeditionSectionPanel" unique_id=570001012]
 layout_mode = 2
@@ -190,7 +173,6 @@ size_flags_vertical = 3
 custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 size_flags_horizontal = 3
-horizontal_scroll_mode = 1
 vertical_scroll_mode = 0
 
 [node name="ExpeditionSlotsRow" type="HBoxContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller" unique_id=570001014]
@@ -227,29 +209,26 @@ theme_override_constants/separation = 6
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
-mouse_filter = 2
 text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="SlotOneNameLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=980786867]
 layout_mode = 2
-mouse_filter = 2
+theme_override_font_sizes/font_size = 10
 text = "Empty Slot"
 horizontal_alignment = 1
 autowrap_mode = 2
-theme_override_font_sizes/font_size = 10
 max_lines_visible = 2
 
 [node name="SlotOneStateLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1411912238]
 layout_mode = 2
 size_flags_vertical = 3
-mouse_filter = 2
+theme_override_font_sizes/font_size = 9
 text = "Tap to open Expedition Board"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
-theme_override_font_sizes/font_size = 9
 max_lines_visible = 4
 
 [node name="SlotTwoCard" type="Button" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1241231002]
@@ -281,29 +260,26 @@ theme_override_constants/separation = 6
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
-mouse_filter = 2
 text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="SlotTwoNameLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1361604704]
 layout_mode = 2
-mouse_filter = 2
+theme_override_font_sizes/font_size = 10
 text = "Empty Slot"
 horizontal_alignment = 1
 autowrap_mode = 2
-theme_override_font_sizes/font_size = 10
 max_lines_visible = 2
 
 [node name="SlotTwoStateLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=760266556]
 layout_mode = 2
 size_flags_vertical = 3
-mouse_filter = 2
+theme_override_font_sizes/font_size = 9
 text = "Tap to open Expedition Board"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
-theme_override_font_sizes/font_size = 9
 max_lines_visible = 4
 
 [node name="SlotThreeCard" type="Button" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=570001015]
@@ -336,31 +312,42 @@ theme_override_constants/separation = 6
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
-mouse_filter = 2
 text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="SlotThreeNameLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001019]
 layout_mode = 2
-mouse_filter = 2
+theme_override_font_sizes/font_size = 10
 text = "Locked Slot"
 horizontal_alignment = 1
 autowrap_mode = 2
-theme_override_font_sizes/font_size = 10
 max_lines_visible = 2
 
 [node name="SlotThreeStateLabel" type="Label" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=570001020]
 layout_mode = 2
 size_flags_vertical = 3
-mouse_filter = 2
+theme_override_font_sizes/font_size = 9
 text = "Reserved for future expansion"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
-theme_override_font_sizes/font_size = 9
 max_lines_visible = 4
 
-[node name="BottomNavBar" parent="BottomNavSafe" instance=ExtResource("2_nav")]
+[node name="BottomNavSafe" type="MarginContainer" parent="." unique_id=1491293952]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -59.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="BottomNavBar" parent="BottomNavSafe" unique_id=1735187439 instance=ExtResource("2_nav")]
 layout_mode = 2
 size_flags_vertical = 3
