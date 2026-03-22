@@ -207,7 +207,7 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="TextureRect" type="TextureRect" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1597555090]
+[node name="SlotOneImage" type="TextureRect" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1597555090]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("5_513lt")
@@ -266,7 +266,7 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="TextureRect" type="TextureRect" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=221270952]
+[node name="SlotTwoImage" type="TextureRect" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=221270952]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("5_0pdko")
@@ -327,7 +327,7 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="TextureRect" type="TextureRect" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=1641990942]
+[node name="SlotThreeImage" type="TextureRect" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=1641990942]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("7_o7uwm")
