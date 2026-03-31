@@ -92,6 +92,94 @@ custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Dispatch Selected Expedition"
 
+[node name="ExpeditionDetailOverlay" type="Control" parent="." unique_id=129330011]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Dimmer" type="ColorRect" parent="ExpeditionDetailOverlay" unique_id=209395511]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.45)
+
+[node name="Window" type="PanelContainer" parent="ExpeditionDetailOverlay" unique_id=180912301]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.12
+anchor_top = 0.12
+anchor_right = 0.88
+anchor_bottom = 0.88
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="WindowMargin" type="MarginContainer" parent="ExpeditionDetailOverlay/Window" unique_id=1964412033]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="WindowColumn" type="VBoxContainer" parent="ExpeditionDetailOverlay/Window/WindowMargin" unique_id=191913901]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ImagePlaceholder" type="PanelContainer" parent="ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn" unique_id=1419910248]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+
+[node name="ImagePlaceholderLabel" type="Label" parent="ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn/ImagePlaceholder" unique_id=192385130]
+layout_mode = 2
+text = "Image Placeholder"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn" unique_id=111462074]
+layout_mode = 2
+text = "Expedition"
+horizontal_alignment = 1
+
+[node name="DurationLabel" type="Label" parent="ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn" unique_id=156930882]
+layout_mode = 2
+text = "Duration: --"
+
+[node name="RewardLabel" type="Label" parent="ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn" unique_id=11332904]
+layout_mode = 2
+text = "Reward: --"
+
+[node name="RiskLabel" type="Label" parent="ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn" unique_id=171228723]
+layout_mode = 2
+text = "Risk: --"
+
+[node name="Spacer" type="Control" parent="ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn" unique_id=1480891123]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ActionsRow" type="HBoxContainer" parent="ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn" unique_id=112840123]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AcceptButton" type="Button" parent="ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn/ActionsRow" unique_id=1456656372]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Accept"
+
+[node name="CloseButton" type="Button" parent="ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn/ActionsRow" unique_id=406622091]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Close"
+
 [node name="BottomNavSafe" type="MarginContainer" parent="." unique_id=1491293952]
 layout_mode = 1
 anchors_preset = 12
