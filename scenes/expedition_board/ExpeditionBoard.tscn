@@ -71,10 +71,6 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="SelectionLabel" type="Label" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=1417322659]
-layout_mode = 2
-text = "Select an expedition to continue."
-
 [node name="CardScroll" type="ScrollContainer" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=1276735346]
 layout_mode = 2
 size_flags_vertical = 3
@@ -86,11 +82,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 6
-
-[node name="DispatchButton" type="Button" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=726765546]
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-text = "Dispatch Selected Expedition"
 
 [node name="BottomNavSafe" type="MarginContainer" parent="." unique_id=1491293952]
 layout_mode = 1
