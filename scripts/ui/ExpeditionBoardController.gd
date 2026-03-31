@@ -16,6 +16,8 @@ class_name ExpeditionBoardController
 # - Region selection is shown by a green border on the selected region card.
 # - Region choice is preserved through RegionSystem/GameManager, then restored
 #   here via generation_context + set_region_data.
+# - Expedition details are shown in an in-screen overlay so players keep
+#   region context visible behind the popup instead of changing scenes.
 
 signal expedition_dispatch_requested(expedition_data: Dictionary)
 signal return_to_guild_hall_requested
@@ -47,6 +49,13 @@ const _REGION_TEXTURES := {
 @onready var _dispatch_button: Button = $MiddleSection/MiddleMargin/MiddleColumn/DispatchButton
 @onready var _selection_label: Label = $MiddleSection/MiddleMargin/MiddleColumn/SelectionLabel
 @onready var _bottom_nav: BottomNavBar = $BottomNavSafe/BottomNavBar
+@onready var _detail_overlay: Control = $ExpeditionDetailOverlay
+@onready var _detail_title_label: Label = $ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn/TitleLabel
+@onready var _detail_duration_label: Label = $ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn/DurationLabel
+@onready var _detail_reward_label: Label = $ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn/RewardLabel
+@onready var _detail_risk_label: Label = $ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn/RiskLabel
+@onready var _detail_accept_button: Button = $ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn/ActionsRow/AcceptButton
+@onready var _detail_close_button: Button = $ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn/ActionsRow/CloseButton
 
 var _generator := ExpeditionGenerator.new()
 var _selected_expedition: Dictionary = {}
@@ -64,6 +73,10 @@ func _ready() -> void:
 	randomize()
 	_dispatch_button.disabled = true
 	_dispatch_button.pressed.connect(_on_dispatch_pressed)
+	# Overlay actions are scene-authored so designers can tweak layout in editor.
+	_detail_accept_button.pressed.connect(_on_detail_accept_pressed)
+	_detail_close_button.pressed.connect(_on_detail_close_pressed)
+	_hide_detail_overlay()
 	_bottom_nav.set_current_screen(BottomNavBar.TARGET_EXPEDITION_BOARD)
 	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
 	# Hook bounded layout updates to safe lifecycle points instead of _process().
@@ -317,6 +330,7 @@ func _on_card_selected(expedition_data: Dictionary) -> void:
 	_selected_expedition = expedition_data.duplicate(true)
 	_dispatch_button.disabled = false
 	_selection_label.text = "Selected: %s" % str(_selected_expedition.get("display_name", "Unknown Expedition"))
+	_show_detail_overlay(_selected_expedition)
 
 	for card in _card_views:
 		var is_selected: bool = card.expedition_data.get("id", "") == _selected_expedition.get("id", "")
@@ -361,6 +375,7 @@ func _clear_selected_expedition() -> void:
 	_selected_expedition = {}
 	_dispatch_button.disabled = true
 	_selection_label.text = "Select an expedition to continue."
+	_hide_detail_overlay()
 	for card in _card_views:
 		card.set_selected(false)
 
@@ -398,3 +413,34 @@ func _is_selected_expedition_dispatchable() -> bool:
 		if str(card.expedition_data.get("id", "")) == selected_id:
 			return true
 	return false
+
+
+func _show_detail_overlay(expedition_data: Dictionary) -> void:
+	# Bind selected offer data into the popup labels. This is intentionally an
+	# in-screen overlay to keep the Expedition Board state and region list visible.
+	var title := str(expedition_data.get("display_name", "Unknown Expedition"))
+	var duration_minutes := int(expedition_data.get("duration_minutes", 0))
+	var reward := str(expedition_data.get("reward_profile_name", "Balanced"))
+	var risk := str(expedition_data.get("risk_label", "Unknown"))
+
+	_detail_title_label.text = title
+	_detail_duration_label.text = "Duration: %s" % ("%d min" % duration_minutes if duration_minutes > 0 else "? min")
+	_detail_reward_label.text = "Reward: %s" % reward
+	_detail_risk_label.text = "Risk: %s" % risk
+	_detail_overlay.visible = true
+
+
+func _hide_detail_overlay() -> void:
+	_detail_overlay.visible = false
+
+
+func _on_detail_close_pressed() -> void:
+	# Close only dismisses the overlay; selected offer and board remain unchanged.
+	_hide_detail_overlay()
+
+
+func _on_detail_accept_pressed() -> void:
+	# Accept reuses the same dispatch handler as the existing dispatch button so
+	# any current confirmation/flow behavior is preserved.
+	_hide_detail_overlay()
+	_on_dispatch_pressed()
