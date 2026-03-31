@@ -14,15 +14,28 @@ signal navigate_requested(target_screen: String)
 
 @onready var _summary_label: Label = $SafeArea/RootColumn/HeaderPanel/HeaderRows/SummaryLabel
 @onready var _hint_label: Label = $SafeArea/RootColumn/HeaderPanel/HeaderRows/HintLabel
+@onready var _entries_scroll: ScrollContainer = $SafeArea/RootColumn/EntriesScroll
 @onready var _entries_list_label: Label = $SafeArea/RootColumn/EntriesScroll/EntriesPanel/EntriesRows/EntriesListLabel
 @onready var _bottom_nav: BottomNavBar = $SafeArea/RootColumn/BottomNavBar
 
 
 func _ready() -> void:
+	_hide_scrollbars(_entries_scroll)
 	$SafeArea/RootColumn/BackButton.pressed.connect(_on_back_pressed)
 	# Bottom nav is shared; center CX is the active destination on this screen.
 	_bottom_nav.set_current_screen(BottomNavBar.TARGET_CODEX)
 	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
+
+
+func _hide_scrollbars(scroll_container: ScrollContainer) -> void:
+	var h_scroll := scroll_container.get_h_scroll_bar()
+	if h_scroll != null:
+		h_scroll.visible = false
+		h_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var v_scroll := scroll_container.get_v_scroll_bar()
+	if v_scroll != null:
+		v_scroll.visible = false
+		v_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func set_codex_data(total_discoveries: int, discovered_entries: Array[String]) -> void:

@@ -42,6 +42,7 @@ const _SLOT_VISUAL_COMPLETED := "completed"
 @onready var _codex_entries_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row/CodexEntriesValueLabel
 @onready var _debug_finish_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugFinishButton
 @onready var _debug_reset_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugResetButton
+@onready var _expedition_slots_scroller: ScrollContainer = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller
 @onready var _slot_one_card: TouchScrollCardButton = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
 @onready var _slot_two_card: TouchScrollCardButton = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
 @onready var _slot_one_name_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
@@ -66,6 +67,7 @@ var _expedition_offset_right := 0.0
 
 
 func _ready() -> void:
+	_hide_scrollbars(_expedition_slots_scroller)
 	_debug_finish_button.pressed.connect(_on_debug_finish_pressed)
 	_debug_reset_button.pressed.connect(_on_debug_reset_pressed)
 	# Drag-aware taps prevent accidental card activation while swiping slots.
@@ -93,6 +95,17 @@ func _ready() -> void:
 	set_process(true)
 	_refresh_resource_labels()
 	_refresh_active_status()
+
+
+func _hide_scrollbars(scroll_container: ScrollContainer) -> void:
+	var h_scroll := scroll_container.get_h_scroll_bar()
+	if h_scroll != null:
+		h_scroll.visible = false
+		h_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var v_scroll := scroll_container.get_v_scroll_bar()
+	if v_scroll != null:
+		v_scroll.visible = false
+		v_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _process(_delta: float) -> void:
