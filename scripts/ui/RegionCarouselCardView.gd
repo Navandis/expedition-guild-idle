@@ -1,4 +1,4 @@
-extends Button
+extends TouchScrollCardButton
 class_name RegionCarouselCardView
 
 # File: RegionCarouselCardView.gd
@@ -8,6 +8,8 @@ class_name RegionCarouselCardView
 # - The board previously built each region card's full node tree in code.
 # - Moving that structure into a .tscn makes it editable in the Godot editor.
 # - The board controller now only instantiates this component and binds data.
+# - It extends TouchScrollCardButton so horizontal drags can start directly on
+#   cards without triggering accidental region taps.
 
 const _IMAGE_PATH := ^"CardMargin/CardColumn/RegionImage"
 const _NAME_LABEL_PATH := ^"CardMargin/CardColumn/RegionNameLabel"

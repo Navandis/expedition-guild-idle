@@ -42,8 +42,8 @@ const _SLOT_VISUAL_COMPLETED := "completed"
 @onready var _codex_entries_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row/CodexEntriesValueLabel
 @onready var _debug_finish_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugFinishButton
 @onready var _debug_reset_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugResetButton
-@onready var _slot_one_card: Button = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
-@onready var _slot_two_card: Button = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
+@onready var _slot_one_card: TouchScrollCardButton = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
+@onready var _slot_two_card: TouchScrollCardButton = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
 @onready var _slot_one_name_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
 @onready var _slot_one_state_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
 @onready var _slot_two_name_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
@@ -68,10 +68,11 @@ var _expedition_offset_right := 0.0
 func _ready() -> void:
 	_debug_finish_button.pressed.connect(_on_debug_finish_pressed)
 	_debug_reset_button.pressed.connect(_on_debug_reset_pressed)
-	_slot_one_card.pressed.connect(func() -> void:
+	# Drag-aware taps prevent accidental card activation while swiping slots.
+	_slot_one_card.confirmed_tap.connect(func() -> void:
 		_on_slot_card_pressed(0)
 	)
-	_slot_two_card.pressed.connect(func() -> void:
+	_slot_two_card.confirmed_tap.connect(func() -> void:
 		_on_slot_card_pressed(1)
 	)
 	# Shared bottom nav is the primary cross-screen backbone.

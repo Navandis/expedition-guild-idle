@@ -1,8 +1,10 @@
-extends Button
+extends TouchScrollCardButton
 class_name ExpeditionCardView
 
 # ExpeditionCardView is a thin "presenter" for one expedition offer.
 # It receives already-built expedition data and maps fields to labels.
+# It extends TouchScrollCardButton so drags on top of the card keep scrolling
+# the parent list instead of firing an unintended tap.
 
 signal pressed_with_data(expedition_data: Dictionary)
 
@@ -18,7 +20,8 @@ var _upgrade_effects: Dictionary = {}
 
 func _ready() -> void:
 	_resolve_labels()
-	pressed.connect(_on_pressed)
+	# Use drag-aware tap signal so scroll gestures on top of cards do not dispatch.
+	confirmed_tap.connect(_on_confirmed_tap)
 
 
 func set_expedition_data(data: Dictionary) -> void:
@@ -44,7 +47,7 @@ func set_selected(is_selected: bool) -> void:
 	modulate = Color(1.0, 1.0, 1.0) if is_selected else Color(0.86, 0.86, 0.86)
 
 
-func _on_pressed() -> void:
+func _on_confirmed_tap() -> void:
 	var selected_preview := ExpeditionOfferEffects.build_preview(expedition_data, _upgrade_effects)
 	pressed_with_data.emit(selected_preview)
 
