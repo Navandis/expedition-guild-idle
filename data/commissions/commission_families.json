@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "description": "Minimal authored family definitions for Hall of Ventures commissions.",
+  "families": [
+    {
+      "id": "retrieval",
+      "name": "Retrieval",
+      "default_duration_bands": [
+        "medium",
+        "long"
+      ],
+      "default_risk_bands": [
+        "moderate",
+        "high"
+      ],
+      "base_crew_required": {
+        "min": 3,
+        "max": 5
+      },
+      "base_supplies_required": {
+        "min": 1,
+        "max": 2
+      },
+      "typical_requirement_tags": [
+        "retrieval_capable",
+        "archive_handling",
+        "scholar_officer"
+      ],
+      "reward_focus": [
+        "gold",
+        "small_codex_side_chance"
+      ],
+      "presentation_style": "recover_or_extract_value"
+    },
+    {
+      "id": "escort",
+      "name": "Escort",
+      "default_duration_bands": [
+        "short",
+        "medium"
+      ],
+      "default_risk_bands": [
+        "low",
+        "moderate"
+      ],
+      "base_crew_required": {
+        "min": 4,
+        "max": 6
+      },
+      "base_supplies_required": {
+        "min": 1,
+        "max": 2
+      },
+      "typical_requirement_tags": [
+        "escort_capable",
+        "merchant_officer",
+        "scout_officer"
+      ],
+      "reward_focus": [
+        "gold",
+        "standing"
+      ],
+      "presentation_style": "protect_person_or_goods"
+    },
+    {
+      "id": "survey",
+      "name": "Survey",
+      "default_duration_bands": [
+        "short",
+        "medium",
+        "long"
+      ],
+      "default_risk_bands": [
+        "low",
+        "moderate"
+      ],
+      "base_crew_required": {
+        "min": 3,
+        "max": 5
+      },
+      "base_supplies_required": {
+        "min": 1,
+        "max": 2
+      },
+      "typical_requirement_tags": [
+        "survey_capable",
+        "scout_officer",
+        "region_knowledge"
+      ],
+      "reward_focus": [
+        "gold",
+        "intel_bonus"
+      ],
+      "presentation_style": "chart_verify_or_assess"
+    },
+    {
+      "id": "security",
+      "name": "Security",
+      "default_duration_bands": [
+        "medium",
+        "long"
+      ],
+      "default_risk_bands": [
+        "moderate",
+        "high"
+      ],
+      "base_crew_required": {
+        "min": 5,
+        "max": 7
+      },
+      "base_supplies_required": {
+        "min": 2,
+        "max": 3
+      },
+      "typical_requirement_tags": [
+        "security_capable",
+        "combat_officer",
+        "environment_ready"
+      ],
+      "reward_focus": [
+        "gold",
+        "standing",
+        "route_safety_hook"
+      ],
+      "presentation_style": "secure_or_suppress_threat"
+    }
+  ],
+  "duration_band_minutes": {
+    "short": {
+      "min": 10,
+      "max": 15
+    },
+    "medium": {
+      "min": 25,
+      "max": 35
+    },
+    "long": {
+      "min": 50,
+      "max": 70
+    }
+  },
+  "risk_bands": [
+    "low",
+    "moderate",
+    "high"
+  ]
+}

@@ -4,29 +4,29 @@
 
 [node name="ExpeditionCard" type="Button" unique_id=1611412042]
 custom_minimum_size = Vector2(0, 110)
+offset_right = 154.0
+offset_bottom = 138.0
 size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 3
 script = ExtResource("1_kipng")
 
 [node name="CardContent" type="MarginContainer" parent="." unique_id=11652599]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = 119.0
-offset_bottom = 75.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_right = 151.0
+offset_bottom = 138.0
 mouse_filter = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
 
 [node name="Rows" type="VBoxContainer" parent="CardContent" unique_id=342305149]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 3
 
 [node name="SiteImage" type="TextureRect" parent="CardContent/Rows" unique_id=446881102]
+visible = false
 texture_filter = 1
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2

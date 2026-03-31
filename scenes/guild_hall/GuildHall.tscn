@@ -1,13 +1,16 @@
 [gd_scene format=3 uid="uid://ca4nismuvcpik"]
 
 [ext_resource type="Script" uid="uid://bky2lwy64owpe" path="res://scripts/ui/GuildHallController.gd" id="1_72fw3"]
+[ext_resource type="Texture2D" uid="uid://dirvqyqmpqp1s" path="res://assets/UI/Mock UI.png" id="2_elgiq"]
 [ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="2_nav"]
+[ext_resource type="Texture2D" uid="uid://tk3w5radyv80" path="res://assets/Regions/Hollowspire Uplands - v3.png" id="3_elgiq"]
 [ext_resource type="Texture2D" uid="uid://py6ohnws3tte" path="res://assets/UI/ResourceCounters/gold.png" id="3_gold_icon"]
+[ext_resource type="Texture2D" uid="uid://djooculgweyvr" path="res://assets/UI/Frames/Portal_frame2.png" id="4_elgiq"]
 [ext_resource type="Texture2D" uid="uid://dxyg3vxg80kwd" path="res://assets/UI/ResourceCounters/relics.png" id="4_relics_icon"]
 [ext_resource type="Texture2D" uid="uid://ci2mmj6qfgl4r" path="res://assets/Regions/Emberwake Coast - upscaled.png" id="5_0pdko"]
-[ext_resource type="Texture2D" uid="uid://bv6gjkd8ihhnf" path="res://assets/Regions/Greyfen March - variant 6.png" id="5_513lt"]
+[ext_resource type="Texture2D" uid="uid://54g82p854pgd" path="res://assets/Regions/Emberwake Coast - sketch v4.png" id="5_513lt"]
 [ext_resource type="Texture2D" uid="uid://d0a672tahkdym" path="res://assets/UI/ResourceCounters/codex_fragment.png" id="5_codex_icon"]
-[ext_resource type="Texture2D" uid="uid://c8vu3rm352krs" path="res://assets/Regions/Hollowspire Uplands - v2.png" id="7_o7uwm"]
+[ext_resource type="Texture2D" uid="uid://8qgknq71pugv" path="res://assets/Regions/Greyfen March - Sketch - v2.png" id="7_o7uwm"]
 
 [node name="GuildHall" type="Control" unique_id=1458496136]
 layout_mode = 3
@@ -18,12 +21,70 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_72fw3")
 
+[node name="Background" type="TextureRect" parent="." unique_id=86573058]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_elgiq")
+expand_mode = 1
+
+[node name="PortalAnchor" type="Control" parent="." unique_id=194209512]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -85.0
+offset_top = 125.0
+offset_right = 115.0
+offset_bottom = 257.0
+grow_horizontal = 2
+
+[node name="PortalRatio" type="AspectRatioContainer" parent="PortalAnchor" unique_id=965445187]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PortalClip" type="Control" parent="PortalAnchor/PortalRatio" unique_id=331806199]
+visible = false
+clip_contents = true
+layout_mode = 2
+
+[node name="RegionImage" type="TextureRect" parent="PortalAnchor/PortalRatio/PortalClip" unique_id=1917422686]
+visible = false
+layout_mode = 0
+offset_left = -22.000006
+offset_top = -9.999994
+offset_right = 1002.0
+offset_bottom = 1014.0
+scale = Vector2(0.145, 0.145)
+texture = ExtResource("3_elgiq")
+
+[node name="PortalFrame" type="TextureRect" parent="PortalAnchor" unique_id=1926898684]
+visible = false
+layout_mode = 0
+offset_left = -4.0000014
+offset_top = -35.0
+offset_right = 4686.4766
+offset_bottom = 5715.0005
+scale = Vector2(0.042, 0.036)
+mouse_filter = 2
+texture = ExtResource("4_elgiq")
+
 [node name="TopSafeArea" type="MarginContainer" parent="." unique_id=2084556186]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 20.0
-offset_bottom = 92.0
+offset_bottom = 90.0
 grow_horizontal = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 0
@@ -140,7 +201,6 @@ layout_mode = 2
 alignment = 2
 
 [node name="DebugFinishButton" type="Button" parent="TopSafeArea/TopStack/TopRightToolsRow" unique_id=1694514361]
-visible = false
 custom_minimum_size = Vector2(74, 28)
 layout_mode = 2
 text = "DBG-FE"

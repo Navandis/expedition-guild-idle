@@ -1,0 +1,517 @@
+{
+  "schema_version": 1,
+  "description": "Minimal starter objective templates for procedurally generated commissions.",
+  "templates": [
+    {
+      "id": "retrieval_recover_records",
+      "family_id": "retrieval",
+      "template_text": "Recover [record_type] from [site_context] in [region_name].",
+      "compatible_patron_ids": [
+        "mages_guild",
+        "surveyors_office",
+        "grand_mage_conclave"
+      ],
+      "compatible_region_ids": [
+        "sunscar_expanse",
+        "greenhollow_reaches",
+        "hollowspire_uplands"
+      ],
+      "required_tag_biases": [
+        "retrieval_capable",
+        "archive_handling"
+      ],
+      "preferred_tag_biases": [
+        "scholar_officer"
+      ],
+      "risk_modifiers": {
+        "moderate": 1.0,
+        "high": 1.2
+      },
+      "reward_modifiers": {
+        "gold_multiplier": 1.1
+      },
+      "brief_style_allowed": [
+        "explicit",
+        "guided"
+      ],
+      "context_tokens": {
+        "record_type": [
+          "survey ledgers",
+          "sealed inscriptions",
+          "observatory tablets"
+        ],
+        "site_context": [
+          "a ruined archive",
+          "a collapsed observatory",
+          "a flooded record vault"
+        ]
+      }
+    },
+    {
+      "id": "retrieval_reclaim_heirloom",
+      "family_id": "retrieval",
+      "template_text": "Reclaim a lost [heirloom_type] tied to [patron_group].",
+      "compatible_patron_ids": [
+        "village_elder",
+        "regional_court",
+        "royal_court"
+      ],
+      "compatible_region_ids": [
+        "greenhollow_reaches",
+        "greyfen_march",
+        "hollowspire_uplands"
+      ],
+      "required_tag_biases": [
+        "retrieval_capable"
+      ],
+      "preferred_tag_biases": [
+        "region_knowledge"
+      ],
+      "risk_modifiers": {
+        "moderate": 1.0
+      },
+      "reward_modifiers": {
+        "gold_multiplier": 1.0,
+        "standing_multiplier": 1.1
+      },
+      "brief_style_allowed": [
+        "guided",
+        "inferred"
+      ],
+      "context_tokens": {
+        "heirloom_type": [
+          "signet",
+          "ceremonial blade",
+          "reliquary fragment"
+        ],
+        "patron_group": [
+          "a minor house",
+          "a temple lineage",
+          "a court retinue"
+        ]
+      }
+    },
+    {
+      "id": "retrieval_extract_materials",
+      "family_id": "retrieval",
+      "template_text": "Secure a cache of [material_type] from [site_context].",
+      "compatible_patron_ids": [
+        "local_merchant",
+        "merchant_consortium",
+        "mages_guild"
+      ],
+      "compatible_region_ids": [
+        "emberwake_coast",
+        "sunscar_expanse",
+        "greyfen_march"
+      ],
+      "required_tag_biases": [
+        "retrieval_capable"
+      ],
+      "preferred_tag_biases": [
+        "scholar_officer",
+        "archive_handling"
+      ],
+      "risk_modifiers": {
+        "moderate": 1.0,
+        "high": 1.1
+      },
+      "reward_modifiers": {
+        "gold_multiplier": 1.15
+      },
+      "brief_style_allowed": [
+        "explicit",
+        "guided"
+      ],
+      "context_tokens": {
+        "material_type": [
+          "crystal shards",
+          "carved motif plates",
+          "sealed trade samples"
+        ],
+        "site_context": [
+          "a storm-cut cove",
+          "a dune-buried chamber",
+          "a half-sunk storage crypt"
+        ]
+      }
+    },
+    {
+      "id": "escort_guard_caravan",
+      "family_id": "escort",
+      "template_text": "Guard a [cargo_type] caravan through [route_context].",
+      "compatible_patron_ids": [
+        "local_merchant",
+        "merchant_consortium",
+        "frontier_quartermaster"
+      ],
+      "compatible_region_ids": [
+        "greenhollow_reaches",
+        "greyfen_march",
+        "emberwake_coast"
+      ],
+      "required_tag_biases": [
+        "escort_capable"
+      ],
+      "preferred_tag_biases": [
+        "merchant_officer",
+        "region_knowledge"
+      ],
+      "risk_modifiers": {
+        "low": 1.0,
+        "moderate": 1.1
+      },
+      "reward_modifiers": {
+        "gold_multiplier": 1.0
+      },
+      "brief_style_allowed": [
+        "explicit",
+        "guided"
+      ],
+      "context_tokens": {
+        "cargo_type": [
+          "salt",
+          "sealed goods",
+          "temple stores"
+        ],
+        "route_context": [
+          "a marsh road",
+          "an exposed hill pass",
+          "a cliffside trade route"
+        ]
+      }
+    },
+    {
+      "id": "escort_person_of_interest",
+      "family_id": "escort",
+      "template_text": "Escort a [person_type] safely across [region_name].",
+      "compatible_patron_ids": [
+        "village_elder",
+        "mages_guild",
+        "regional_court",
+        "royal_court"
+      ],
+      "compatible_region_ids": [
+        "greenhollow_reaches",
+        "greyfen_march",
+        "hollowspire_uplands"
+      ],
+      "required_tag_biases": [
+        "escort_capable"
+      ],
+      "preferred_tag_biases": [
+        "merchant_officer",
+        "scout_officer"
+      ],
+      "risk_modifiers": {
+        "low": 1.0,
+        "moderate": 1.05
+      },
+      "reward_modifiers": {
+        "standing_multiplier": 1.2
+      },
+      "brief_style_allowed": [
+        "explicit",
+        "guided"
+      ],
+      "context_tokens": {
+        "person_type": [
+          "scholar delegation",
+          "minor envoy",
+          "priestly courier"
+        ]
+      }
+    },
+    {
+      "id": "escort_sensitive_transport",
+      "family_id": "escort",
+      "template_text": "Protect a [transport_type] moving through unstable territory.",
+      "compatible_patron_ids": [
+        "merchant_consortium",
+        "surveyors_office",
+        "regional_court"
+      ],
+      "compatible_region_ids": [
+        "greyfen_march",
+        "hollowspire_uplands",
+        "emberwake_coast"
+      ],
+      "required_tag_biases": [
+        "escort_capable"
+      ],
+      "preferred_tag_biases": [
+        "merchant_officer",
+        "highland_ready",
+        "marsh_ready"
+      ],
+      "risk_modifiers": {
+        "moderate": 1.0
+      },
+      "reward_modifiers": {
+        "gold_multiplier": 1.1
+      },
+      "brief_style_allowed": [
+        "guided",
+        "inferred"
+      ],
+      "context_tokens": {
+        "transport_type": [
+          "sealed relic convoy",
+          "survey instrument cart",
+          "tax chest convoy"
+        ]
+      }
+    },
+    {
+      "id": "survey_chart_route",
+      "family_id": "survey",
+      "template_text": "Chart a [route_type] through [region_name].",
+      "compatible_patron_ids": [
+        "border_reeve",
+        "surveyors_office",
+        "merchant_consortium"
+      ],
+      "compatible_region_ids": [
+        "greenhollow_reaches",
+        "greyfen_march",
+        "hollowspire_uplands"
+      ],
+      "required_tag_biases": [
+        "survey_capable"
+      ],
+      "preferred_tag_biases": [
+        "scout_officer",
+        "region_knowledge"
+      ],
+      "risk_modifiers": {
+        "low": 1.0,
+        "moderate": 1.05
+      },
+      "reward_modifiers": {
+        "gold_multiplier": 0.95
+      },
+      "brief_style_allowed": [
+        "explicit",
+        "guided",
+        "inferred"
+      ],
+      "context_tokens": {
+        "route_type": [
+          "caravan-safe track",
+          "ridge pass",
+          "marsh crossing"
+        ]
+      }
+    },
+    {
+      "id": "survey_verify_passage",
+      "family_id": "survey",
+      "template_text": "Verify whether [location_type] is viable for [purpose].",
+      "compatible_patron_ids": [
+        "frontier_quartermaster",
+        "governors_office",
+        "surveyors_office"
+      ],
+      "compatible_region_ids": [
+        "greyfen_march",
+        "hollowspire_uplands",
+        "sunscar_expanse"
+      ],
+      "required_tag_biases": [
+        "survey_capable"
+      ],
+      "preferred_tag_biases": [
+        "region_knowledge",
+        "scout_officer"
+      ],
+      "risk_modifiers": {
+        "moderate": 1.0
+      },
+      "reward_modifiers": {
+        "gold_multiplier": 1.05
+      },
+      "brief_style_allowed": [
+        "guided",
+        "inferred"
+      ],
+      "context_tokens": {
+        "location_type": [
+          "a pass",
+          "a ford",
+          "a canyon approach"
+        ],
+        "purpose": [
+          "winter travel",
+          "wagon movement",
+          "sealed transport"
+        ]
+      }
+    },
+    {
+      "id": "survey_assess_site",
+      "family_id": "survey",
+      "template_text": "Assess the condition of [site_type] in [region_name].",
+      "compatible_patron_ids": [
+        "mages_guild",
+        "surveyors_office",
+        "grand_mage_conclave"
+      ],
+      "compatible_region_ids": [
+        "sunscar_expanse",
+        "greenhollow_reaches",
+        "emberwake_coast"
+      ],
+      "required_tag_biases": [
+        "survey_capable"
+      ],
+      "preferred_tag_biases": [
+        "scholar_officer",
+        "archive_handling"
+      ],
+      "risk_modifiers": {
+        "low": 1.0,
+        "moderate": 1.1
+      },
+      "reward_modifiers": {
+        "intel_bonus": 1.0
+      },
+      "brief_style_allowed": [
+        "explicit",
+        "guided"
+      ],
+      "context_tokens": {
+        "site_type": [
+          "a beacon tower",
+          "a shrine approach",
+          "an observatory annex"
+        ]
+      }
+    },
+    {
+      "id": "security_clear_route_threat",
+      "family_id": "security",
+      "template_text": "Remove [threat_type] from [route_context] in [region_name].",
+      "compatible_patron_ids": [
+        "border_reeve",
+        "frontier_quartermaster",
+        "governors_office"
+      ],
+      "compatible_region_ids": [
+        "greenhollow_reaches",
+        "greyfen_march",
+        "hollowspire_uplands"
+      ],
+      "required_tag_biases": [
+        "security_capable"
+      ],
+      "preferred_tag_biases": [
+        "combat_officer",
+        "region_knowledge"
+      ],
+      "risk_modifiers": {
+        "moderate": 1.0,
+        "high": 1.2
+      },
+      "reward_modifiers": {
+        "gold_multiplier": 1.2
+      },
+      "brief_style_allowed": [
+        "explicit",
+        "guided"
+      ],
+      "context_tokens": {
+        "threat_type": [
+          "bandits",
+          "raiders",
+          "hostile fauna"
+        ],
+        "route_context": [
+          "a key crossing",
+          "a ridge road",
+          "a caravan approach"
+        ]
+      }
+    },
+    {
+      "id": "security_secure_site",
+      "family_id": "security",
+      "template_text": "Secure the perimeter of [site_type] for future use.",
+      "compatible_patron_ids": [
+        "mages_guild",
+        "regional_court",
+        "royal_court"
+      ],
+      "compatible_region_ids": [
+        "greyfen_march",
+        "sunscar_expanse",
+        "hollowspire_uplands"
+      ],
+      "required_tag_biases": [
+        "security_capable"
+      ],
+      "preferred_tag_biases": [
+        "combat_officer",
+        "archive_handling"
+      ],
+      "risk_modifiers": {
+        "moderate": 1.0,
+        "high": 1.1
+      },
+      "reward_modifiers": {
+        "gold_multiplier": 1.15,
+        "standing_multiplier": 1.1
+      },
+      "brief_style_allowed": [
+        "explicit",
+        "guided"
+      ],
+      "context_tokens": {
+        "site_type": [
+          "a ruin complex",
+          "a shrine precinct",
+          "an archive entrance"
+        ]
+      }
+    },
+    {
+      "id": "security_guard_work_team",
+      "family_id": "security",
+      "template_text": "Provide security for a [work_team_type] operating in [region_name].",
+      "compatible_patron_ids": [
+        "surveyors_office",
+        "mages_guild",
+        "merchant_consortium"
+      ],
+      "compatible_region_ids": [
+        "emberwake_coast",
+        "greyfen_march",
+        "sunscar_expanse"
+      ],
+      "required_tag_biases": [
+        "security_capable"
+      ],
+      "preferred_tag_biases": [
+        "combat_officer",
+        "marsh_ready",
+        "desert_ready"
+      ],
+      "risk_modifiers": {
+        "moderate": 1.0
+      },
+      "reward_modifiers": {
+        "gold_multiplier": 1.05
+      },
+      "brief_style_allowed": [
+        "guided",
+        "inferred"
+      ],
+      "context_tokens": {
+        "work_team_type": [
+          "survey team",
+          "archive salvage crew",
+          "motif hunters"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,364 @@
+{
+  "schema_version": 1,
+  "description": "Minimal authored patron tiers and patron pools for Hall of Ventures commissions.",
+  "patron_tiers": [
+    {
+      "id": "tier_1_local_patrons",
+      "name": "Local Patrons",
+      "tier_index": 1,
+      "default_unlock_state": "active_start",
+      "family_biases": {
+        "retrieval": 0.25,
+        "escort": 0.35,
+        "survey": 0.3,
+        "security": 0.1
+      },
+      "reward_bias": "low",
+      "standing_bias": "low"
+    },
+    {
+      "id": "tier_2_organized_institutions",
+      "name": "Organized Institutions",
+      "tier_index": 2,
+      "default_unlock_state": "early_unlock",
+      "family_biases": {
+        "retrieval": 0.35,
+        "escort": 0.2,
+        "survey": 0.3,
+        "security": 0.15
+      },
+      "reward_bias": "medium",
+      "standing_bias": "medium"
+    },
+    {
+      "id": "tier_3_regional_powers",
+      "name": "Regional Powers",
+      "tier_index": 3,
+      "default_unlock_state": "mid_unlock",
+      "family_biases": {
+        "retrieval": 0.2,
+        "escort": 0.25,
+        "survey": 0.2,
+        "security": 0.35
+      },
+      "reward_bias": "high",
+      "standing_bias": "high"
+    },
+    {
+      "id": "tier_4_grand_patrons",
+      "name": "Sovereign / Grand Faction Patrons",
+      "tier_index": 4,
+      "default_unlock_state": "late_unlock",
+      "family_biases": {
+        "retrieval": 0.3,
+        "escort": 0.25,
+        "survey": 0.2,
+        "security": 0.25
+      },
+      "reward_bias": "very_high",
+      "standing_bias": "very_high"
+    }
+  ],
+  "patrons": [
+    {
+      "id": "village_elder",
+      "name": "Village Elder",
+      "tier_id": "tier_1_local_patrons",
+      "tags": [
+        "civilian",
+        "local"
+      ],
+      "brief_style_bias": {
+        "explicit": 0.55,
+        "guided": 0.35,
+        "inferred": 0.1
+      },
+      "family_biases": {
+        "retrieval": 0.2,
+        "escort": 0.3,
+        "survey": 0.35,
+        "security": 0.15
+      },
+      "preferred_region_tags": [
+        "starter_region",
+        "stable_frontier"
+      ],
+      "reward_bias": "low",
+      "standing_bias": "low"
+    },
+    {
+      "id": "local_merchant",
+      "name": "Local Merchant",
+      "tier_id": "tier_1_local_patrons",
+      "tags": [
+        "merchant",
+        "trade"
+      ],
+      "brief_style_bias": {
+        "explicit": 0.5,
+        "guided": 0.4,
+        "inferred": 0.1
+      },
+      "family_biases": {
+        "retrieval": 0.2,
+        "escort": 0.45,
+        "survey": 0.25,
+        "security": 0.1
+      },
+      "preferred_region_tags": [
+        "starter_region",
+        "trade_route"
+      ],
+      "reward_bias": "low",
+      "standing_bias": "low"
+    },
+    {
+      "id": "border_reeve",
+      "name": "Border Reeve",
+      "tier_id": "tier_1_local_patrons",
+      "tags": [
+        "civic",
+        "frontier"
+      ],
+      "brief_style_bias": {
+        "explicit": 0.45,
+        "guided": 0.35,
+        "inferred": 0.2
+      },
+      "family_biases": {
+        "retrieval": 0.1,
+        "escort": 0.3,
+        "survey": 0.35,
+        "security": 0.25
+      },
+      "preferred_region_tags": [
+        "borderland",
+        "stable_frontier"
+      ],
+      "reward_bias": "low",
+      "standing_bias": "medium"
+    },
+    {
+      "id": "merchant_consortium",
+      "name": "Merchant Consortium",
+      "tier_id": "tier_2_organized_institutions",
+      "tags": [
+        "merchant",
+        "institution"
+      ],
+      "brief_style_bias": {
+        "explicit": 0.35,
+        "guided": 0.45,
+        "inferred": 0.2
+      },
+      "family_biases": {
+        "retrieval": 0.25,
+        "escort": 0.35,
+        "survey": 0.25,
+        "security": 0.15
+      },
+      "preferred_region_tags": [
+        "trade_route",
+        "coast",
+        "borderland"
+      ],
+      "reward_bias": "medium",
+      "standing_bias": "medium"
+    },
+    {
+      "id": "mages_guild",
+      "name": "Mages' Guild",
+      "tier_id": "tier_2_organized_institutions",
+      "tags": [
+        "scholarly",
+        "arcane_institution"
+      ],
+      "brief_style_bias": {
+        "explicit": 0.4,
+        "guided": 0.35,
+        "inferred": 0.25
+      },
+      "family_biases": {
+        "retrieval": 0.45,
+        "escort": 0.1,
+        "survey": 0.3,
+        "security": 0.15
+      },
+      "preferred_region_tags": [
+        "ruins",
+        "observatory",
+        "archive",
+        "desert"
+      ],
+      "reward_bias": "medium",
+      "standing_bias": "medium"
+    },
+    {
+      "id": "surveyors_office",
+      "name": "Surveyor's Office",
+      "tier_id": "tier_2_organized_institutions",
+      "tags": [
+        "civic",
+        "survey",
+        "institution"
+      ],
+      "brief_style_bias": {
+        "explicit": 0.3,
+        "guided": 0.45,
+        "inferred": 0.25
+      },
+      "family_biases": {
+        "retrieval": 0.1,
+        "escort": 0.15,
+        "survey": 0.55,
+        "security": 0.2
+      },
+      "preferred_region_tags": [
+        "frontier",
+        "highlands",
+        "marsh",
+        "trade_route"
+      ],
+      "reward_bias": "medium",
+      "standing_bias": "medium"
+    },
+    {
+      "id": "regional_court",
+      "name": "Regional Court",
+      "tier_id": "tier_3_regional_powers",
+      "tags": [
+        "noble",
+        "political"
+      ],
+      "brief_style_bias": {
+        "explicit": 0.45,
+        "guided": 0.35,
+        "inferred": 0.2
+      },
+      "family_biases": {
+        "retrieval": 0.15,
+        "escort": 0.3,
+        "survey": 0.15,
+        "security": 0.4
+      },
+      "preferred_region_tags": [
+        "borderland",
+        "highlands",
+        "marsh"
+      ],
+      "reward_bias": "high",
+      "standing_bias": "high"
+    },
+    {
+      "id": "frontier_quartermaster",
+      "name": "Frontier Quartermaster",
+      "tier_id": "tier_3_regional_powers",
+      "tags": [
+        "military_adjacent",
+        "logistics"
+      ],
+      "brief_style_bias": {
+        "explicit": 0.5,
+        "guided": 0.3,
+        "inferred": 0.2
+      },
+      "family_biases": {
+        "retrieval": 0.1,
+        "escort": 0.3,
+        "survey": 0.2,
+        "security": 0.4
+      },
+      "preferred_region_tags": [
+        "trade_route",
+        "borderland",
+        "stable_frontier"
+      ],
+      "reward_bias": "high",
+      "standing_bias": "high"
+    },
+    {
+      "id": "governors_office",
+      "name": "Governor's Office",
+      "tier_id": "tier_3_regional_powers",
+      "tags": [
+        "civic",
+        "political"
+      ],
+      "brief_style_bias": {
+        "explicit": 0.45,
+        "guided": 0.35,
+        "inferred": 0.2
+      },
+      "family_biases": {
+        "retrieval": 0.15,
+        "escort": 0.25,
+        "survey": 0.2,
+        "security": 0.4
+      },
+      "preferred_region_tags": [
+        "coast",
+        "marsh",
+        "highlands"
+      ],
+      "reward_bias": "high",
+      "standing_bias": "high"
+    },
+    {
+      "id": "royal_court",
+      "name": "Royal Court",
+      "tier_id": "tier_4_grand_patrons",
+      "tags": [
+        "royal",
+        "prestige"
+      ],
+      "brief_style_bias": {
+        "explicit": 0.4,
+        "guided": 0.35,
+        "inferred": 0.25
+      },
+      "family_biases": {
+        "retrieval": 0.2,
+        "escort": 0.35,
+        "survey": 0.2,
+        "security": 0.25
+      },
+      "preferred_region_tags": [
+        "highlands",
+        "desert",
+        "coast",
+        "frontier"
+      ],
+      "reward_bias": "very_high",
+      "standing_bias": "very_high"
+    },
+    {
+      "id": "grand_mage_conclave",
+      "name": "Grand Mage Conclave",
+      "tier_id": "tier_4_grand_patrons",
+      "tags": [
+        "scholarly",
+        "prestige",
+        "arcane_institution"
+      ],
+      "brief_style_bias": {
+        "explicit": 0.35,
+        "guided": 0.35,
+        "inferred": 0.3
+      },
+      "family_biases": {
+        "retrieval": 0.4,
+        "escort": 0.1,
+        "survey": 0.35,
+        "security": 0.15
+      },
+      "preferred_region_tags": [
+        "observatory",
+        "archive",
+        "desert",
+        "ruins"
+      ],
+      "reward_bias": "very_high",
+      "standing_bias": "very_high"
+    }
+  ]
+}

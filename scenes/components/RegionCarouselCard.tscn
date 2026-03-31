@@ -1,12 +1,10 @@
 [gd_scene format=3 uid="uid://bpb7x6pcjwkx1"]
 
-[ext_resource type="Script" path="res://scripts/ui/RegionCarouselCardView.gd" id="1_v0yhg"]
+[ext_resource type="Script" uid="uid://crn3oi5een3v" path="res://scripts/ui/RegionCarouselCardView.gd" id="1_v0yhg"]
 
 [node name="RegionCarouselCard" type="Button" unique_id=194168201]
 custom_minimum_size = Vector2(168, 220)
 size_flags_vertical = 3
-focus_mode = 2
-text = ""
 script = ExtResource("1_v0yhg")
 
 [node name="CardMargin" type="MarginContainer" parent="." unique_id=195568644]
@@ -20,7 +18,7 @@ mouse_filter = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_bottom = 3
 
 [node name="CardColumn" type="VBoxContainer" parent="CardMargin" unique_id=67205288]
 layout_mode = 2
@@ -31,12 +29,13 @@ theme_override_constants/separation = 6
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 2
 expand_mode = 1
 stretch_mode = 6
-mouse_filter = 2
 
 [node name="RegionNameLabel" type="Label" parent="CardMargin/CardColumn" unique_id=985355650]
 layout_mode = 2
+size_flags_horizontal = 4
+text = "Region Name"
 horizontal_alignment = 1
 autowrap_mode = 2
-text = "Region Name"

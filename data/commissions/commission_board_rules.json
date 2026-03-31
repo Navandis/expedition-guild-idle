@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "description": "Minimal board composition rules for the visible commission board.",
+  "visible_offer_count": 3,
+  "standard_offers_expire": false,
+  "refill_behavior": "refill_single_slot_on_accept",
+  "reroll_behavior": "refresh_all_visible_slots",
+  "composition_rules": {
+    "avoid_family_duplicates_if_possible": true,
+    "avoid_patron_duplicates_if_possible": true,
+    "avoid_same_region_all_slots_if_possible": true,
+    "target_risk_spread": [
+      "low_or_moderate",
+      "moderate",
+      "moderate_or_high"
+    ],
+    "target_brief_style_mix": [
+      "explicit",
+      "guided",
+      "explicit_or_inferred"
+    ],
+    "ensure_one_reasonably_runnable_offer_if_possible": true,
+    "interesting_slot_bias": {
+      "enabled": true,
+      "possible_traits": [
+        "higher_payout",
+        "rarer_patron",
+        "higher_risk",
+        "more_specific_bonus_hook"
+      ]
+    }
+  },
+  "fallback_rules": {
+    "allow_family_duplicates_when_pool_is_small": true,
+    "allow_patron_duplicates_when_pool_is_small": true,
+    "allow_region_duplicates_when_player_has_one_region": true
+  }
+}

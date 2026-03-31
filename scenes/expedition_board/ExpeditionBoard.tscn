@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://c6nirf3040vhe"]
 
 [ext_resource type="Script" uid="uid://c31ng4ivfwgb4" path="res://scripts/ui/ExpeditionBoardController.gd" id="1_cx6e2"]
-[ext_resource type="PackedScene" path="res://scenes/components/ExpeditionCard.tscn" id="2_u0gmk"]
+[ext_resource type="PackedScene" uid="uid://y85yyywv7acc" path="res://scenes/components/ExpeditionCard.tscn" id="2_u0gmk"]
+[ext_resource type="PackedScene" uid="uid://bpb7x6pcjwkx1" path="res://scenes/components/RegionCarouselCard.tscn" id="3_8v7s6"]
 [ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="3_nav"]
-[ext_resource type="PackedScene" path="res://scenes/components/RegionCarouselCard.tscn" id="3_8v7s6"]
 
 [node name="ExpeditionBoard" type="Control" unique_id=2096162743]
 layout_mode = 3
@@ -36,6 +36,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="RegionHintLabel" type="Label" parent="TopSection/TopMargin/TopColumn" unique_id=1435295267]
+visible = false
 layout_mode = 2
 text = "Choose a region"
 
@@ -59,10 +60,10 @@ grow_horizontal = 2
 
 [node name="MiddleMargin" type="MarginContainer" parent="MiddleSection" unique_id=1971464897]
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
 [node name="MiddleColumn" type="VBoxContainer" parent="MiddleSection/MiddleMargin" unique_id=1309430938]
 layout_mode = 2
@@ -83,6 +84,7 @@ horizontal_scroll_mode = 0
 [node name="ExpeditionCardsContainer" type="VBoxContainer" parent="MiddleSection/MiddleMargin/MiddleColumn/CardScroll" unique_id=983485744]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 6
 
 [node name="DispatchButton" type="Button" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=726765546]

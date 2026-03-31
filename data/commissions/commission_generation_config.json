@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "description": "Minimal tuning/config file for commission generation.",
+  "starting_board": {
+    "visible_offer_count": 3
+  },
+  "family_weights_default": {
+    "retrieval": 1.0,
+    "escort": 1.0,
+    "survey": 1.0,
+    "security": 0.9
+  },
+  "brief_style_weights_default": {
+    "explicit": 0.45,
+    "guided": 0.35,
+    "inferred": 0.2
+  },
+  "risk_weights_default": {
+    "low": 0.3,
+    "moderate": 0.5,
+    "high": 0.2
+  },
+  "duration_band_weights_default": {
+    "short": 0.35,
+    "medium": 0.45,
+    "long": 0.2
+  },
+  "outcome_band_labels": [
+    "excellent",
+    "solid",
+    "strained",
+    "poor"
+  ],
+  "requirement_tags": {
+    "officer_tags": [
+      "combat_officer",
+      "merchant_officer",
+      "scholar_officer",
+      "scout_officer"
+    ],
+    "mission_suitability_tags": [
+      "escort_capable",
+      "survey_capable",
+      "retrieval_capable",
+      "security_capable"
+    ],
+    "environment_tags": [
+      "marsh_ready",
+      "desert_ready",
+      "highland_ready",
+      "archive_handling"
+    ],
+    "knowledge_tag_pattern": "region_knowledge_<region_id>_<level>"
+  },
+  "resource_inputs": {
+    "v1_supply_resource_name": "supplies",
+    "crew_states": [
+      "max",
+      "available",
+      "assigned",
+      "recovering"
+    ]
+  },
+  "starter_region_ids": [
+    "greenhollow_reaches",
+    "emberwake_coast",
+    "greyfen_march",
+    "sunscar_expanse",
+    "hollowspire_uplands"
+  ]
+}
