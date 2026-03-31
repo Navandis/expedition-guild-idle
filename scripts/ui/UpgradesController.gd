@@ -16,15 +16,28 @@ signal navigate_requested(target_screen: String)
 @onready var _gold_label: Label = $SafeArea/RootColumn/HeaderPanel/HeaderRows/GoldLabel
 @onready var _effects_label: Label = $SafeArea/RootColumn/HeaderPanel/HeaderRows/EffectsLabel
 @onready var _status_label: Label = $SafeArea/RootColumn/StatusLabel
+@onready var _upgrades_scroll: ScrollContainer = $SafeArea/RootColumn/UpgradesScroll
 @onready var _list_container: VBoxContainer = $SafeArea/RootColumn/UpgradesScroll/UpgradesList
 @onready var _bottom_nav: BottomNavBar = $SafeArea/RootColumn/BottomNavBar
 
 
 func _ready() -> void:
+	_hide_scrollbars(_upgrades_scroll)
 	$SafeArea/RootColumn/BackButton.pressed.connect(_on_back_pressed)
 	# Shared nav keeps GH/EB/GU/CX switching consistent across screens.
 	_bottom_nav.set_current_screen(BottomNavBar.TARGET_GUILD_UPGRADES)
 	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
+
+
+func _hide_scrollbars(scroll_container: ScrollContainer) -> void:
+	var h_scroll := scroll_container.get_h_scroll_bar()
+	if h_scroll != null:
+		h_scroll.visible = false
+		h_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var v_scroll := scroll_container.get_v_scroll_bar()
+	if v_scroll != null:
+		v_scroll.visible = false
+		v_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func set_view_model(upgrades: Array[Dictionary], owned_map: Dictionary, current_gold: int, effects: Dictionary) -> void:

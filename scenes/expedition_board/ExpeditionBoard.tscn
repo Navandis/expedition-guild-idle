@@ -87,6 +87,7 @@ vertical_scroll_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+mouse_filter = 2
 theme_override_constants/separation = 6
 
 [node name="DispatchButton" type="Button" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=726765546]

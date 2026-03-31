@@ -44,7 +44,9 @@ const _REGION_TEXTURES := {
 @onready var _middle_section: PanelContainer = $MiddleSection
 @onready var _bottom_nav_safe: MarginContainer = $BottomNavSafe
 @onready var _region_hint_label: Label = $TopSection/TopMargin/TopColumn/RegionHintLabel
+@onready var _region_carousel_scroll: ScrollContainer = $TopSection/TopMargin/TopColumn/RegionCarouselScroll
 @onready var _region_carousel_row: HBoxContainer = $TopSection/TopMargin/TopColumn/RegionCarouselScroll/RegionCarouselRow
+@onready var _card_scroll: ScrollContainer = $MiddleSection/MiddleMargin/MiddleColumn/CardScroll
 @onready var _cards_container: VBoxContainer = $MiddleSection/MiddleMargin/MiddleColumn/CardScroll/ExpeditionCardsContainer
 @onready var _dispatch_button: Button = $MiddleSection/MiddleMargin/MiddleColumn/DispatchButton
 @onready var _selection_label: Label = $MiddleSection/MiddleMargin/MiddleColumn/SelectionLabel
@@ -71,6 +73,8 @@ var _region_card_views: Dictionary = {}
 
 func _ready() -> void:
 	randomize()
+	_hide_scrollbars(_region_carousel_scroll)
+	_hide_scrollbars(_card_scroll)
 	_dispatch_button.disabled = true
 	_dispatch_button.pressed.connect(_on_dispatch_pressed)
 	# Overlay actions are scene-authored so designers can tweak layout in editor.
@@ -86,6 +90,17 @@ func _ready() -> void:
 	call_deferred("_update_board_layout")
 	_refresh_region_carousel()
 	_show_board_for_selected_region()
+
+
+func _hide_scrollbars(scroll_container: ScrollContainer) -> void:
+	var h_scroll := scroll_container.get_h_scroll_bar()
+	if h_scroll != null:
+		h_scroll.visible = false
+		h_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var v_scroll := scroll_container.get_v_scroll_bar()
+	if v_scroll != null:
+		v_scroll.visible = false
+		v_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _notification(what: int) -> void:
