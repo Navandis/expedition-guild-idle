@@ -292,7 +292,8 @@ func _add_region_card(row: Dictionary) -> void:
 	# Ensure @onready nodes in RegionCarouselCardView are initialized before setup().
 	_region_carousel_row.add_child(card)
 	card.setup(row, _resolve_region_texture(region_id))
-	card.pressed.connect(func() -> void:
+	# confirmed_tap comes from TouchScrollCardButton and ignores drag gestures.
+	card.confirmed_tap.connect(func() -> void:
 		_on_region_card_pressed(region_id)
 	)
 

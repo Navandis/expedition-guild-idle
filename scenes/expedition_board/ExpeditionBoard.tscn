@@ -43,6 +43,7 @@ text = "Choose a region"
 [node name="RegionCarouselScroll" type="ScrollContainer" parent="TopSection/TopMargin/TopColumn" unique_id=619514099]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 2
 vertical_scroll_mode = 0
 
 [node name="RegionCarouselRow" type="HBoxContainer" parent="TopSection/TopMargin/TopColumn/RegionCarouselScroll" unique_id=462995050]
@@ -80,6 +81,7 @@ autowrap_mode = 3
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
 
 [node name="ExpeditionCardsContainer" type="VBoxContainer" parent="MiddleSection/MiddleMargin/MiddleColumn/CardScroll" unique_id=983485744]
 layout_mode = 2
@@ -197,4 +199,3 @@ custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Close"
-
