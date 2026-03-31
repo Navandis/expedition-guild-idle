@@ -43,7 +43,7 @@ text = "Choose a region"
 [node name="RegionCarouselScroll" type="ScrollContainer" parent="TopSection/TopMargin/TopColumn" unique_id=619514099]
 layout_mode = 2
 size_flags_vertical = 3
-horizontal_scroll_mode = 2
+horizontal_scroll_mode = 3
 vertical_scroll_mode = 0
 
 [node name="RegionCarouselRow" type="HBoxContainer" parent="TopSection/TopMargin/TopColumn/RegionCarouselScroll" unique_id=462995050]
@@ -71,23 +71,20 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="SelectionLabel" type="Label" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=1866229231]
-visible = false
+[node name="SelectionLabel" type="Label" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=1417322659]
 layout_mode = 2
 text = "Select an expedition to continue."
-autowrap_mode = 3
 
 [node name="CardScroll" type="ScrollContainer" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=1276735346]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
-vertical_scroll_mode = 2
+vertical_scroll_mode = 3
 
 [node name="ExpeditionCardsContainer" type="VBoxContainer" parent="MiddleSection/MiddleMargin/MiddleColumn/CardScroll" unique_id=983485744]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-mouse_filter = 2
 theme_override_constants/separation = 6
 
 [node name="DispatchButton" type="Button" parent="MiddleSection/MiddleMargin/MiddleColumn" unique_id=726765546]
@@ -134,7 +131,7 @@ color = Color(0, 0, 0, 0.45)
 
 [node name="Window" type="PanelContainer" parent="ExpeditionDetailOverlay" unique_id=180912301]
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = -1
 anchor_left = 0.12
 anchor_top = 0.12
 anchor_right = 0.88

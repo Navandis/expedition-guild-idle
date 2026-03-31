@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://ci2mmj6qfgl4r" path="res://assets/Regions/Emberwake Coast - upscaled.png" id="5_0pdko"]
 [ext_resource type="Texture2D" uid="uid://54g82p854pgd" path="res://assets/Regions/Emberwake Coast - sketch v4.png" id="5_513lt"]
 [ext_resource type="Texture2D" uid="uid://d0a672tahkdym" path="res://assets/UI/ResourceCounters/codex_fragment.png" id="5_codex_icon"]
-[ext_resource type="Script" path="res://scripts/ui/TouchScrollCardButton.gd" id="6_touch_card"]
+[ext_resource type="Script" uid="uid://dea00ojayku33" path="res://scripts/ui/TouchScrollCardButton.gd" id="6_touch_card"]
 [ext_resource type="Texture2D" uid="uid://8qgknq71pugv" path="res://assets/Regions/Greyfen March - Sketch - v2.png" id="7_o7uwm"]
 
 [node name="GuildHall" type="Control" unique_id=1458496136]
@@ -236,7 +236,7 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-horizontal_scroll_mode = 2
+horizontal_scroll_mode = 3
 vertical_scroll_mode = 0
 
 [node name="ExpeditionSlotsRow" type="HBoxContainer" parent="ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller" unique_id=570001014]
