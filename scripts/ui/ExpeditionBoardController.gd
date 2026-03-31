@@ -4,7 +4,7 @@ class_name ExpeditionBoardController
 # File: ExpeditionBoardController.gd
 # This controller drives the Expedition Board as a 3-bucket dispatch workspace:
 # 1) Top bucket (fixed 50%): region carousel only.
-# 2) Middle bucket (dynamic): offered expeditions + dispatch button.
+# 2) Middle bucket (dynamic): offered expeditions list.
 # 3) Bottom bucket: shared bottom nav in BottomNavSafe.
 #
 # Beginner notes for this pass:
@@ -48,8 +48,6 @@ const _REGION_TEXTURES := {
 @onready var _region_carousel_row: HBoxContainer = $TopSection/TopMargin/TopColumn/RegionCarouselScroll/RegionCarouselRow
 @onready var _card_scroll: ScrollContainer = $MiddleSection/MiddleMargin/MiddleColumn/CardScroll
 @onready var _cards_container: VBoxContainer = $MiddleSection/MiddleMargin/MiddleColumn/CardScroll/ExpeditionCardsContainer
-@onready var _dispatch_button: Button = $MiddleSection/MiddleMargin/MiddleColumn/DispatchButton
-@onready var _selection_label: Label = $MiddleSection/MiddleMargin/MiddleColumn/SelectionLabel
 @onready var _bottom_nav: BottomNavBar = $BottomNavSafe/BottomNavBar
 @onready var _detail_overlay: Control = $ExpeditionDetailOverlay
 @onready var _detail_title_label: Label = $ExpeditionDetailOverlay/Window/WindowMargin/WindowColumn/TitleLabel
@@ -75,8 +73,6 @@ func _ready() -> void:
 	randomize()
 	_hide_scrollbars(_region_carousel_scroll)
 	_hide_scrollbars(_card_scroll)
-	_dispatch_button.disabled = true
-	_dispatch_button.pressed.connect(_on_dispatch_pressed)
 	# Overlay actions are scene-authored so designers can tweak layout in editor.
 	_detail_accept_button.pressed.connect(_on_detail_accept_pressed)
 	_detail_close_button.pressed.connect(_on_detail_close_pressed)
@@ -344,8 +340,6 @@ func _update_region_card_highlights() -> void:
 
 func _on_card_selected(expedition_data: Dictionary) -> void:
 	_selected_expedition = expedition_data.duplicate(true)
-	_dispatch_button.disabled = false
-	_selection_label.text = "Selected: %s" % str(_selected_expedition.get("display_name", "Unknown Expedition"))
 	_show_detail_overlay(_selected_expedition)
 
 	for card in _card_views:
@@ -389,8 +383,6 @@ func _show_board_for_selected_region(force_regenerate: bool = false) -> void:
 
 func _clear_selected_expedition() -> void:
 	_selected_expedition = {}
-	_dispatch_button.disabled = true
-	_selection_label.text = "Select an expedition to continue."
 	_hide_detail_overlay()
 	for card in _card_views:
 		card.set_selected(false)
