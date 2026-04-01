@@ -105,7 +105,7 @@ func process_crew_recovery(now_unix: int = -1) -> int:
 	# Passive/offline-ready endpoint:
 	# - Call during runtime ticks for passive recovery.
 	# - Call on app launch/load to capture offline elapsed time.
-	var now := now_unix if now_unix >= 0 else Time.get_unix_time_from_system()
+	var now: int = now_unix if now_unix >= 0 else Time.get_unix_time_from_system()
 	var entries := _runtime_state.get("crew_recovery_entries", []) as Array
 	var remaining_entries: Array[Dictionary] = []
 	var recovered_total := 0
