@@ -71,10 +71,14 @@ func _generate_offer_for_slot(unlocked_region_ids: Array[String], board_so_far: 
 	var composition := board_rules.get("composition_rules", {}) as Dictionary
 	var scored: Array[Dictionary] = []
 	for candidate in candidates:
-		var score := _score_candidate_for_board(candidate, board_so_far, composition)
+		# Sample risk once per candidate so slot scoring and final offer output
+		# use the same risk result. This keeps risk-spread composition reliable.
+		var candidate_with_plan := candidate.duplicate(true)
+		candidate_with_plan["_planned_risk_band"] = _pick_risk_band(candidate_with_plan)
+		var score := _score_candidate_for_board(candidate_with_plan, board_so_far, composition)
 		if score <= 0.0:
 			continue
-		var row := candidate.duplicate(true)
+		var row := candidate_with_plan
 		row["_score"] = score
 		scored.append(row)
 
@@ -148,7 +152,7 @@ func _score_candidate_for_board(candidate: Dictionary, board_so_far: Array[Dicti
 	if board_so_far.size() < target_risks.size():
 		var target := target_risks[board_so_far.size()]
 		if not target.is_empty():
-			var likely_risk := _pick_risk_band(candidate)
+			var likely_risk := str(candidate.get("_planned_risk_band", "moderate"))
 			if _risk_matches_target(likely_risk, target):
 				score *= 1.2
 			else:
@@ -163,7 +167,9 @@ func _finalize_offer(candidate: Dictionary) -> Dictionary:
 	var family := _get_family_by_id(str(candidate.get("family_id", "")))
 	var tier := _get_tier_by_id(str(patron.get("tier_id", "")))
 
-	var risk_band := _pick_risk_band(candidate)
+	var risk_band := str(candidate.get("_planned_risk_band", ""))
+	if risk_band.is_empty():
+		risk_band = _pick_risk_band(candidate)
 	var duration_band := _pick_duration_band(family)
 	var duration_minutes := _pick_duration_minutes(duration_band)
 	var brief_style := _pick_brief_style(template, patron)
@@ -206,7 +212,8 @@ func _finalize_offer(candidate: Dictionary) -> Dictionary:
 		"metadata": {
 			"status": "board_visible",
 			"generated_at_unix": Time.get_unix_time_from_system(),
-			"context_tokens": context
+			"context_tokens": context,
+			"risk_planned_during_board_scoring": risk_band
 		}
 	}
 
