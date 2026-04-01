@@ -19,9 +19,12 @@ var _generator := CommissionGenerator.new()
 var _commission_data: Dictionary = {}
 var _visible_offers: Array[Dictionary] = []
 var _visible_offer_count := 3
+var _authored_data_loaded := false
 
 
-func _ready() -> void:
+func _init() -> void:
+	# This controller is frequently used as a plain object via .new() (not as a
+	# scene-tree node), so authored data must load during construction.
 	load_authored_data()
 
 
@@ -32,21 +35,31 @@ func load_authored_data() -> void:
 	var board_rules := _commission_data.get("board_rules", {}) as Dictionary
 	var generated_count := int((_commission_data.get("generation_config", {}) as Dictionary).get("starting_board", {}).get("visible_offer_count", 3))
 	_visible_offer_count = maxi(1, int(board_rules.get("visible_offer_count", generated_count)))
+	_authored_data_loaded = true
+
+
+func _ensure_authored_data_loaded() -> void:
+	if _authored_data_loaded:
+		return
+	load_authored_data()
 
 
 func generate_board_for_regions(unlocked_region_ids: Array[String]) -> Array[Dictionary]:
+	_ensure_authored_data_loaded()
 	# Standard offers persist by default, so generation only fills missing slots.
 	_visible_offers = _generator.generate_board(unlocked_region_ids, _visible_offers, _visible_offer_count)
 	return get_visible_offers()
 
 
 func refresh_board_for_regions(unlocked_region_ids: Array[String]) -> Array[Dictionary]:
+	_ensure_authored_data_loaded()
 	# Full reroll endpoint for future "refresh board" actions.
 	_visible_offers = _generator.generate_board(unlocked_region_ids, [], _visible_offer_count)
 	return get_visible_offers()
 
 
 func accept_offer(offer_id: String, unlocked_region_ids: Array[String]) -> Dictionary:
+	_ensure_authored_data_loaded()
 	# Accept flow removes the selected slot and refills one slot using current
 	# unlocked regions. This keeps board continuity without expirations.
 	var accepted: Dictionary = {}
