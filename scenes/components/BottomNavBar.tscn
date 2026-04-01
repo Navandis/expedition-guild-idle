@@ -155,13 +155,12 @@ texture = ExtResource("5_cx_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="XXButtonLeft" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=688611344]
+[node name="CBButton" type="Button" parent="Panel/Margin/ButtonsRow" unique_id=688611344]
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
-disabled = true
 
-[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/XXButtonLeft" unique_id=358284808]
+[node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/CBButton" unique_id=358284808]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -177,7 +176,7 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
-[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/XXButtonLeft/IconMargin" unique_id=362992459]
+[node name="Icon" type="TextureRect" parent="Panel/Margin/ButtonsRow/CBButton/IconMargin" unique_id=362992459]
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("6_xx_left_icon")

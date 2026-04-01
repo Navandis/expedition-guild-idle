@@ -25,6 +25,7 @@ const DISPATCH_SCREEN_SCENE := preload("res://scenes/dispatch/DispatchScreen.tsc
 const EXPEDITION_REPORT_SCENE := preload("res://scenes/report/ExpeditionReport.tscn")
 const GUILD_UPGRADES_SCENE := preload("res://scenes/upgrades/GuildUpgrades.tscn")
 const CODEX_SCREEN_SCENE := preload("res://scenes/codex/CodexScreen.tscn")
+const COMMISSION_BOARD_SCENE := preload("res://scenes/commissions/CommissionBoard.tscn")
 const DEFAULT_RESOURCES := {
 	"gold": 1250,
 	"relic_fragments": 0,
@@ -46,6 +47,7 @@ var _dispatch_controller: DispatchController
 var _report_controller: ReportController
 var _upgrades_controller: UpgradesController
 var _codex_controller: CodexController
+var _commission_board_controller: CommissionBoardScreenController
 var _mounted_screen: Control
 
 @onready var _ui_root: Control = $CanvasLayer/UIRoot
@@ -150,6 +152,31 @@ func _show_codex_screen() -> void:
 	)
 
 
+func _show_commission_board() -> void:
+	if _commission_board_controller == null:
+		_commission_board_controller = COMMISSION_BOARD_SCENE.instantiate() as CommissionBoardScreenController
+		_commission_board_controller.navigate_requested.connect(_on_global_navigation_requested)
+
+	_commission_board_controller.set_board_context(
+		_get_unlocked_region_ids_for_commissions(),
+		_commission_resolver.get_available_crew(),
+		_commission_resolver.get_supplies()
+	)
+	_show_screen(_commission_board_controller)
+
+
+
+
+func _get_unlocked_region_ids_for_commissions() -> Array[String]:
+	var ids: Array[String] = []
+	for row in _region_system.get_region_list_for_ui():
+		if not bool(row.get("is_visible", false)):
+			continue
+		if not bool(row.get("is_unlocked", false)):
+			continue
+		ids.append(str(row.get("id", "")))
+	return ids
+
 func _show_screen(screen: Control) -> void:
 	if screen == null:
 		return
@@ -177,8 +204,8 @@ func _on_open_report_requested() -> void:
 
 
 func _on_global_navigation_requested(target_screen: String) -> void:
-	# Shared bottom-nav routes for GH/EB/GU/CX.
-	# Placeholder buttons (XX/XX/SH) are intentionally inert and emit nothing.
+	# Shared bottom-nav routes for GH/EB/GU/CX/CB.
+	# Placeholder buttons (XX-right/SH) are intentionally inert and emit nothing.
 	match target_screen:
 		BottomNavBar.TARGET_GUILD_HALL:
 			_show_guild_hall()
@@ -188,6 +215,8 @@ func _on_global_navigation_requested(target_screen: String) -> void:
 			_show_upgrades_screen()
 		BottomNavBar.TARGET_CODEX:
 			_show_codex_screen()
+		BottomNavBar.TARGET_COMMISSION_BOARD:
+			_show_commission_board()
 
 
 func _on_debug_finish_requested() -> void:

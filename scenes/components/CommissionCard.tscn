@@ -1,9 +1,66 @@
 [gd_scene format=3 uid="uid://dtg2qlkhl3o3m"]
 
-[node name="CommissionCard" type="Control" unique_id=2111080259]
+[ext_resource type="Script" path="res://scripts/ui/CommissionCardView.gd" id="1_card_script"]
+
+[node name="CommissionCard" type="PanelContainer" unique_id=2111080259]
+custom_minimum_size = Vector2(0, 132)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_card_script")
+
+[node name="CardMargin" type="MarginContainer" parent="." unique_id=191010001]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="CardColumn" type="VBoxContainer" parent="CardMargin" unique_id=191010002]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="PatronLabel" type="Label" parent="CardMargin/CardColumn" unique_id=191010003]
+layout_mode = 2
+text = "Patron: --"
+
+[node name="FamilyLabel" type="Label" parent="CardMargin/CardColumn" unique_id=191010004]
+layout_mode = 2
+text = "Family: --"
+
+[node name="TitleLabel" type="Label" parent="CardMargin/CardColumn" unique_id=191010005]
+layout_mode = 2
+text = "Commission objective"
+autowrap_mode = 3
+
+[node name="RegionLabel" type="Label" parent="CardMargin/CardColumn" unique_id=191010006]
+layout_mode = 2
+text = "Region: --"
+
+[node name="MetaRow" type="HBoxContainer" parent="CardMargin/CardColumn" unique_id=191010007]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DurationLabel" type="Label" parent="CardMargin/CardColumn/MetaRow" unique_id=191010008]
+layout_mode = 2
+text = "Duration: --"
+
+[node name="RiskLabel" type="Label" parent="CardMargin/CardColumn/MetaRow" unique_id=191010009]
+layout_mode = 2
+text = "Risk: --"
+
+[node name="RewardLabel" type="Label" parent="CardMargin/CardColumn" unique_id=191010010]
+layout_mode = 2
+text = "Reward: --"
+
+[node name="RequirementsLabel" type="Label" parent="CardMargin/CardColumn" unique_id=191010011]
+layout_mode = 2
+text = "Crew Needed: --   Supplies Needed: --"
+
+[node name="NoteLabel" type="Label" parent="CardMargin/CardColumn" unique_id=191010012]
+layout_mode = 2
+text = "Recommended knowledge: --"
+autowrap_mode = 3

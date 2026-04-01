@@ -17,6 +17,7 @@ const TARGET_GUILD_HALL := "guild_hall"
 const TARGET_EXPEDITION_BOARD := "expedition_board"
 const TARGET_GUILD_UPGRADES := "guild_upgrades"
 const TARGET_CODEX := "codex"
+const TARGET_COMMISSION_BOARD := "commission_board"
 
 @export var current_screen: String = ""
 
@@ -25,12 +26,13 @@ const TARGET_CODEX := "codex"
 @onready var _expedition_board_button: Button = $Panel/Margin/ButtonsRow/EBButton
 @onready var _guild_upgrades_button: Button = $Panel/Margin/ButtonsRow/GUButton
 @onready var _codex_button: Button = $Panel/Margin/ButtonsRow/CXButton
+@onready var _commission_board_button: Button = $Panel/Margin/ButtonsRow/CBButton
 @onready var _all_buttons: Array[Button] = [
 	$Panel/Margin/ButtonsRow/GHButton,
 	$Panel/Margin/ButtonsRow/EBButton,
 	$Panel/Margin/ButtonsRow/GUButton,
 	$Panel/Margin/ButtonsRow/CXButton,
-	$Panel/Margin/ButtonsRow/XXButtonLeft,
+	$Panel/Margin/ButtonsRow/CBButton,
 	$Panel/Margin/ButtonsRow/XXButtonRight,
 	$Panel/Margin/ButtonsRow/SHButton
 ]
@@ -39,7 +41,7 @@ const TARGET_CODEX := "codex"
 	$Panel/Margin/ButtonsRow/EBButton/IconMargin,
 	$Panel/Margin/ButtonsRow/GUButton/IconMargin,
 	$Panel/Margin/ButtonsRow/CXButton/IconMargin,
-	$Panel/Margin/ButtonsRow/XXButtonLeft/IconMargin,
+	$Panel/Margin/ButtonsRow/CBButton/IconMargin,
 	$Panel/Margin/ButtonsRow/XXButtonRight/IconMargin,
 	$Panel/Margin/ButtonsRow/SHButton/IconMargin
 ]
@@ -48,7 +50,7 @@ const TARGET_CODEX := "codex"
 func _ready() -> void:
 	# Reflow nav button sizes whenever the control width changes.
 	resized.connect(_update_responsive_button_sizes)
-	# Active routes wired for this milestone: GH, EB, GU, and center CX.
+	# Active routes wired for this milestone: GH, EB, GU, CX, and CB.
 	_guild_hall_button.pressed.connect(func() -> void:
 		navigate_requested.emit(TARGET_GUILD_HALL)
 	)
@@ -60,6 +62,9 @@ func _ready() -> void:
 	)
 	_codex_button.pressed.connect(func() -> void:
 		navigate_requested.emit(TARGET_CODEX)
+	)
+	_commission_board_button.pressed.connect(func() -> void:
+		navigate_requested.emit(TARGET_COMMISSION_BOARD)
 	)
 	_refresh_active_state()
 	_update_responsive_button_sizes()
@@ -78,6 +83,7 @@ func _refresh_active_state() -> void:
 	_expedition_board_button.disabled = current_screen == TARGET_EXPEDITION_BOARD
 	_guild_upgrades_button.disabled = current_screen == TARGET_GUILD_UPGRADES
 	_codex_button.disabled = current_screen == TARGET_CODEX
+	_commission_board_button.disabled = current_screen == TARGET_COMMISSION_BOARD
 
 
 func _update_responsive_button_sizes() -> void:

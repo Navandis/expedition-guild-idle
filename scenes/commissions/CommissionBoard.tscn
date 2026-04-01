@@ -1,5 +1,9 @@
 [gd_scene format=3 uid="uid://s6valn5dvncq"]
 
+[ext_resource type="Script" path="res://scripts/ui/CommissionBoardScreenController.gd" id="1_commission_board_script"]
+[ext_resource type="PackedScene" uid="uid://dtg2qlkhl3o3m" path="res://scenes/components/CommissionCard.tscn" id="2_commission_card"]
+[ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="3_nav"]
+
 [node name="CommissionBoard" type="Control" unique_id=1523872121]
 layout_mode = 3
 anchors_preset = 15
@@ -7,3 +11,87 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_commission_board_script")
+
+[node name="MainMargin" type="MarginContainer" parent="." unique_id=1523872122]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -60.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainColumn" type="VBoxContainer" parent="MainMargin" unique_id=1523872123]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="HeaderPanel" type="PanelContainer" parent="MainMargin/MainColumn" unique_id=1523872124]
+layout_mode = 2
+
+[node name="HeaderMargin" type="MarginContainer" parent="MainMargin/MainColumn/HeaderPanel" unique_id=1523872125]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="HeaderColumn" type="VBoxContainer" parent="MainMargin/MainColumn/HeaderPanel/HeaderMargin" unique_id=1523872126]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="TitleLabel" type="Label" parent="MainMargin/MainColumn/HeaderPanel/HeaderMargin/HeaderColumn" unique_id=1523872127]
+layout_mode = 2
+text = "Commission Board"
+
+[node name="CrewSummaryLabel" type="Label" parent="MainMargin/MainColumn/HeaderPanel/HeaderMargin/HeaderColumn" unique_id=1523872128]
+layout_mode = 2
+text = "Available Crew: --   Supplies: --"
+
+[node name="BoardHintLabel" type="Label" parent="MainMargin/MainColumn/HeaderPanel/HeaderMargin/HeaderColumn" unique_id=1523872129]
+layout_mode = 2
+text = "Showing 3 curated offers."
+autowrap_mode = 3
+
+[node name="BoardPanel" type="PanelContainer" parent="MainMargin/MainColumn" unique_id=1523872130]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BoardMargin" type="MarginContainer" parent="MainMargin/MainColumn/BoardPanel" unique_id=1523872131]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="CardsColumn" type="VBoxContainer" parent="MainMargin/MainColumn/BoardPanel/BoardMargin" unique_id=1523872132]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="CommissionCardSlot1" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/CardsColumn" unique_id=1523872133 instance=ExtResource("2_commission_card")]
+layout_mode = 2
+
+[node name="CommissionCardSlot2" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/CardsColumn" unique_id=1523872134 instance=ExtResource("2_commission_card")]
+layout_mode = 2
+
+[node name="CommissionCardSlot3" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/CardsColumn" unique_id=1523872135 instance=ExtResource("2_commission_card")]
+layout_mode = 2
+
+[node name="BottomNavSafe" type="MarginContainer" parent="." unique_id=1523872136]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="BottomNavBar" parent="BottomNavSafe" unique_id=1523872137 instance=ExtResource("3_nav")]
+layout_mode = 2
+size_flags_vertical = 3
