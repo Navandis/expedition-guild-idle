@@ -13,6 +13,11 @@ extends Node
 # - tracks selected region runtime state,
 # - persists per-region player progress + selected region id,
 # - passes selected-region constraints into expedition board generation.
+#
+# Commission resource foundation slice:
+# - stores Crew (max/available/assigned/recovering) as runtime player state,
+# - stores Supplies as a single v1 operational resource,
+# - keeps these values in save data instead of authored commission JSON.
 
 const GUILD_HALL_SCENE := preload("res://scenes/guild_hall/GuildHall.tscn")
 const EXPEDITION_BOARD_SCENE := preload("res://scenes/expedition_board/ExpeditionBoard.tscn")
@@ -30,6 +35,7 @@ var _expedition_manager := ExpeditionManager.new()
 var _upgrade_system := UpgradeSystem.new()
 var _codex_system := CodexSystem.new()
 var _region_system := RegionSystem.new()
+var _commission_resolver := CommissionResolver.new()
 var _save_manager := SaveManager.new()
 var _resources := DEFAULT_RESOURCES.duplicate(true)
 var _expedition_board_offers: Array[Dictionary] = []
@@ -202,6 +208,8 @@ func reset_to_debug_baseline() -> void:
 	# This is a test-only helper that wipes prototype progression and runtime
 	# state in one place to avoid partial resets across multiple scripts.
 	_resources = DEFAULT_RESOURCES.duplicate(true)
+	# Commission economy state is runtime data and resets with debug baseline.
+	_commission_resolver.restore_runtime_snapshot({})
 
 	# Clear progression systems back to fresh-start values.
 	_upgrade_system.restore_owned_upgrade_ids([])
@@ -345,6 +353,9 @@ func _load_runtime_state() -> void:
 
 	# Missing keys are safe: each system uses default fallback values.
 	_resources = _sanitize_resources(save_data.get("resources", {}))
+	_commission_resolver.restore_runtime_snapshot(save_data.get("commission_resources", {}))
+	# Process delayed crew recovery on load so offline time can be honored later.
+	_commission_resolver.process_crew_recovery()
 	_upgrade_system.restore_owned_upgrade_ids(_to_string_array(save_data.get("owned_upgrades", [])))
 	_codex_system.restore_discoveries(_to_string_array(save_data.get("codex_discoveries", [])))
 	_region_system.restore_player_state(
@@ -362,6 +373,7 @@ func _save_runtime_state() -> void:
 	# Save flow: capture a snapshot from owner systems and write plain JSON.
 	_save_manager.save_game_state({
 		"resources": _resources,
+		"commission_resources": _commission_resolver.build_runtime_snapshot(),
 		"owned_upgrades": _upgrade_system.get_owned_upgrade_ids(),
 		"codex_discoveries": _codex_system.get_discovered_entries(),
 		"region_progress": _region_system.build_save_progress_snapshot(),

@@ -5,10 +5,11 @@ class_name SaveManager
 # For the region-foundation milestone it now stores:
 # - authored-state references (selected_region_id),
 # - player-owned per-region progress (region_progress),
+# - commission runtime resources (Crew pools + Supplies),
 # while keeping previous keys for expedition loop persistence.
 
 const SAVE_PATH := "user://prototype_save.json"
-const SAVE_SCHEMA_VERSION := 3
+const SAVE_SCHEMA_VERSION := 4
 
 
 func load_game_state() -> Dictionary:
@@ -46,6 +47,7 @@ func save_game_state(state: Dictionary) -> bool:
 		"schema_version": SAVE_SCHEMA_VERSION,
 		"saved_at_unix": Time.get_unix_time_from_system(),
 		"resources": _coerce_resources(state.get("resources", {})),
+		"commission_resources": _coerce_commission_resources(state.get("commission_resources", {})),
 		"owned_upgrades": _coerce_string_array(state.get("owned_upgrades", [])),
 		"codex_discoveries": _coerce_string_array(state.get("codex_discoveries", [])),
 		"region_progress": _coerce_dictionary_of_dictionaries(state.get("region_progress", {})),
@@ -90,6 +92,27 @@ func _coerce_resources(value: Variant) -> Dictionary:
 		"gold": int(source.get("gold", 0)),
 		"relic_fragments": int(source.get("relic_fragments", 0)),
 		"codex_entries": int(source.get("codex_entries", 0))
+	}
+
+
+func _coerce_commission_resources(value: Variant) -> Dictionary:
+	# Commission resources are runtime/player state, not authored commission JSON.
+	var source := _coerce_dictionary(value)
+	var max_crew := maxi(0, int(source.get("max_crew", 10)))
+	var assigned_crew := maxi(0, int(source.get("assigned_crew", 0)))
+	var recovering_crew := maxi(0, int(source.get("recovering_crew", 0)))
+	var available_crew := maxi(0, int(source.get("available_crew", max_crew - assigned_crew - recovering_crew)))
+	var entries := _coerce_dictionary_array(source.get("crew_recovery_entries", []))
+
+	return {
+		"max_crew": max_crew,
+		"available_crew": available_crew,
+		"assigned_crew": assigned_crew,
+		"recovering_crew": recovering_crew,
+		# Supplies v1 intentionally stays one single resource bucket.
+		"supplies": maxi(0, int(source.get("supplies", 50))),
+		# Keep entries serializable now so later offline/passive recovery can read them.
+		"crew_recovery_entries": entries
 	}
 
 
