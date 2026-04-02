@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://b5o52ig647fl6"]
+[gd_scene load_steps=2 format=3 uid="uid://b5o52ig647fl6"]
+
+[ext_resource type="Script" path="res://scripts/commissions/PrepTierSelector.gd" id="1_prep_tier_script"]
 
 [node name="PrepTierSelector" type="Control" unique_id=1081660292]
 layout_mode = 3
@@ -7,3 +9,45 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_prep_tier_script")
+
+[node name="SelectorColumn" type="VBoxContainer" parent="." unique_id=1081660293]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="TierLabel" type="Label" parent="SelectorColumn" unique_id=1081660294]
+layout_mode = 2
+text = "Prep Tier"
+
+[node name="TierButtons" type="HBoxContainer" parent="SelectorColumn" unique_id=1081660295]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="UnderPreparedButton" type="Button" parent="SelectorColumn/TierButtons" unique_id=1081660296]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+text = "Under-Prepared"
+
+[node name="PreparedButton" type="Button" parent="SelectorColumn/TierButtons" unique_id=1081660297]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+text = "Prepared"
+button_pressed = true
+
+[node name="OverPreparedButton" type="Button" parent="SelectorColumn/TierButtons" unique_id=1081660298]
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+text = "Over-Prepared"
+
+[node name="TierSummaryLabel" type="Label" parent="SelectorColumn" unique_id=1081660299]
+layout_mode = 2
+text = "Prepared · Base Risk · Outcome Weight +0%"
+autowrap_mode = 3

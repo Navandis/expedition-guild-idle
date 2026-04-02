@@ -1,9 +1,86 @@
-[gd_scene format=3 uid="uid://oi6qo74ipqei"]
+[gd_scene load_steps=3 format=3 uid="uid://oi6qo74ipqei"]
 
-[node name="CommissionDetailPanel" type="Control" unique_id=505833382]
+[ext_resource type="Script" path="res://scripts/ui/CommissionDetailPanelController.gd" id="1_detail_script"]
+[ext_resource type="PackedScene" uid="uid://b5o52ig647fl6" path="res://scenes/components/PrepTierSelector.tscn" id="2_prep_selector"]
+
+[node name="CommissionDetailPanel" type="PanelContainer" unique_id=505833382]
+visible = false
+custom_minimum_size = Vector2(0, 280)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_detail_script")
+
+[node name="DetailMargin" type="MarginContainer" parent="." unique_id=505833383]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="DetailColumn" type="VBoxContainer" parent="DetailMargin" unique_id=505833384]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TitleLabel" type="Label" parent="DetailMargin/DetailColumn" unique_id=505833385]
+layout_mode = 2
+text = "Commission Confirmation"
+
+[node name="OfferNameLabel" type="Label" parent="DetailMargin/DetailColumn" unique_id=505833386]
+layout_mode = 2
+text = "Offer name"
+autowrap_mode = 3
+
+[node name="RegionLabel" type="Label" parent="DetailMargin/DetailColumn" unique_id=505833387]
+layout_mode = 2
+text = "Region: --"
+
+[node name="RewardLabel" type="Label" parent="DetailMargin/DetailColumn" unique_id=505833388]
+layout_mode = 2
+text = "Reward: --"
+
+[node name="RiskLabel" type="Label" parent="DetailMargin/DetailColumn" unique_id=505833389]
+layout_mode = 2
+text = "Risk Outlook: --"
+autowrap_mode = 3
+
+[node name="SuitabilityLabel" type="Label" parent="DetailMargin/DetailColumn" unique_id=505833390]
+layout_mode = 2
+text = "Suitability: --"
+autowrap_mode = 3
+
+[node name="OperationalInputsLabel" type="Label" parent="DetailMargin/DetailColumn" unique_id=505833391]
+layout_mode = 2
+text = "Dispatch Commitment: --"
+autowrap_mode = 3
+
+[node name="PrepTierSelector" parent="DetailMargin/DetailColumn" unique_id=505833392 instance=ExtResource("2_prep_selector")]
+layout_mode = 2
+
+[node name="DispatchHintLabel" type="Label" parent="DetailMargin/DetailColumn" unique_id=505833393]
+layout_mode = 2
+text = "Dispatch is immediate on confirm."
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="DetailMargin/DetailColumn" unique_id=505833394]
+visible = false
+layout_mode = 2
+text = "Status"
+autowrap_mode = 3
+
+[node name="ButtonsRow" type="HBoxContainer" parent="DetailMargin/DetailColumn" unique_id=505833395]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CancelButton" type="Button" parent="DetailMargin/DetailColumn/ButtonsRow" unique_id=505833396]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+
+[node name="DispatchButton" type="Button" parent="DetailMargin/DetailColumn/ButtonsRow" unique_id=505833397]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Dispatch Now"

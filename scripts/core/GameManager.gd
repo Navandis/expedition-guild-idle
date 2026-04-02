@@ -156,6 +156,7 @@ func _show_commission_board() -> void:
 	if _commission_board_controller == null:
 		_commission_board_controller = COMMISSION_BOARD_SCENE.instantiate() as CommissionBoardScreenController
 		_commission_board_controller.navigate_requested.connect(_on_global_navigation_requested)
+		_commission_board_controller.commission_dispatch_requested.connect(_on_commission_dispatch_requested)
 
 	_commission_board_controller.set_board_context(
 		_get_unlocked_region_ids_for_commissions(),
@@ -371,6 +372,44 @@ func _refresh_upgrades_view() -> void:
 
 func _on_report_close_requested() -> void:
 	_show_guild_hall()
+
+
+func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, commitment: Dictionary, _offer_snapshot: Dictionary) -> void:
+	# Commission accept in this prototype is also immediate dispatch.
+	# We commit runtime resources first, then the board controller removes/refills.
+	var crew_cost := maxi(0, int(commitment.get("crew_commitment", 0)))
+	var supplies_cost := maxi(0, int(commitment.get("supplies_commitment", 0)))
+
+	if crew_cost > _commission_resolver.get_available_crew() or supplies_cost > _commission_resolver.get_supplies():
+		_commission_board_controller.handle_dispatch_result(
+			false,
+			offer_id,
+			"Dispatch failed: insufficient Crew or Supplies."
+		)
+		return
+
+	# No manual raw number entry in UI: these values are derived from prep tier.
+	var crew_committed := _commission_resolver.assign_crew_to_commission(crew_cost)
+	var supplies_committed := _commission_resolver.spend_supplies(supplies_cost)
+	if not crew_committed or not supplies_committed:
+		_commission_board_controller.handle_dispatch_result(
+			false,
+			offer_id,
+			"Dispatch failed while committing resources."
+		)
+		return
+
+	_save_runtime_state()
+	_commission_board_controller.set_board_context(
+		_get_unlocked_region_ids_for_commissions(),
+		_commission_resolver.get_available_crew(),
+		_commission_resolver.get_supplies()
+	)
+	_commission_board_controller.handle_dispatch_result(
+		true,
+		offer_id,
+		"Dispatched now (%s). Crew and Supplies committed immediately." % prep_tier_id.capitalize()
+	)
 
 
 func _load_runtime_state() -> void:
