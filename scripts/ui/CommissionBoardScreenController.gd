@@ -34,6 +34,7 @@ const _UNLOCKED_CARD_COUNT := 3
 
 var _board_controller := CommissionBoardController.new()
 var _unlocked_region_ids: Array[String] = []
+var _current_gold := 0
 var _available_crew := 0
 var _available_supplies := 0
 var _selected_offer: Dictionary = {}
@@ -58,10 +59,11 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_apply_top_half_bounds)
 
 
-func set_board_context(unlocked_region_ids: Array[String], available_crew: int, available_supplies: int) -> void:
+func set_board_context(unlocked_region_ids: Array[String], available_crew: int, available_supplies: int, current_gold: int = 0) -> void:
 	_unlocked_region_ids = unlocked_region_ids.duplicate(true)
 	_available_crew = maxi(0, available_crew)
 	_available_supplies = maxi(0, available_supplies)
+	_current_gold = maxi(0, current_gold)
 	_ensure_board_generated()
 	if is_node_ready():
 		_bind_board_cards()
@@ -137,8 +139,9 @@ func _bind_board_cards() -> void:
 
 
 func _refresh_resource_summary() -> void:
-	# Keep this row consistent with Guild Hall style while using board-specific values.
-	_gold_value_label.text = "0"
+	# Keep this row consistent with Guild Hall style while using live runtime values.
+	# Gold is shared progression state and must not be hardcoded for playtests.
+	_gold_value_label.text = str(_current_gold)
 	_crew_value_label.text = str(_available_crew)
 	_supplies_value_label.text = str(_available_supplies)
 
