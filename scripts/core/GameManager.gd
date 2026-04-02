@@ -18,6 +18,11 @@ extends Node
 # - stores Crew (max/available/assigned/recovering) as runtime player state,
 # - stores Supplies as a single v1 operational resource,
 # - keeps these values in save data instead of authored commission JSON.
+#
+# New-game baseline slice:
+# - reads authored start conditions from res://data/progression/new_game_start_conditions.json,
+# - applies those values only when no save exists yet,
+# - keeps runtime/save state separate from authored baseline content.
 
 const GUILD_HALL_SCENE := preload("res://scenes/guild_hall/GuildHall.tscn")
 const EXPEDITION_BOARD_SCENE := preload("res://scenes/expedition_board/ExpeditionBoard.tscn")
@@ -26,8 +31,34 @@ const EXPEDITION_REPORT_SCENE := preload("res://scenes/report/ExpeditionReport.t
 const GUILD_UPGRADES_SCENE := preload("res://scenes/upgrades/GuildUpgrades.tscn")
 const CODEX_SCREEN_SCENE := preload("res://scenes/codex/CodexScreen.tscn")
 const COMMISSION_BOARD_SCENE := preload("res://scenes/commissions/CommissionBoard.tscn")
+const NEW_GAME_START_CONDITIONS_PATH := "res://data/progression/new_game_start_conditions.json"
+const DEFAULT_NEW_GAME_START_CONDITIONS := {
+	"schema_version": 1,
+	"starting_resources": {
+		"gold": 1000,
+		"supplies": 10
+	},
+	"starting_crew": {
+		"available": 20,
+		"assigned": 0,
+		"recovering": 0,
+		"max": 50
+	},
+	"starting_slot_capacities": {
+		"expedition": {
+			"current_expedition_slot_capacity": 2,
+			"max_expedition_slot_capacity": 3
+		},
+		"commission": {
+			"current_commission_slot_capacity": 3,
+			"max_commission_slot_capacity": 4
+		}
+	}
+}
 const DEFAULT_RESOURCES := {
-	"gold": 1250,
+	# New-profile gold now comes from authored start-conditions JSON.
+	# This dictionary remains the runtime shape used by save/load paths.
+	"gold": 1000,
 	"relic_fragments": 0,
 	"codex_entries": 0
 }
@@ -38,7 +69,9 @@ var _codex_system := CodexSystem.new()
 var _region_system := RegionSystem.new()
 var _commission_resolver := CommissionResolver.new()
 var _save_manager := SaveManager.new()
+var _new_game_start_conditions := DEFAULT_NEW_GAME_START_CONDITIONS.duplicate(true)
 var _resources := DEFAULT_RESOURCES.duplicate(true)
+var _slot_capacities := DEFAULT_NEW_GAME_START_CONDITIONS.get("starting_slot_capacities", {}).duplicate(true)
 var _expedition_board_offers: Array[Dictionary] = []
 
 var _guild_hall_controller: GuildHallController
@@ -54,6 +87,9 @@ var _mounted_screen: Control
 
 
 func _ready() -> void:
+	# Start conditions are authored content for fresh profiles only.
+	_new_game_start_conditions = _load_new_game_start_conditions()
+	_apply_new_game_start_conditions_baseline()
 	_load_runtime_state()
 	_show_guild_hall()
 
@@ -243,9 +279,9 @@ func reset_to_debug_baseline() -> void:
 	# TEMPORARY DEBUG RESET:
 	# This is a test-only helper that wipes prototype progression and runtime
 	# state in one place to avoid partial resets across multiple scripts.
-	_resources = DEFAULT_RESOURCES.duplicate(true)
+	# Debug baseline intentionally mirrors the authored new-game start values.
+	_apply_new_game_start_conditions_baseline()
 	# Commission economy state is runtime data and resets with debug baseline.
-	_commission_resolver.restore_runtime_snapshot({})
 
 	# Clear progression systems back to fresh-start values.
 	_upgrade_system.restore_owned_upgrade_ids([])
@@ -436,15 +472,17 @@ func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, c
 
 
 func _load_runtime_state() -> void:
-	# Load flow: start from defaults, then apply any valid JSON save values.
+	# Load flow: authored start conditions are already applied as baseline;
+	# saved runtime state overrides them when a save exists.
 	var save_data := _save_manager.load_game_state()
 	if save_data.is_empty():
-		# Older/new save default behavior is handled by RegionSystem init defaults.
+		# No save present => keep authored new-game baseline values.
 		return
 
 	# Missing keys are safe: each system uses default fallback values.
 	_resources = _sanitize_resources(save_data.get("resources", {}))
 	_commission_resolver.restore_runtime_snapshot(save_data.get("commission_resources", {}))
+	_slot_capacities = _sanitize_slot_capacities(save_data.get("slot_capacities", {}))
 	# Process delayed crew recovery on load so offline time can be honored later.
 	_commission_resolver.process_crew_recovery()
 	_upgrade_system.restore_owned_upgrade_ids(_to_string_array(save_data.get("owned_upgrades", [])))
@@ -465,6 +503,7 @@ func _save_runtime_state() -> void:
 	_save_manager.save_game_state({
 		"resources": _resources,
 		"commission_resources": _commission_resolver.build_runtime_snapshot(),
+		"slot_capacities": _slot_capacities,
 		"owned_upgrades": _upgrade_system.get_owned_upgrade_ids(),
 		"codex_discoveries": _codex_system.get_discovered_entries(),
 		"region_progress": _region_system.build_save_progress_snapshot(),
@@ -482,6 +521,93 @@ func _sanitize_resources(value: Variant) -> Dictionary:
 		"gold": maxi(0, int(source.get("gold", int(_resources.get("gold", 0))))),
 		"relic_fragments": maxi(0, int(source.get("relic_fragments", int(_resources.get("relic_fragments", 0))))),
 		"codex_entries": maxi(0, int(source.get("codex_entries", int(_resources.get("codex_entries", 0)))))
+	}
+
+
+func _load_new_game_start_conditions() -> Dictionary:
+	# This file is authored balancing data for *new game setup only*.
+	# Runtime and save progress stay in save JSON, not here.
+	if not FileAccess.file_exists(NEW_GAME_START_CONDITIONS_PATH):
+		push_warning("GameManager: new-game start conditions file missing; using fallback defaults.")
+		return DEFAULT_NEW_GAME_START_CONDITIONS.duplicate(true)
+
+	var file := FileAccess.open(NEW_GAME_START_CONDITIONS_PATH, FileAccess.READ)
+	if file == null:
+		push_warning("GameManager: failed to open start conditions file; using fallback defaults.")
+		return DEFAULT_NEW_GAME_START_CONDITIONS.duplicate(true)
+
+	var raw_text := file.get_as_text()
+	file.close()
+
+	var parsed := JSON.parse_string(raw_text)
+	if not (parsed is Dictionary):
+		push_warning("GameManager: start conditions JSON must be a dictionary; using fallback defaults.")
+		return DEFAULT_NEW_GAME_START_CONDITIONS.duplicate(true)
+
+	return _sanitize_new_game_start_conditions(parsed as Dictionary)
+
+
+func _sanitize_new_game_start_conditions(value: Dictionary) -> Dictionary:
+	var resources := value.get("starting_resources", {}) as Dictionary
+	var crew := value.get("starting_crew", {}) as Dictionary
+	var slot_capacities := _sanitize_slot_capacities(value.get("starting_slot_capacities", {}))
+	return {
+		"schema_version": int(value.get("schema_version", 1)),
+		"starting_resources": {
+			"gold": maxi(0, int(resources.get("gold", 1000))),
+			"supplies": maxi(0, int(resources.get("supplies", 10)))
+		},
+		"starting_crew": {
+			"available": maxi(0, int(crew.get("available", 20))),
+			"assigned": maxi(0, int(crew.get("assigned", 0))),
+			"recovering": maxi(0, int(crew.get("recovering", 0))),
+			"max": maxi(0, int(crew.get("max", 50)))
+		},
+		"starting_slot_capacities": slot_capacities
+	}
+
+
+func _apply_new_game_start_conditions_baseline() -> void:
+	var resources := _new_game_start_conditions.get("starting_resources", {}) as Dictionary
+	var crew := _new_game_start_conditions.get("starting_crew", {}) as Dictionary
+	_resources = {
+		"gold": maxi(0, int(resources.get("gold", 1000))),
+		"relic_fragments": 0,
+		"codex_entries": 0
+	}
+	_commission_resolver.restore_runtime_snapshot({
+		"max_crew": maxi(0, int(crew.get("max", 50))),
+		"available_crew": maxi(0, int(crew.get("available", 20))),
+		"assigned_crew": maxi(0, int(crew.get("assigned", 0))),
+		"recovering_crew": maxi(0, int(crew.get("recovering", 0))),
+		"supplies": maxi(0, int(resources.get("supplies", 10))),
+		"standing": 0,
+		"crew_recovery_entries": []
+	})
+	# Slot-capacity ownership is runtime/save state; the authored file only seeds
+	# fresh profiles and is never written back at runtime.
+	_slot_capacities = _sanitize_slot_capacities(_new_game_start_conditions.get("starting_slot_capacities", {}))
+
+
+func _sanitize_slot_capacities(value: Variant) -> Dictionary:
+	# Migration-safe sanitize path for both authored start data and save data.
+	var source := value as Dictionary if value is Dictionary else {}
+	var expedition := source.get("expedition", {}) as Dictionary
+	var commission := source.get("commission", {}) as Dictionary
+	var expedition_current := maxi(0, int(expedition.get("current_expedition_slot_capacity", int(_slot_capacities.get("expedition", {}).get("current_expedition_slot_capacity", 2)))))
+	var expedition_max := maxi(expedition_current, int(expedition.get("max_expedition_slot_capacity", int(_slot_capacities.get("expedition", {}).get("max_expedition_slot_capacity", 3)))))
+	var commission_current := maxi(0, int(commission.get("current_commission_slot_capacity", int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 3)))))
+	var commission_max := maxi(commission_current, int(commission.get("max_commission_slot_capacity", int(_slot_capacities.get("commission", {}).get("max_commission_slot_capacity", 4)))))
+
+	return {
+		"expedition": {
+			"current_expedition_slot_capacity": expedition_current,
+			"max_expedition_slot_capacity": expedition_max
+		},
+		"commission": {
+			"current_commission_slot_capacity": commission_current,
+			"max_commission_slot_capacity": commission_max
+		}
 	}
 
 
