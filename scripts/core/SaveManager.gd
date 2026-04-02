@@ -6,6 +6,7 @@ class_name SaveManager
 # - authored-state references (selected_region_id),
 # - player-owned per-region progress (region_progress),
 # - commission runtime resources (Crew pools + Supplies),
+# - runtime slot-capacity ownership state (current/max for expedition/commission),
 # while keeping previous keys for expedition loop persistence.
 
 const SAVE_PATH := "user://prototype_save.json"
@@ -48,6 +49,7 @@ func save_game_state(state: Dictionary) -> bool:
 		"saved_at_unix": Time.get_unix_time_from_system(),
 		"resources": _coerce_resources(state.get("resources", {})),
 		"commission_resources": _coerce_commission_resources(state.get("commission_resources", {})),
+		"slot_capacities": _coerce_slot_capacities(state.get("slot_capacities", {})),
 		"owned_upgrades": _coerce_string_array(state.get("owned_upgrades", [])),
 		"codex_discoveries": _coerce_string_array(state.get("codex_discoveries", [])),
 		"region_progress": _coerce_dictionary_of_dictionaries(state.get("region_progress", {})),
@@ -115,6 +117,29 @@ func _coerce_commission_resources(value: Variant) -> Dictionary:
 		"standing": int(source.get("standing", 0)),
 		# Keep entries serializable now so later offline/passive recovery can read them.
 		"crew_recovery_entries": entries
+	}
+
+
+func _coerce_slot_capacities(value: Variant) -> Dictionary:
+	# Slot capacities are runtime/player progression state and are persisted in
+	# saves. Authored JSON only supplies brand-new profile baselines.
+	var source := _coerce_dictionary(value)
+	var expedition := _coerce_dictionary(source.get("expedition", {}))
+	var commission := _coerce_dictionary(source.get("commission", {}))
+	var expedition_current := maxi(0, int(expedition.get("current_expedition_slot_capacity", 2)))
+	var expedition_max := maxi(expedition_current, int(expedition.get("max_expedition_slot_capacity", 3)))
+	var commission_current := maxi(0, int(commission.get("current_commission_slot_capacity", 3)))
+	var commission_max := maxi(commission_current, int(commission.get("max_commission_slot_capacity", 4)))
+
+	return {
+		"expedition": {
+			"current_expedition_slot_capacity": expedition_current,
+			"max_expedition_slot_capacity": expedition_max
+		},
+		"commission": {
+			"current_commission_slot_capacity": commission_current,
+			"max_commission_slot_capacity": commission_max
+		}
 	}
 
 

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "starting_resources": {
+    "gold": 1000,
+    "supplies": 10
+  },
+  "starting_crew": {
+    "available": 20,
+    "assigned": 0,
+    "recovering": 0,
+    "max": 50
+  },
+  "starting_slot_capacities": {
+    "expedition": {
+      "current_expedition_slot_capacity": 2,
+      "max_expedition_slot_capacity": 3
+    },
+    "commission": {
+      "current_commission_slot_capacity": 3,
+      "max_commission_slot_capacity": 4
+    }
+  }
+}
