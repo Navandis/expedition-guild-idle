@@ -60,7 +60,7 @@ autowrap_mode = 3
 
 [node name="BoardPanel" type="PanelContainer" parent="MainMargin/MainColumn" unique_id=1523872130]
 layout_mode = 2
-size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 164)
 
 [node name="BoardMargin" type="MarginContainer" parent="MainMargin/MainColumn/BoardPanel" unique_id=1523872131]
 layout_mode = 2
@@ -69,18 +69,28 @@ theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
-[node name="CardsColumn" type="VBoxContainer" parent="MainMargin/MainColumn/BoardPanel/BoardMargin" unique_id=1523872132]
+[node name="OffersScroll" type="ScrollContainer" parent="MainMargin/MainColumn/BoardPanel/BoardMargin" unique_id=1523872140]
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_horizontal = 3
+horizontal_scroll_mode = 1
+vertical_scroll_mode = 0
+
+[node name="CardsRow" type="HBoxContainer" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/OffersScroll" unique_id=1523872132]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="CommissionCardSlot1" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/CardsColumn" unique_id=1523872133 instance=ExtResource("2_commission_card")]
+[node name="CommissionCardSlot1" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/OffersScroll/CardsRow" unique_id=1523872133 instance=ExtResource("2_commission_card")]
+custom_minimum_size = Vector2(252, 132)
 layout_mode = 2
 
-[node name="CommissionCardSlot2" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/CardsColumn" unique_id=1523872134 instance=ExtResource("2_commission_card")]
+[node name="CommissionCardSlot2" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/OffersScroll/CardsRow" unique_id=1523872134 instance=ExtResource("2_commission_card")]
+custom_minimum_size = Vector2(252, 132)
 layout_mode = 2
 
-[node name="CommissionCardSlot3" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/CardsColumn" unique_id=1523872135 instance=ExtResource("2_commission_card")]
+[node name="CommissionCardSlot3" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/OffersScroll/CardsRow" unique_id=1523872135 instance=ExtResource("2_commission_card")]
+custom_minimum_size = Vector2(252, 132)
 layout_mode = 2
 
 
