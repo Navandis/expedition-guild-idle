@@ -86,6 +86,10 @@ func _wire_card_actions() -> void:
 
 func _wire_detail_panel() -> void:
 	_detail_panel.closed.connect(func() -> void:
+		# Cancel/close is a deliberate dismissal, so clear selection state too.
+		# Otherwise set_board_context() (called when revisiting board) can reopen
+		# the previously inspected offer even though player canceled it.
+		_selected_offer = {}
 		_detail_panel_container.visible = false
 	)
 	_detail_panel.dispatch_pressed.connect(func(offer: Dictionary, prep_tier_id: String, commitment: Dictionary) -> void:
