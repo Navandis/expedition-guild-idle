@@ -5,6 +5,7 @@ class_name GuildHallController
 # Guild Hall is the dashboard landing screen for the prototype loop.
 # This controller keeps the screen lightweight by handling only:
 # - resource value text updates (icons are wired in the scene),
+# - compact Crew dropdown behavior for available/assigned/recovering snapshots,
 # - two active expedition cards with compact status text,
 # - completed-card clicks as the report entry point,
 # - shared bottom-nav routing and test-only debug actions.
@@ -38,8 +39,12 @@ const _SLOT_VISUAL_ONGOING := "ongoing"
 const _SLOT_VISUAL_COMPLETED := "completed"
 
 @onready var _gold_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
-@onready var _relic_fragments_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row/RelicFragmentsValueLabel
-@onready var _codex_entries_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row/CodexEntriesValueLabel
+@onready var _crew_dropdown_button: Button = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton
+@onready var _crew_collapsed_value: RichTextLabel = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton/CrewCollapsedValue
+@onready var _crew_dropdown_popup: PopupPanel = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup
+@onready var _assigned_crew_value_label: RichTextLabel = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues/AssignedCrewValueLabel
+@onready var _recovering_crew_value_label: RichTextLabel = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues/RecoveringCrewValueLabel
+@onready var _supplies_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter/Row/SuppliesValueLabel
 @onready var _debug_finish_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugFinishButton
 @onready var _debug_reset_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugResetButton
 @onready var _expedition_slots_scroller: ScrollContainer = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller
@@ -56,8 +61,11 @@ const _SLOT_VISUAL_COMPLETED := "completed"
 var _expedition_manager: ExpeditionManager
 var _resources := {
 	"gold": 0,
-	"relic_fragments": 0,
-	"codex_entries": 0
+	"available_crew": 0,
+	"assigned_crew": 0,
+	"recovering_crew": 0,
+	"max_crew": 0,
+	"supplies": 0
 }
 var _slot_is_empty: Array[bool] = [true, true]
 var _slot_visual_states: Array[String] = ["", ""]
@@ -80,6 +88,10 @@ func _ready() -> void:
 	# Shared bottom nav is the primary cross-screen backbone.
 	_bottom_nav.set_current_screen(BottomNavBar.TARGET_GUILD_HALL)
 	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
+	# Keep the top-row Crew counter compact: default state shows Available/Max.
+	# Tap opens a tiny popup with Assigned and Recovering values only.
+	_crew_dropdown_button.pressed.connect(_on_crew_dropdown_button_pressed)
+	_crew_dropdown_popup.popup_hide.connect(_on_crew_dropdown_popup_hidden)
 	_build_cached_slot_styles()
 	# Preserve scene-authored horizontal padding so this script only owns vertical
 	# bounds for the middle section.
@@ -168,8 +180,39 @@ func _refresh_resource_labels() -> void:
 	# Icon textures are assigned in GuildHall.tscn.
 	# Keep this method focused on number updates only.
 	_gold_value_label.text = str(int(_resources.get("gold", 0)))
-	_relic_fragments_value_label.text = str(int(_resources.get("relic_fragments", 0)))
-	_codex_entries_value_label.text = str(int(_resources.get("codex_entries", 0)))
+	_supplies_value_label.text = str(int(_resources.get("supplies", 0)))
+
+	var available_crew := int(_resources.get("available_crew", 0))
+	var max_crew := int(_resources.get("max_crew", 0))
+	var assigned_crew := int(_resources.get("assigned_crew", 0))
+	var recovering_crew := int(_resources.get("recovering_crew", 0))
+	# Collapsed view intentionally shows the most "at a glance" crew signal:
+	# available units now versus hard cap for this profile.
+	_crew_collapsed_value.text = "[color=#6EEB74]%d[/color] / %d" % [available_crew, max_crew]
+	# Expanded popup keeps the extra details compact with color-only values:
+	# yellow for assigned and orange for recovering.
+	_assigned_crew_value_label.text = "[color=#F5D547]%d[/color]" % assigned_crew
+	_recovering_crew_value_label.text = "[color=#F2A14A]%d[/color]" % recovering_crew
+
+
+func _on_crew_dropdown_button_pressed() -> void:
+	if _crew_dropdown_popup.visible:
+		_crew_dropdown_popup.hide()
+		return
+
+	# PopupPanel gives dropdown-like behavior and auto-closes when focus moves
+	# elsewhere, which fits mobile tap workflows.
+	var button_rect := _crew_dropdown_button.get_global_rect()
+	_crew_dropdown_popup.position = Vector2i(
+		int(button_rect.position.x),
+		int(button_rect.position.y + button_rect.size.y + 2.0)
+	)
+	_crew_dropdown_popup.popup()
+	_crew_dropdown_button.text = "▲"
+
+
+func _on_crew_dropdown_popup_hidden() -> void:
+	_crew_dropdown_button.text = "▼"
 
 
 func _refresh_active_status() -> void:

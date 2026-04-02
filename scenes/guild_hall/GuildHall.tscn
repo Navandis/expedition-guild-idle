@@ -6,10 +6,10 @@
 [ext_resource type="Texture2D" uid="uid://tk3w5radyv80" path="res://assets/Regions/Hollowspire Uplands - v3.png" id="3_elgiq"]
 [ext_resource type="Texture2D" uid="uid://py6ohnws3tte" path="res://assets/UI/ResourceCounters/gold.png" id="3_gold_icon"]
 [ext_resource type="Texture2D" uid="uid://djooculgweyvr" path="res://assets/UI/Frames/Portal_frame2.png" id="4_elgiq"]
-[ext_resource type="Texture2D" uid="uid://dxyg3vxg80kwd" path="res://assets/UI/ResourceCounters/relics.png" id="4_relics_icon"]
+[ext_resource type="Texture2D" uid="uid://bv5xb7c6dh0gp" path="res://assets/UI/ResourceCounters/crew.png" id="4_crew_icon"]
 [ext_resource type="Texture2D" uid="uid://ci2mmj6qfgl4r" path="res://assets/Regions/Emberwake Coast - upscaled.png" id="5_0pdko"]
 [ext_resource type="Texture2D" uid="uid://54g82p854pgd" path="res://assets/Regions/Emberwake Coast - sketch v4.png" id="5_513lt"]
-[ext_resource type="Texture2D" uid="uid://d0a672tahkdym" path="res://assets/UI/ResourceCounters/codex_fragment.png" id="5_codex_icon"]
+[ext_resource type="Texture2D" uid="uid://bvmnwunr0da8o" path="res://assets/UI/ResourceCounters/supplies.png" id="5_supplies_icon"]
 [ext_resource type="Script" uid="uid://dea00ojayku33" path="res://scripts/ui/TouchScrollCardButton.gd" id="6_touch_card"]
 [ext_resource type="Texture2D" uid="uid://8qgknq71pugv" path="res://assets/Regions/Greyfen March - Sketch - v2.png" id="7_o7uwm"]
 
@@ -153,45 +153,92 @@ size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="RelicCounter" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001004]
+[node name="CrewCounter" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001004]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Row" type="HBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter" unique_id=570001005]
+[node name="Row" type="HBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter" unique_id=570001005]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="RelicIcon" type="TextureRect" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row" unique_id=570001006]
+[node name="CrewIcon" type="TextureRect" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row" unique_id=570001006]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 mouse_filter = 2
-texture = ExtResource("4_relics_icon")
+texture = ExtResource("4_crew_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="RelicFragmentsValueLabel" type="Label" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/RelicCounter/Row" unique_id=462742622]
+[node name="CrewDropdownButton" type="Button" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "0"
+flat = true
+text = "▼"
+icon_alignment = 2
+alignment = 2
+
+[node name="CrewCollapsedValue" type="RichTextLabel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton"]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "[color=#6EEB74]0[/color] / 0"
+horizontal_alignment = 2
+fit_content = true
+scroll_active = false
+
+[node name="CrewDropdownPopup" type="PopupPanel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter"]
+initial_position = 0
+size = Vector2i(110, 72)
+visible = false
+
+[node name="CrewDropdownMargin" type="MarginContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CrewDropdownValues" type="VBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="AssignedCrewValueLabel" type="RichTextLabel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[color=#F5D547]0[/color]"
+fit_content = true
+scroll_active = false
 horizontal_alignment = 2
 
-[node name="CodexCounter" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001007]
+[node name="RecoveringCrewValueLabel" type="RichTextLabel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[color=#F2A14A]0[/color]"
+fit_content = true
+scroll_active = false
+horizontal_alignment = 2
+
+[node name="SuppliesCounter" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001007]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Row" type="HBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter" unique_id=570001008]
+[node name="Row" type="HBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter" unique_id=570001008]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="CodexIcon" type="TextureRect" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row" unique_id=570001009]
+[node name="SuppliesIcon" type="TextureRect" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter/Row" unique_id=570001009]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 mouse_filter = 2
-texture = ExtResource("5_codex_icon")
+texture = ExtResource("5_supplies_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CodexEntriesValueLabel" type="Label" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CodexCounter/Row" unique_id=404869075]
+[node name="SuppliesValueLabel" type="Label" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter/Row" unique_id=404869075]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"

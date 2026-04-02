@@ -111,7 +111,7 @@ func _show_guild_hall() -> void:
 
 	_show_screen(_guild_hall_controller)
 	_guild_hall_controller.set_expedition_manager(_expedition_manager)
-	_guild_hall_controller.set_resources(_resources)
+	_guild_hall_controller.set_resources(_build_guild_hall_resources())
 
 
 func _show_expedition_board() -> void:
@@ -657,6 +657,18 @@ func _on_region_selected(region_id: String) -> void:
 
 func _on_codex_back_requested() -> void:
 	_show_guild_hall()
+
+
+func _build_guild_hall_resources() -> Dictionary:
+	# Guild Hall top row mixes shared progression (gold) with commission runtime
+	# state (crew/supplies), so this helper builds one UI-friendly snapshot.
+	var view := _resources.duplicate(true)
+	view["available_crew"] = _commission_resolver.get_available_crew()
+	view["assigned_crew"] = _commission_resolver.get_assigned_crew()
+	view["recovering_crew"] = _commission_resolver.get_recovering_crew()
+	view["max_crew"] = _commission_resolver.get_max_crew()
+	view["supplies"] = _commission_resolver.get_supplies()
+	return view
 
 
 func _notification(what: int) -> void:
