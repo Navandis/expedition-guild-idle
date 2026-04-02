@@ -30,6 +30,8 @@ const DEFAULT_RUNTIME_STATE := {
 	"recovering_crew": 0,
 	# Supplies v1 intentionally stays as one single resource bucket.
 	"supplies": 50,
+	# Basic standing/reputation scaffold for future reputation systems.
+	"standing": 0,
 	# Recovery tracking list for future offline/passive processing.
 	# Each row shape:
 	# { "crew": int, "ready_at_unix": int, "started_at_unix": int, "source": String }
@@ -37,6 +39,44 @@ const DEFAULT_RUNTIME_STATE := {
 }
 
 var _runtime_state: Dictionary = DEFAULT_RUNTIME_STATE.duplicate(true)
+
+# Outcome bands for v1 commission completion.
+const OUTCOME_EXCELLENT := "excellent"
+const OUTCOME_SOLID := "solid"
+const OUTCOME_STRAINED := "strained"
+const OUTCOME_POOR := "poor"
+
+# Tunable thresholds and multipliers live in one place so balancing can happen
+# later without touching UI scripts or authored JSON.
+const OUTCOME_SCORE_THRESHOLDS := {
+	OUTCOME_EXCELLENT: 0.82,
+	OUTCOME_SOLID: 0.58,
+	OUTCOME_STRAINED: 0.32
+}
+const OUTCOME_GOLD_MULTIPLIERS := {
+	OUTCOME_EXCELLENT: 1.30,
+	OUTCOME_SOLID: 1.00,
+	OUTCOME_STRAINED: 0.70,
+	OUTCOME_POOR: 0.40
+}
+const OUTCOME_STANDING_DELTA := {
+	OUTCOME_EXCELLENT: 2,
+	OUTCOME_SOLID: 1,
+	OUTCOME_STRAINED: 0,
+	OUTCOME_POOR: -1
+}
+const OUTCOME_SIDE_REWARD_CHANCE := {
+	OUTCOME_EXCELLENT: 0.30,
+	OUTCOME_SOLID: 0.16,
+	OUTCOME_STRAINED: 0.08,
+	OUTCOME_POOR: 0.03
+}
+const OUTCOME_RECOVERY_MULTIPLIERS := {
+	OUTCOME_EXCELLENT: 0.75,
+	OUTCOME_SOLID: 1.0,
+	OUTCOME_STRAINED: 1.2,
+	OUTCOME_POOR: 1.45
+}
 
 
 func build_runtime_snapshot() -> Dictionary:
@@ -59,9 +99,50 @@ func restore_runtime_snapshot(snapshot: Variant) -> void:
 		"assigned_crew": assigned_crew,
 		"recovering_crew": recovering_crew,
 		"supplies": supplies,
+		"standing": int(source.get("standing", int(DEFAULT_RUNTIME_STATE.get("standing", 0)))),
 		"crew_recovery_entries": _sanitize_recovery_entries(source.get("crew_recovery_entries", []))
 	}
 	_runtime_state = _normalize_crew_state(state)
+
+
+func resolve_commission_completion(offer: Dictionary, prep_tier_id: String, commitment: Dictionary) -> Dictionary:
+	# Runtime resolution is intentionally separate from authored commission files.
+	# Offer data is read as input, while output values are computed per-run.
+	var crew_committed := maxi(0, int(commitment.get("crew_commitment", 0)))
+	var prep_modifier := clampf(float(commitment.get("success_weight_modifier", 0.0)), -0.50, 0.50)
+	var base_score := _build_base_outcome_score(offer, prep_tier_id)
+	var swing := randf_range(-0.16, 0.16)
+	var final_score := clampf(base_score + prep_modifier + swing, 0.0, 1.0)
+	var outcome_band := _resolve_outcome_band_from_score(final_score)
+
+	# Gold payout is the primary reward channel and scales by outcome band.
+	var base_gold := _resolve_base_gold(offer)
+	var gold_payout := maxi(0, int(round(float(base_gold) * float(OUTCOME_GOLD_MULTIPLIERS.get(outcome_band, 1.0)))))
+
+	# First-pass standing scaffold: tiny deltas only, so it is safe to keep simple.
+	var standing_delta := int(OUTCOME_STANDING_DELTA.get(outcome_band, 0))
+	_runtime_state["standing"] = int(_runtime_state.get("standing", 0)) + standing_delta
+
+	# Crew leaves the assigned pool and enters Recovering on completion.
+	var recovery_seconds := _resolve_recovery_seconds(offer, outcome_band)
+	move_assigned_crew_to_recovering(crew_committed, recovery_seconds, "commission_%s" % outcome_band)
+
+	# Optional side reward chance: small bonus supplies grant to keep v1 light.
+	var side_reward := _roll_side_reward(offer, outcome_band)
+	if not side_reward.is_empty():
+		add_supplies(int(side_reward.get("amount", 0)))
+
+	return {
+		"outcome_band": outcome_band,
+		"outcome_label": _to_outcome_label(outcome_band),
+		"outcome_score": final_score,
+		"gold_payout": gold_payout,
+		"standing_delta": standing_delta,
+		"crew_to_recovering": crew_committed,
+		"recovery_seconds": recovery_seconds,
+		"side_reward": side_reward,
+		"summary": _build_outcome_summary(outcome_band, gold_payout, recovery_seconds)
+	}
 
 
 func assign_crew_to_commission(crew_amount: int) -> bool:
@@ -171,6 +252,106 @@ func get_supplies() -> int:
 	return int(_runtime_state.get("supplies", 0))
 
 
+func get_standing() -> int:
+	return int(_runtime_state.get("standing", 0))
+
+
+func _build_base_outcome_score(offer: Dictionary, prep_tier_id: String) -> float:
+	# Risk band provides the primary baseline: higher risk starts slightly lower.
+	var risk_band := str(offer.get("risk_band", "moderate")).to_lower()
+	var risk_base := 0.58
+	match risk_band:
+		"low":
+			risk_base = 0.68
+		"high":
+			risk_base = 0.48
+		_:
+			risk_base = 0.58
+
+	# Prep tier contributes a small deterministic nudge for readability in v1.
+	var prep_nudge := 0.0
+	match prep_tier_id.strip_edges().to_lower():
+		"quick":
+			prep_nudge = -0.06
+		"prepared":
+			prep_nudge = 0.0
+		"meticulous":
+			prep_nudge = 0.06
+		_:
+			prep_nudge = 0.0
+
+	return clampf(risk_base + prep_nudge, 0.0, 1.0)
+
+
+func _resolve_outcome_band_from_score(score: float) -> String:
+	if score >= float(OUTCOME_SCORE_THRESHOLDS.get(OUTCOME_EXCELLENT, 0.82)):
+		return OUTCOME_EXCELLENT
+	if score >= float(OUTCOME_SCORE_THRESHOLDS.get(OUTCOME_SOLID, 0.58)):
+		return OUTCOME_SOLID
+	if score >= float(OUTCOME_SCORE_THRESHOLDS.get(OUTCOME_STRAINED, 0.32)):
+		return OUTCOME_STRAINED
+	return OUTCOME_POOR
+
+
+func _resolve_base_gold(offer: Dictionary) -> int:
+	var reward_scaffold := offer.get("reward_scaffold", {}) as Dictionary
+	var authored_base := maxi(0, int(reward_scaffold.get("base_gold", 0)))
+	var authored_estimate := maxi(0, int(reward_scaffold.get("estimated_gold", 0)))
+	if authored_base > 0:
+		return authored_base
+	if authored_estimate > 0:
+		return authored_estimate
+	# Fallback keeps payout available even if scaffold keys are omitted.
+	return 20 + (maxi(1, int(offer.get("duration_hours", 1))) * 14)
+
+
+func _resolve_recovery_seconds(offer: Dictionary, outcome_band: String) -> int:
+	var base_minutes := maxi(1, int(offer.get("duration_minutes", 0)))
+	if base_minutes <= 1 and offer.has("duration_hours"):
+		base_minutes = maxi(1, int(offer.get("duration_hours", 1)) * 60)
+	var base_seconds := base_minutes * 60
+	var multiplier := float(OUTCOME_RECOVERY_MULTIPLIERS.get(outcome_band, 1.0))
+	return maxi(30, int(round(float(base_seconds) * multiplier)))
+
+
+func _roll_side_reward(offer: Dictionary, outcome_band: String) -> Dictionary:
+	var chance := clampf(float(OUTCOME_SIDE_REWARD_CHANCE.get(outcome_band, 0.0)), 0.0, 1.0)
+	if randf() > chance:
+		return {}
+	var base_supplies := maxi(1, int(offer.get("supplies_required", 1)))
+	var amount := maxi(1, int(round(float(base_supplies) * 0.35)))
+	return {
+		"type": "supplies",
+		"amount": amount,
+		"label": "+%d Supplies found during completion." % amount
+	}
+
+
+func _to_outcome_label(outcome_band: String) -> String:
+	match outcome_band:
+		OUTCOME_EXCELLENT:
+			return "Excellent"
+		OUTCOME_SOLID:
+			return "Solid"
+		OUTCOME_STRAINED:
+			return "Strained"
+		_:
+			return "Poor"
+
+
+func _build_outcome_summary(outcome_band: String, gold_payout: int, recovery_seconds: int) -> String:
+	var recovery_minutes := maxi(1, int(round(float(recovery_seconds) / 60.0)))
+	match outcome_band:
+		OUTCOME_EXCELLENT:
+			return "Excellent outcome: earned %d gold with quick crew recovery (~%d min)." % [gold_payout, recovery_minutes]
+		OUTCOME_SOLID:
+			return "Solid outcome: earned %d gold. Crew is recovering (~%d min)." % [gold_payout, recovery_minutes]
+		OUTCOME_STRAINED:
+			return "Strained outcome: reduced payout (%d gold) and longer recovery (~%d min)." % [gold_payout, recovery_minutes]
+		_:
+			return "Poor outcome: low payout (%d gold) and heavy recovery burden (~%d min)." % [gold_payout, recovery_minutes]
+
+
 func _sanitize_recovery_entries(value: Variant) -> Array[Dictionary]:
 	var output: Array[Dictionary] = []
 	if not (value is Array):
@@ -224,4 +405,5 @@ func _normalize_crew_state(state: Dictionary) -> Dictionary:
 	normalized["recovering_crew"] = recovering
 	normalized["available_crew"] = available
 	normalized["supplies"] = maxi(0, int(normalized.get("supplies", 0)))
+	normalized["standing"] = int(normalized.get("standing", 0))
 	return normalized

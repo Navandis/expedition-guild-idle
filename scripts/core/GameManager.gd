@@ -158,6 +158,12 @@ func _show_commission_board() -> void:
 		_commission_board_controller.navigate_requested.connect(_on_global_navigation_requested)
 		_commission_board_controller.commission_dispatch_requested.connect(_on_commission_dispatch_requested)
 
+	# Process ready recovery entries whenever players revisit this screen so crew
+	# burden is visible but does not require a full app restart to clear.
+	var recovered_now := _commission_resolver.process_crew_recovery()
+	if recovered_now > 0:
+		_save_runtime_state()
+
 	_commission_board_controller.set_board_context(
 		_get_unlocked_region_ids_for_commissions(),
 		_commission_resolver.get_available_crew(),
@@ -374,9 +380,10 @@ func _on_report_close_requested() -> void:
 	_show_guild_hall()
 
 
-func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, commitment: Dictionary, _offer_snapshot: Dictionary) -> void:
-	# Commission accept in this prototype is also immediate dispatch.
-	# We commit runtime resources first, then the board controller removes/refills.
+func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, commitment: Dictionary, offer_snapshot: Dictionary) -> void:
+	# Commission accept in this prototype is also immediate dispatch + completion.
+	# This keeps the first gold loop simple: accept -> resolve outcome -> payout.
+	# Board replenishment still happens on acceptance via handle_dispatch_result().
 	var crew_cost := maxi(0, int(commitment.get("crew_commitment", 0)))
 	var supplies_cost := maxi(0, int(commitment.get("supplies_commitment", 0)))
 
@@ -399,16 +406,32 @@ func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, c
 		)
 		return
 
+	# Outcome resolution is centralized in CommissionResolver to keep UI scripts
+	# data-binding focused and to avoid mixing authored offer content with runtime
+	# mutable state such as payout/standing/recovery burdens.
+	var completion := _commission_resolver.resolve_commission_completion(
+		offer_snapshot,
+		prep_tier_id,
+		commitment
+	)
+	var gold_payout := maxi(0, int(completion.get("gold_payout", 0)))
+	_resources["gold"] = int(_resources.get("gold", 0)) + gold_payout
+
 	_save_runtime_state()
 	_commission_board_controller.set_board_context(
 		_get_unlocked_region_ids_for_commissions(),
 		_commission_resolver.get_available_crew(),
 		_commission_resolver.get_supplies()
 	)
+	var outcome_label := str(completion.get("outcome_label", "Solid"))
+	var side_reward := completion.get("side_reward", {}) as Dictionary
+	var side_text := ""
+	if not side_reward.is_empty():
+		side_text = " %s" % str(side_reward.get("label", "")).strip_edges()
 	_commission_board_controller.handle_dispatch_result(
 		true,
 		offer_id,
-		"Dispatched now (%s). Crew and Supplies committed immediately." % prep_tier_id.capitalize()
+		"%s outcome: +%d Gold. Crew moved to Recovering.%s" % [outcome_label, gold_payout, side_text]
 	)
 
 
