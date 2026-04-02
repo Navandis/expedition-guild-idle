@@ -27,11 +27,32 @@ var _offer_id := ""
 
 
 func _ready() -> void:
+	_configure_drag_passthrough()
 	_inspect_button.pressed.connect(func() -> void:
 		if _offer_id.is_empty():
 			return
 		inspect_requested.emit(_offer_id)
 	)
+
+
+func _configure_drag_passthrough() -> void:
+	# Cards live inside a horizontal ScrollContainer on the board screen.
+	# PASS/IGNORE keeps taps working while allowing swipe drags that start on
+	# card content (labels/button) to continue scrolling the parent container.
+	mouse_filter = Control.MOUSE_FILTER_PASS
+	_set_descendant_mouse_filter(self)
+
+
+func _set_descendant_mouse_filter(node: Node) -> void:
+	for child in node.get_children():
+		if not child is Control:
+			continue
+		var control := child as Control
+		if control == _inspect_button:
+			control.mouse_filter = Control.MOUSE_FILTER_PASS
+		else:
+			control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_set_descendant_mouse_filter(control)
 
 
 func set_offer_data(offer: Dictionary) -> void:

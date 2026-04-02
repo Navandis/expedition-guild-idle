@@ -11,6 +11,12 @@ class_name CommissionBoardScreenController
 # The board is intentionally finite/curated (3 visible offers): no infinite list,
 # no expiry timers, and no auto-reroll loops. Standard offers persist until a
 # future accept/refresh action replaces them.
+#
+# Layout note for this quick pass:
+# - The 3 visible cards now live in a horizontal ScrollContainer with bounded
+#   height, so portrait screens keep dispatch confirmation controls visible.
+# - Card content/behavior is unchanged; only presentation was shifted from a
+#   tall vertical stack to a compact horizontal row.
 
 signal navigate_requested(target_screen: String)
 signal commission_dispatch_requested(offer_id: String, prep_tier_id: String, commitment: Dictionary, offer_snapshot: Dictionary)
@@ -19,10 +25,11 @@ const _VISIBLE_CARD_COUNT := 3
 
 @onready var _crew_summary_label: Label = $MainMargin/MainColumn/HeaderPanel/HeaderMargin/HeaderColumn/CrewSummaryLabel
 @onready var _board_hint_label: Label = $MainMargin/MainColumn/HeaderPanel/HeaderMargin/HeaderColumn/BoardHintLabel
-@onready var _cards_column: VBoxContainer = $MainMargin/MainColumn/BoardPanel/BoardMargin/CardsColumn
-@onready var _card_slot_1: CommissionCardView = $MainMargin/MainColumn/BoardPanel/BoardMargin/CardsColumn/CommissionCardSlot1
-@onready var _card_slot_2: CommissionCardView = $MainMargin/MainColumn/BoardPanel/BoardMargin/CardsColumn/CommissionCardSlot2
-@onready var _card_slot_3: CommissionCardView = $MainMargin/MainColumn/BoardPanel/BoardMargin/CardsColumn/CommissionCardSlot3
+@onready var _offers_scroll: ScrollContainer = $MainMargin/MainColumn/BoardPanel/BoardMargin/OffersScroll
+@onready var _cards_row: HBoxContainer = $MainMargin/MainColumn/BoardPanel/BoardMargin/OffersScroll/CardsRow
+@onready var _card_slot_1: CommissionCardView = $MainMargin/MainColumn/BoardPanel/BoardMargin/OffersScroll/CardsRow/CommissionCardSlot1
+@onready var _card_slot_2: CommissionCardView = $MainMargin/MainColumn/BoardPanel/BoardMargin/OffersScroll/CardsRow/CommissionCardSlot2
+@onready var _card_slot_3: CommissionCardView = $MainMargin/MainColumn/BoardPanel/BoardMargin/OffersScroll/CardsRow/CommissionCardSlot3
 @onready var _detail_panel_container: MarginContainer = $MainMargin/MainColumn/DetailPanelContainer
 @onready var _detail_panel: CommissionDetailPanelController = $MainMargin/MainColumn/DetailPanelContainer/CommissionDetailPanel
 @onready var _bottom_nav: BottomNavBar = $BottomNavSafe/BottomNavBar
@@ -41,13 +48,29 @@ func _ready() -> void:
 		navigate_requested.emit(target_screen)
 	)
 
-	# Scene-authored card nodes are fixed at 3 to emphasize curated board scope.
-	_cards_column.alignment = BoxContainer.ALIGNMENT_BEGIN
+	# Scene-authored card nodes are still fixed at 3 to emphasize curated scope.
+	# Only the container changed: horizontal scroll bounds card height so the
+	# detail/dispatch confirmation panel remains usable on smaller screens.
+	_cards_row.alignment = BoxContainer.ALIGNMENT_BEGIN
+	_hide_scrollbars(_offers_scroll)
 	_wire_card_actions()
 	_wire_detail_panel()
 	_ensure_board_generated()
 	_bind_board_cards()
 	_refresh_resource_summary()
+
+
+func _hide_scrollbars(scroll_container: ScrollContainer) -> void:
+	# Hide bar chrome because this is a small mobile carousel-style row.
+	# Drag/touch still works, but the bounded row looks cleaner.
+	var h_scroll := scroll_container.get_h_scroll_bar()
+	if h_scroll != null:
+		h_scroll.visible = false
+		h_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var v_scroll := scroll_container.get_v_scroll_bar()
+	if v_scroll != null:
+		v_scroll.visible = false
+		v_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func set_board_context(unlocked_region_ids: Array[String], available_crew: int, available_supplies: int) -> void:
