@@ -4,20 +4,21 @@ class_name CommissionDetailPanelController
 # File: CommissionDetailPanelController.gd
 # Commission confirmation panel shown before dispatching a board offer.
 #
-# Key rule for this prototype: accepting a commission dispatches immediately.
-# This panel is the only confirmation step; there is no accepted-but-idle queue.
+# Temporary readability pass notes:
+# - The old TitleLabel and DispatchHintLabel were removed from the scene because
+#   the panel is now opened from clear card buttons and no longer needs extra
+#   duplicate instruction text.
+# - Dispatch behavior itself is unchanged: confirm still dispatches immediately.
 
 signal closed
 signal dispatch_pressed(offer: Dictionary, prep_tier_id: String, commitment: Dictionary)
 
-@onready var _title_label: Label = $DetailMargin/DetailColumn/TitleLabel
 @onready var _offer_name_label: Label = $DetailMargin/DetailColumn/OfferNameLabel
 @onready var _region_label: Label = $DetailMargin/DetailColumn/RegionLabel
 @onready var _reward_label: Label = $DetailMargin/DetailColumn/RewardLabel
 @onready var _risk_label: Label = $DetailMargin/DetailColumn/RiskLabel
 @onready var _suitability_label: Label = $DetailMargin/DetailColumn/SuitabilityLabel
 @onready var _operational_label: Label = $DetailMargin/DetailColumn/OperationalInputsLabel
-@onready var _dispatch_hint_label: Label = $DetailMargin/DetailColumn/DispatchHintLabel
 @onready var _status_label: Label = $DetailMargin/DetailColumn/StatusLabel
 @onready var _prep_selector: PrepTierSelector = $DetailMargin/DetailColumn/PrepTierSelector
 @onready var _cancel_button: Button = $DetailMargin/DetailColumn/ButtonsRow/CancelButton
@@ -80,7 +81,6 @@ func _refresh_view() -> void:
 	var risk_text := _build_risk_text(_selected_offer, tier)
 	var suitability_text := _build_suitability_text(_selected_offer)
 
-	_title_label.text = "Commission Confirmation"
 	_offer_name_label.text = str(_selected_offer.get("brief_text", "Untitled Commission"))
 	_region_label.text = "Region: %s" % _resolve_region_name(_selected_offer)
 	_reward_label.text = "Reward: %s" % reward_text
@@ -92,7 +92,6 @@ func _refresh_view() -> void:
 		int(commitment.get("supplies_commitment", 0)),
 		_available_supplies
 	]
-	_dispatch_hint_label.text = "Dispatch is immediate on confirm. There is no accepted backlog queue in this prototype."
 
 	var can_dispatch := bool(commitment.get("has_enough_resources", false))
 	_dispatch_button.disabled = not can_dispatch

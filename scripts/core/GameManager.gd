@@ -203,7 +203,8 @@ func _show_commission_board() -> void:
 	_commission_board_controller.set_board_context(
 		_get_unlocked_region_ids_for_commissions(),
 		_commission_resolver.get_available_crew(),
-		_commission_resolver.get_supplies()
+		_commission_resolver.get_supplies(),
+		int(_resources.get("gold", 0))
 	)
 	_show_screen(_commission_board_controller)
 
@@ -457,7 +458,8 @@ func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, c
 	_commission_board_controller.set_board_context(
 		_get_unlocked_region_ids_for_commissions(),
 		_commission_resolver.get_available_crew(),
-		_commission_resolver.get_supplies()
+		_commission_resolver.get_supplies(),
+		int(_resources.get("gold", 0))
 	)
 	var outcome_label := str(completion.get("outcome_label", "Solid"))
 	var side_reward := completion.get("side_reward", {}) as Dictionary
