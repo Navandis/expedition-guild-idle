@@ -306,8 +306,10 @@ func _resolve_base_gold(offer: Dictionary) -> int:
 
 
 func _resolve_recovery_seconds(offer: Dictionary, outcome_band: String) -> int:
-	var base_hours := maxi(1, int(offer.get("duration_hours", 1)))
-	var base_seconds := base_hours * 60 * 60
+	var base_minutes := maxi(1, int(offer.get("duration_minutes", 0)))
+	if base_minutes <= 1 and offer.has("duration_hours"):
+		base_minutes = maxi(1, int(offer.get("duration_hours", 1)) * 60)
+	var base_seconds := base_minutes * 60
 	var multiplier := float(OUTCOME_RECOVERY_MULTIPLIERS.get(outcome_band, 1.0))
 	return maxi(30, int(round(float(base_seconds) * multiplier)))
 
