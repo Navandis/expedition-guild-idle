@@ -71,7 +71,7 @@ var _commission_resolver := CommissionResolver.new()
 var _save_manager := SaveManager.new()
 var _new_game_start_conditions := DEFAULT_NEW_GAME_START_CONDITIONS.duplicate(true)
 var _resources := DEFAULT_RESOURCES.duplicate(true)
-var _slot_capacities := DEFAULT_NEW_GAME_START_CONDITIONS.get("starting_slot_capacities", {}).duplicate(true)
+var _slot_capacities: Dictionary = DEFAULT_NEW_GAME_START_CONDITIONS.get("starting_slot_capacities", {}).duplicate(true)
 var _expedition_board_offers: Array[Dictionary] = []
 
 var _guild_hall_controller: GuildHallController
