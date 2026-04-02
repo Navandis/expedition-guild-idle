@@ -539,7 +539,7 @@ func _load_new_game_start_conditions() -> Dictionary:
 	var raw_text := file.get_as_text()
 	file.close()
 
-	var parsed := JSON.parse_string(raw_text)
+	var parsed: Variant = JSON.parse_string(raw_text)
 	if not (parsed is Dictionary):
 		push_warning("GameManager: start conditions JSON must be a dictionary; using fallback defaults.")
 		return DEFAULT_NEW_GAME_START_CONDITIONS.duplicate(true)
