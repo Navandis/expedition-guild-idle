@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/ui/CommissionBoardScreenController.gd" id="1_commission_board_script"]
 [ext_resource type="PackedScene" uid="uid://dtg2qlkhl3o3m" path="res://scenes/components/CommissionCard.tscn" id="2_commission_card"]
 [ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="3_nav"]
+[ext_resource type="PackedScene" uid="uid://oi6qo74ipqei" path="res://scenes/components/CommissionDetailPanel.tscn" id="4_detail"]
 
 [node name="CommissionBoard" type="Control" unique_id=1523872121]
 layout_mode = 3
@@ -80,6 +81,19 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="CommissionCardSlot3" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/CardsColumn" unique_id=1523872135 instance=ExtResource("2_commission_card")]
+layout_mode = 2
+
+
+[node name="DetailPanelContainer" type="MarginContainer" parent="MainMargin/MainColumn" unique_id=1523872138]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="CommissionDetailPanel" parent="MainMargin/MainColumn/DetailPanelContainer" unique_id=1523872139 instance=ExtResource("4_detail")]
 layout_mode = 2
 
 [node name="BottomNavSafe" type="MarginContainer" parent="." unique_id=1523872136]

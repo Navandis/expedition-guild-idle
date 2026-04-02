@@ -64,3 +64,7 @@ text = "Crew Needed: --   Supplies Needed: --"
 layout_mode = 2
 text = "Recommended knowledge: --"
 autowrap_mode = 3
+
+[node name="InspectButton" type="Button" parent="CardMargin/CardColumn" unique_id=191010013]
+layout_mode = 2
+text = "Inspect & Dispatch"

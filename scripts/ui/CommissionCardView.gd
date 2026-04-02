@@ -10,6 +10,8 @@ class_name CommissionCardView
 # - This script only binds generated commission data into that authored layout.
 # - The card intentionally stays compact/readable for a 3-offer curated board.
 
+signal inspect_requested(offer_id: String)
+
 @onready var _patron_label: Label = $CardMargin/CardColumn/PatronLabel
 @onready var _family_label: Label = $CardMargin/CardColumn/FamilyLabel
 @onready var _title_label: Label = $CardMargin/CardColumn/TitleLabel
@@ -19,11 +21,23 @@ class_name CommissionCardView
 @onready var _reward_label: Label = $CardMargin/CardColumn/RewardLabel
 @onready var _requirements_label: Label = $CardMargin/CardColumn/RequirementsLabel
 @onready var _note_label: Label = $CardMargin/CardColumn/NoteLabel
+@onready var _inspect_button: Button = $CardMargin/CardColumn/InspectButton
+
+var _offer_id := ""
+
+
+func _ready() -> void:
+	_inspect_button.pressed.connect(func() -> void:
+		if _offer_id.is_empty():
+			return
+		inspect_requested.emit(_offer_id)
+	)
 
 
 func set_offer_data(offer: Dictionary) -> void:
 	# Data arrives from CommissionBoardScreenController, which receives board data
 	# from CommissionBoardController/CommissionGenerator.
+	_offer_id = str(offer.get("offer_id", "")).strip_edges()
 	var patron_name := str(offer.get("patron_name", "Unknown Patron"))
 	var family_name := str(offer.get("family_name", "Unknown Family"))
 	var brief_text := str(offer.get("brief_text", "Untitled Commission"))
@@ -45,10 +59,12 @@ func set_offer_data(offer: Dictionary) -> void:
 	_requirements_label.text = "Crew Needed: %d   Supplies Needed: %d" % [crew_needed, supplies_needed]
 	_note_label.text = note_text
 	_note_label.visible = not note_text.is_empty()
+	_inspect_button.disabled = _offer_id.is_empty()
 
 
 func set_empty_state(slot_index: int) -> void:
 	# Keeps the 3-card board visually finite even before all slots are populated.
+	_offer_id = ""
 	_patron_label.text = "Patron: --"
 	_family_label.text = "Family: --"
 	_title_label.text = "No commission in this slot"
@@ -59,11 +75,12 @@ func set_empty_state(slot_index: int) -> void:
 	_requirements_label.text = "Crew Needed: --   Supplies Needed: --"
 	_note_label.text = "Slot %d is currently empty." % (slot_index + 1)
 	_note_label.visible = true
+	_inspect_button.disabled = true
 
 
 func _build_reward_text(offer: Dictionary) -> String:
 	var reward := offer.get("reward_scaffold", {}) as Dictionary
-	var gold := maxi(0, int(reward.get("base_gold", 0)))
+	var gold := maxi(0, int(reward.get("base_gold", reward.get("estimated_gold", 0))))
 	var relics := maxi(0, int(reward.get("base_relic_fragments", 0)))
 	if gold <= 0 and relics <= 0:
 		return "Varies"
