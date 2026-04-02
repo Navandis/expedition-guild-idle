@@ -111,6 +111,8 @@ func _coerce_commission_resources(value: Variant) -> Dictionary:
 		"recovering_crew": recovering_crew,
 		# Supplies v1 intentionally stays one single resource bucket.
 		"supplies": maxi(0, int(source.get("supplies", 50))),
+		# Standing scaffold is runtime progress, kept outside authored JSON.
+		"standing": int(source.get("standing", 0)),
 		# Keep entries serializable now so later offline/passive recovery can read them.
 		"crew_recovery_entries": entries
 	}
