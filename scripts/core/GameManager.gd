@@ -580,6 +580,9 @@ func _apply_new_game_start_conditions_baseline() -> void:
 		"available_crew": maxi(0, int(crew.get("available", 20))),
 		"assigned_crew": maxi(0, int(crew.get("assigned", 0))),
 		"recovering_crew": maxi(0, int(crew.get("recovering", 0))),
+		# Keep authored new-game availability as-is instead of auto-filling
+		# to max_crew; this preserves intended early-game pacing.
+		"preserve_sparse_crew_state": true,
 		"supplies": maxi(0, int(resources.get("supplies", 10))),
 		"standing": 0,
 		"crew_recovery_entries": []

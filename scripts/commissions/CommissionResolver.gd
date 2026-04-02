@@ -87,6 +87,9 @@ func build_runtime_snapshot() -> Dictionary:
 func restore_runtime_snapshot(snapshot: Variant) -> void:
 	# Load-safe sanitize path. Missing keys fall back to defaults.
 	var source := snapshot as Dictionary if snapshot is Dictionary else {}
+	# Optional flag for authored new-game baselines that intentionally start
+	# below max crew availability (for early-game pacing/balance).
+	var preserve_sparse_crew_state := bool(source.get("preserve_sparse_crew_state", false))
 	var max_crew := maxi(0, int(source.get("max_crew", int(DEFAULT_RUNTIME_STATE.get("max_crew", 10)))))
 	var assigned_crew := maxi(0, int(source.get("assigned_crew", 0)))
 	var recovering_crew := maxi(0, int(source.get("recovering_crew", 0)))
@@ -102,7 +105,7 @@ func restore_runtime_snapshot(snapshot: Variant) -> void:
 		"standing": int(source.get("standing", int(DEFAULT_RUNTIME_STATE.get("standing", 0)))),
 		"crew_recovery_entries": _sanitize_recovery_entries(source.get("crew_recovery_entries", []))
 	}
-	_runtime_state = _normalize_crew_state(state)
+	_runtime_state = _normalize_crew_state(state, preserve_sparse_crew_state)
 
 
 func resolve_commission_completion(offer: Dictionary, prep_tier_id: String, commitment: Dictionary) -> Dictionary:
@@ -373,7 +376,7 @@ func _sanitize_recovery_entries(value: Variant) -> Array[Dictionary]:
 	return output
 
 
-func _normalize_crew_state(state: Dictionary) -> Dictionary:
+func _normalize_crew_state(state: Dictionary, preserve_sparse_crew_state: bool = false) -> Dictionary:
 	# Keep pools coherent so later systems can trust this shape.
 	var normalized := state.duplicate(true)
 	var max_crew := maxi(0, int(normalized.get("max_crew", 0)))
@@ -396,7 +399,7 @@ func _normalize_crew_state(state: Dictionary) -> Dictionary:
 			assigned = maxi(0, assigned - overflow)
 
 	total = assigned + recovering + available
-	if total < max_crew:
+	if total < max_crew and not preserve_sparse_crew_state:
 		# Fill idle gap so crew pools always account for max_crew.
 		available += (max_crew - total)
 
