@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://s6valn5dvncq"]
 
-[ext_resource type="Script" path="res://scripts/ui/CommissionBoardScreenController.gd" id="1_commission_board_script"]
+[ext_resource type="Script" uid="uid://bgbblrj4ndjhw" path="res://scripts/ui/CommissionBoardScreenController.gd" id="1_commission_board_script"]
 [ext_resource type="PackedScene" uid="uid://dtg2qlkhl3o3m" path="res://scenes/components/CommissionCard.tscn" id="2_commission_card"]
 [ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="3_nav"]
 [ext_resource type="PackedScene" uid="uid://oi6qo74ipqei" path="res://scenes/components/CommissionDetailPanel.tscn" id="4_detail"]
@@ -46,6 +46,7 @@ layout_mode = 2
 theme_override_constants/separation = 3
 
 [node name="TitleLabel" type="Label" parent="MainMargin/MainColumn/HeaderPanel/HeaderMargin/HeaderColumn" unique_id=1523872127]
+visible = false
 layout_mode = 2
 text = "Commission Board"
 
@@ -54,13 +55,14 @@ layout_mode = 2
 text = "Available Crew: --   Supplies: --"
 
 [node name="BoardHintLabel" type="Label" parent="MainMargin/MainColumn/HeaderPanel/HeaderMargin/HeaderColumn" unique_id=1523872129]
+visible = false
 layout_mode = 2
 text = "Showing 3 curated offers."
 autowrap_mode = 3
 
 [node name="BoardPanel" type="PanelContainer" parent="MainMargin/MainColumn" unique_id=1523872130]
-layout_mode = 2
 custom_minimum_size = Vector2(0, 164)
+layout_mode = 2
 
 [node name="BoardMargin" type="MarginContainer" parent="MainMargin/MainColumn/BoardPanel" unique_id=1523872131]
 layout_mode = 2
@@ -73,7 +75,7 @@ theme_override_constants/margin_bottom = 6
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 3
-horizontal_scroll_mode = 1
+horizontal_scroll_mode = 3
 vertical_scroll_mode = 0
 
 [node name="CardsRow" type="HBoxContainer" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/OffersScroll" unique_id=1523872132]
@@ -92,7 +94,6 @@ layout_mode = 2
 [node name="CommissionCardSlot3" parent="MainMargin/MainColumn/BoardPanel/BoardMargin/OffersScroll/CardsRow" unique_id=1523872135 instance=ExtResource("2_commission_card")]
 custom_minimum_size = Vector2(252, 132)
 layout_mode = 2
-
 
 [node name="DetailPanelContainer" type="MarginContainer" parent="MainMargin/MainColumn" unique_id=1523872138]
 visible = false
