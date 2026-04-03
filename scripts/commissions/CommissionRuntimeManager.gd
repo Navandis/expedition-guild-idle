@@ -83,7 +83,7 @@ func start_commission(
 	if not can_start_commission(current_slot_capacity):
 		return {}
 
-	var now := now_unix if now_unix >= 0 else Time.get_unix_time_from_system()
+	var now: int = now_unix if now_unix >= 0 else int(Time.get_unix_time_from_system())
 	var duration_seconds := _resolve_duration_seconds(offer_snapshot)
 	var runtime_id := _next_runtime_id
 	_next_runtime_id += 1
@@ -116,7 +116,7 @@ func start_commission(
 
 func process_time_progress(now_unix: int = -1) -> int:
 	# Promote finished active entries into ready-to-claim entries.
-	var now := now_unix if now_unix >= 0 else Time.get_unix_time_from_system()
+	var now: int = now_unix if now_unix >= 0 else int(Time.get_unix_time_from_system())
 	var active_remaining: Array[Dictionary] = []
 	var ready_claimable := get_ready_to_claim_entries()
 	var promoted_count := 0
