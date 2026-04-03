@@ -74,7 +74,7 @@ func set_offer_data(offer: Dictionary) -> void:
 	_family_label.text = "Family: %s" % family_name
 	_title_label.text = brief_text
 	_region_label.text = "Region: %s" % region_name
-	_duration_label.text = "Duration: %d min" % duration_minutes if duration_minutes > 0 else "Duration: Unknown"
+	_duration_label.text = "Duration: %s" % TimeFormat.format_minutes_hms(duration_minutes) if duration_minutes > 0 else "Duration: Unknown"
 	_risk_label.text = "Risk: %s" % risk_band
 	_reward_label.text = "Reward: %s" % reward_text
 	_requirements_label.text = "Crew Needed: %d   Supplies Needed: %d" % [crew_needed, supplies_needed]

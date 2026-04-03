@@ -58,7 +58,8 @@ func save_game_state(state: Dictionary) -> bool:
 		"selected_region_id": str(state.get("selected_region_id", "")),
 		"active_expeditions": _coerce_dictionary_array(state.get("active_expeditions", [])),
 		"pending_reports": _coerce_dictionary_array(state.get("pending_reports", [])),
-		"expedition_board_offers": _coerce_dictionary_array(state.get("expedition_board_offers", []))
+		"expedition_board_offers": _coerce_dictionary_array(state.get("expedition_board_offers", [])),
+		"commission_board_snapshot": _coerce_dictionary(state.get("commission_board_snapshot", {}))
 	}
 
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)

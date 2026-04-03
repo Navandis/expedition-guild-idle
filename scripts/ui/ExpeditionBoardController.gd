@@ -432,7 +432,7 @@ func _show_detail_overlay(expedition_data: Dictionary) -> void:
 	var risk := str(expedition_data.get("risk_label", "Unknown"))
 
 	_detail_title_label.text = title
-	_detail_duration_label.text = "Duration: %s" % ("%d min" % duration_minutes if duration_minutes > 0 else "? min")
+	_detail_duration_label.text = "Duration: %s" % (TimeFormat.format_minutes_hms(duration_minutes) if duration_minutes > 0 else "?")
 	_detail_reward_label.text = "Reward: %s" % reward
 	_detail_risk_label.text = "Risk: %s" % risk
 	_detail_overlay.visible = true

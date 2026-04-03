@@ -80,9 +80,9 @@ func _refresh_labels() -> void:
 	_name_label.text = str(preview.get("display_name", "Unknown Expedition"))
 	var duration_minutes := int(preview.get("duration_minutes", 0))
 	if duration_minutes <= 0:
-		_duration_label.text = "Duration: ? min"
+		_duration_label.text = "Duration: ?"
 	else:
-		_duration_label.text = "Duration: %d min" % duration_minutes
+		_duration_label.text = "Duration: %s" % TimeFormat.format_minutes_hms(duration_minutes)
 
 	_risk_label.text = "Risk: %s" % str(preview.get("risk_label", "Unknown"))
 	# Player-facing text should use display names, not internal IDs.

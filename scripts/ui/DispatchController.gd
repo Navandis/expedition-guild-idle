@@ -33,7 +33,8 @@ func set_expedition_data(expedition_data: Dictionary) -> void:
 	# Store a deep copy so this screen has stable data even if upstream UI changes.
 	_expedition_data = expedition_data.duplicate(true)
 	_name_label.text = "Name: %s" % str(_expedition_data.get("display_name", "Unknown Expedition"))
-	_duration_label.text = "Duration: %s min" % str(_expedition_data.get("duration_minutes", "?"))
+	var duration_minutes := int(_expedition_data.get("duration_minutes", 0))
+	_duration_label.text = "Duration: %s" % (TimeFormat.format_minutes_hms(duration_minutes) if duration_minutes > 0 else "?")
 	_risk_label.text = "Risk: %s" % str(_expedition_data.get("risk_label", "Unknown"))
 
 
