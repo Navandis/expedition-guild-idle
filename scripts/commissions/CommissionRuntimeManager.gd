@@ -128,6 +128,7 @@ func process_time_progress(now_unix: int = -1) -> Array[Dictionary]:
 			var completed := entry.duplicate(true)
 			completed["state"] = "ready_to_claim"
 			completed["completed_at_unix"] = now
+			completed["crew_transition_applied"] = false
 			ready_claimable.append(completed)
 			promoted_entries.append(completed.duplicate(true))
 		else:
@@ -167,6 +168,22 @@ func claim_ready_entry(runtime_id: int) -> Dictionary:
 	return claimed
 
 
+func mark_ready_entries_crew_transition_applied(runtime_ids: Array[int]) -> void:
+	if runtime_ids.is_empty():
+		return
+	var lookup: Dictionary = {}
+	for runtime_id in runtime_ids:
+		lookup[runtime_id] = true
+	var updated: Array[Dictionary] = []
+	for row in get_ready_to_claim_entries():
+		var patched := row.duplicate(true)
+		var runtime_id := int(patched.get("runtime_id", 0))
+		if bool(lookup.get(runtime_id, false)):
+			patched["crew_transition_applied"] = true
+		updated.append(patched)
+	_runtime_state["ready_to_claim_entries"] = updated
+
+
 func _sanitize_runtime_entries(entries: Variant, ready_bucket: bool) -> Array[Dictionary]:
 	var rows: Array[Dictionary] = []
 	if not (entries is Array):
@@ -197,6 +214,7 @@ func _sanitize_runtime_entries(entries: Variant, ready_bucket: bool) -> Array[Di
 			"ready_at_unix": ready_at,
 			"duration_seconds": maxi(30, int(row.get("duration_seconds", ready_at - started_at))),
 			"completed_at_unix": maxi(0, int(row.get("completed_at_unix", 0))),
+			"crew_transition_applied": bool(row.get("crew_transition_applied", false)),
 			"completion_payload": completion_payload.duplicate(true)
 		})
 	return rows

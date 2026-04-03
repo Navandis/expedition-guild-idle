@@ -332,9 +332,7 @@ func _on_debug_finish_requested() -> void:
 	# Debug helper now also force-completes in-progress commissions so QA can
 	# verify active -> claimable transitions without waiting full durations.
 	var forced_rows := _commission_runtime_manager.debug_finish_all_active()
-	for row in forced_rows:
-		var payload := (row as Dictionary).get("completion_payload", {}) as Dictionary
-		_commission_resolver.apply_completion_crew_transition(payload)
+	_apply_completion_crew_transition_for_rows(forced_rows)
 	# Persist immediately so force-completed slots/reports survive app restarts.
 	_save_runtime_state()
 	_refresh_guild_hall_commission_and_resources()
@@ -584,9 +582,7 @@ func _on_commission_claim_requested(runtime_id: int) -> void:
 
 	var newly_ready := _commission_runtime_manager.process_time_progress()
 	if not newly_ready.is_empty():
-		for row in newly_ready:
-			var payload := (row as Dictionary).get("completion_payload", {}) as Dictionary
-			_commission_resolver.apply_completion_crew_transition(payload)
+		_apply_completion_crew_transition_for_rows(newly_ready)
 	var claimed := _commission_runtime_manager.claim_ready_entry(runtime_id)
 	if claimed.is_empty():
 		# If the selected row was still active, status refresh is enough.
@@ -596,6 +592,10 @@ func _on_commission_claim_requested(runtime_id: int) -> void:
 		return
 
 	var completion_payload := claimed.get("completion_payload", {}) as Dictionary
+	if not bool(claimed.get("crew_transition_applied", false)):
+		# Migration safety: legacy saves may contain ready rows created before
+		# completion-time transitions existed, so apply once at claim.
+		_commission_resolver.apply_completion_crew_transition(completion_payload)
 	_commission_resolver.apply_completion_claim_rewards(completion_payload)
 	var gold_payout := maxi(0, int(completion_payload.get("gold_payout", 0)))
 	if gold_payout > 0:
@@ -794,10 +794,19 @@ func _process_commission_runtime_progress(now_unix: int = -1) -> bool:
 	var promoted_rows := _commission_runtime_manager.process_time_progress(now_unix)
 	if promoted_rows.is_empty():
 		return false
-	for row in promoted_rows:
-		var payload := (row as Dictionary).get("completion_payload", {}) as Dictionary
-		_commission_resolver.apply_completion_crew_transition(payload)
+	_apply_completion_crew_transition_for_rows(promoted_rows)
 	return true
+
+
+func _apply_completion_crew_transition_for_rows(rows: Array[Dictionary]) -> void:
+	if rows.is_empty():
+		return
+	var transitioned_runtime_ids: Array[int] = []
+	for row in rows:
+		var payload := row.get("completion_payload", {}) as Dictionary
+		_commission_resolver.apply_completion_crew_transition(payload)
+		transitioned_runtime_ids.append(int(row.get("runtime_id", 0)))
+	_commission_runtime_manager.mark_ready_entries_crew_transition_applied(transitioned_runtime_ids)
 
 
 func _refresh_guild_hall_commission_and_resources() -> void:
