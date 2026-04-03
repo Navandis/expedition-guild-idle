@@ -83,10 +83,65 @@ texture = ExtResource("5_crew_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CrewValueLabel" type="Label" parent="TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row" unique_id=260001013]
+[node name="CrewDropdownButton" type="Button" parent="TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "0"
+flat = true
+text = "▼"
+icon_alignment = 2
+alignment = 2
+
+[node name="CrewCollapsedValue" type="RichTextLabel" parent="TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_right = -22.0
+grow_horizontal = 2
+grow_vertical = 2
+bbcode_enabled = true
+text = "[color=#6EEB74]0[/color] / 0"
+horizontal_alignment = 2
+vertical_alignment = 1
+fit_content = true
+scroll_active = false
+mouse_filter = 2
+
+[node name="CrewDropdownPopup" type="PopupPanel" parent="TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter"]
+initial_position = 0
+size = Vector2i(110, 72)
+visible = false
+
+[node name="CrewDropdownMargin" type="MarginContainer" parent="TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CrewDropdownValues" type="VBoxContainer" parent="TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="AssignedCrewValueLabel" type="RichTextLabel" parent="TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[color=#F5D547]0[/color]"
+fit_content = true
+scroll_active = false
+horizontal_alignment = 2
+
+[node name="RecoveringCrewValueLabel" type="RichTextLabel" parent="TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[color=#F2A14A]0[/color]"
+fit_content = true
+scroll_active = false
 horizontal_alignment = 2
 
 [node name="SuppliesCounter" type="PanelContainer" parent="TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=260001014]

@@ -10,6 +10,8 @@ class_name CommissionBoardScreenController
 #   used on Guild Hall so testers read resources the same way on both screens.
 # - Use 2x3 placeholder commission card buttons (CM1-3 + Locked1-3) so taps are
 #   explicit and fast during playtesting.
+# - Mirror Guild Hall Crew dropdown behavior via a shared presenter helper so
+#   both screens show and expand Crew values identically.
 
 signal navigate_requested(target_screen: String)
 signal commission_dispatch_requested(offer_id: String, prep_tier_id: String, commitment: Dictionary, offer_snapshot: Dictionary)
@@ -19,7 +21,11 @@ const _UNLOCKED_CARD_COUNT := 3
 @onready var _top_half_area: Control = $TopHalfArea
 @onready var _resource_row_panel: PanelContainer = $TopHalfArea/TopHalfColumn/ResourceRowPanel
 @onready var _gold_value_label: Label = $TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
-@onready var _crew_value_label: Label = $TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewValueLabel
+@onready var _crew_dropdown_button: Button = $TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton
+@onready var _crew_collapsed_value: RichTextLabel = $TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton/CrewCollapsedValue
+@onready var _crew_dropdown_popup: PopupPanel = $TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup
+@onready var _assigned_crew_value_label: RichTextLabel = $TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues/AssignedCrewValueLabel
+@onready var _recovering_crew_value_label: RichTextLabel = $TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues/RecoveringCrewValueLabel
 @onready var _supplies_value_label: Label = $TopHalfArea/TopHalfColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter/Row/SuppliesValueLabel
 @onready var _cards_grid: GridContainer = $TopHalfArea/TopHalfColumn/CommissionCardsSection/CardsGrid
 @onready var _cm1_button: Button = $TopHalfArea/TopHalfColumn/CommissionCardsSection/CardsGrid/CM1Button
@@ -36,8 +42,12 @@ var _board_controller := CommissionBoardController.new()
 var _unlocked_region_ids: Array[String] = []
 var _current_gold := 0
 var _available_crew := 0
+var _assigned_crew := 0
+var _recovering_crew := 0
+var _max_crew := 0
 var _available_supplies := 0
 var _selected_offer: Dictionary = {}
+var _crew_dropdown_presenter := CrewDropdownPresenter.new()
 
 
 func _ready() -> void:
@@ -49,6 +59,14 @@ func _ready() -> void:
 
 	# The old BoardHintLabel/CrewSummaryLabel path was removed in scene authoring.
 	# Resource values now render inside the GuildHall-style ResourceRowPanel.
+	# Reuse the exact same presenter as Guild Hall so dropdown behavior stays synced.
+	_crew_dropdown_presenter.configure(
+		_crew_dropdown_button,
+		_crew_collapsed_value,
+		_crew_dropdown_popup,
+		_assigned_crew_value_label,
+		_recovering_crew_value_label
+	)
 	_wire_card_actions()
 	_wire_detail_panel()
 	_lock_placeholder_buttons()
@@ -59,11 +77,22 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_apply_top_half_bounds)
 
 
-func set_board_context(unlocked_region_ids: Array[String], available_crew: int, available_supplies: int, current_gold: int = 0) -> void:
+func set_board_context(
+	unlocked_region_ids: Array[String],
+	available_crew: int,
+	available_supplies: int,
+	current_gold: int = 0,
+	assigned_crew: int = 0,
+	recovering_crew: int = 0,
+	max_crew: int = 0
+) -> void:
 	_unlocked_region_ids = unlocked_region_ids.duplicate(true)
 	_available_crew = maxi(0, available_crew)
 	_available_supplies = maxi(0, available_supplies)
 	_current_gold = maxi(0, current_gold)
+	_assigned_crew = maxi(0, assigned_crew)
+	_recovering_crew = maxi(0, recovering_crew)
+	_max_crew = maxi(0, max_crew)
 	_ensure_board_generated()
 	if is_node_ready():
 		_bind_board_cards()
@@ -142,7 +171,12 @@ func _refresh_resource_summary() -> void:
 	# Keep this row consistent with Guild Hall style while using live runtime values.
 	# Gold is shared progression state and must not be hardcoded for playtests.
 	_gold_value_label.text = str(_current_gold)
-	_crew_value_label.text = str(_available_crew)
+	_crew_dropdown_presenter.set_values(
+		_available_crew,
+		_max_crew,
+		_assigned_crew,
+		_recovering_crew
+	)
 	_supplies_value_label.text = str(_available_supplies)
 
 

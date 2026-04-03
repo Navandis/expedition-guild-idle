@@ -59,6 +59,7 @@ const _SLOT_VISUAL_COMPLETED := "completed"
 @onready var _bottom_nav: BottomNavBar = $BottomNavSafe/BottomNavBar
 
 var _expedition_manager: ExpeditionManager
+var _crew_dropdown_presenter := CrewDropdownPresenter.new()
 var _resources := {
 	"gold": 0,
 	"available_crew": 0,
@@ -90,8 +91,13 @@ func _ready() -> void:
 	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
 	# Keep the top-row Crew counter compact: default state shows Available/Max.
 	# Tap opens a tiny popup with Assigned and Recovering values only.
-	_crew_dropdown_button.pressed.connect(_on_crew_dropdown_button_pressed)
-	_crew_dropdown_popup.popup_hide.connect(_on_crew_dropdown_popup_hidden)
+	_crew_dropdown_presenter.configure(
+		_crew_dropdown_button,
+		_crew_collapsed_value,
+		_crew_dropdown_popup,
+		_assigned_crew_value_label,
+		_recovering_crew_value_label
+	)
 	_build_cached_slot_styles()
 	# Preserve scene-authored horizontal padding so this script only owns vertical
 	# bounds for the middle section.
@@ -188,31 +194,7 @@ func _refresh_resource_labels() -> void:
 	var recovering_crew := int(_resources.get("recovering_crew", 0))
 	# Collapsed view intentionally shows the most "at a glance" crew signal:
 	# available units now versus hard cap for this profile.
-	_crew_collapsed_value.text = "[color=#6EEB74]%d[/color] / %d" % [available_crew, max_crew]
-	# Expanded popup keeps the extra details compact with color-only values:
-	# yellow for assigned and orange for recovering.
-	_assigned_crew_value_label.text = "[color=#F5D547]%d[/color]" % assigned_crew
-	_recovering_crew_value_label.text = "[color=#F2A14A]%d[/color]" % recovering_crew
-
-
-func _on_crew_dropdown_button_pressed() -> void:
-	if _crew_dropdown_popup.visible:
-		_crew_dropdown_popup.hide()
-		return
-
-	# PopupPanel gives dropdown-like behavior and auto-closes when focus moves
-	# elsewhere, which fits mobile tap workflows.
-	var button_rect := _crew_dropdown_button.get_global_rect()
-	_crew_dropdown_popup.position = Vector2i(
-		int(button_rect.position.x),
-		int(button_rect.position.y + button_rect.size.y + 2.0)
-	)
-	_crew_dropdown_popup.popup()
-	_crew_dropdown_button.text = "▲"
-
-
-func _on_crew_dropdown_popup_hidden() -> void:
-	_crew_dropdown_button.text = "▼"
+	_crew_dropdown_presenter.set_values(available_crew, max_crew, assigned_crew, recovering_crew)
 
 
 func _refresh_active_status() -> void:
