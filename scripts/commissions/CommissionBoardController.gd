@@ -60,25 +60,51 @@ func refresh_board_for_regions(unlocked_region_ids: Array[String]) -> Array[Dict
 
 func accept_offer(offer_id: String, unlocked_region_ids: Array[String]) -> Dictionary:
 	_ensure_authored_data_loaded()
-	# Accept flow removes the selected slot and refills one slot using current
-	# unlocked regions. This keeps board continuity without expirations.
+	# Slot-stability rule (CM1/CM2/CM3 readability):
+	# - When a player accepts an offer, replace that exact visible slot.
+	# - Do NOT remove-and-append, because that shifts neighboring cards and makes
+	#   "which commission was CM2/CM3?" harder to track at a glance.
+	# This keeps player mental mapping stable: accepted CM1 -> new CM1, etc.
 	var accepted: Dictionary = {}
-	var remaining: Array[Dictionary] = []
-	for offer in _visible_offers:
-		var row := offer as Dictionary
-		if accepted.is_empty() and str(row.get("offer_id", "")) == offer_id:
+	var accepted_index := -1
+	for i in range(_visible_offers.size()):
+		var row := _visible_offers[i] as Dictionary
+		if str(row.get("offer_id", "")) == offer_id:
 			accepted = row.duplicate(true)
-			continue
-		remaining.append(row.duplicate(true))
-	_visible_offers = remaining
+			accepted_index = i
+			break
 
 	if accepted.is_empty():
 		return {}
 
-	if _visible_offers.size() < _visible_offer_count:
-		var single := _generator.generate_single_offer(unlocked_region_ids, _visible_offers)
-		if not single.is_empty():
-			_visible_offers.append(single)
+	# Generate a replacement using the board without the accepted offer so
+	# composition scoring still sees the "other currently visible slots".
+	var board_without_accepted: Array[Dictionary] = []
+	for i in range(_visible_offers.size()):
+		if i == accepted_index:
+			continue
+		board_without_accepted.append((_visible_offers[i] as Dictionary).duplicate(true))
+
+	# Important: pass accepted_index so generator scores risk spread for the exact
+	# destination slot (CM1 vs CM2 vs CM3), not as a generic "last slot fill".
+	var single := _generator.generate_single_offer_for_slot(
+		unlocked_region_ids,
+		board_without_accepted,
+		accepted_index
+	)
+	if not single.is_empty():
+		# Core bug fix: write the replacement back into the same index instead of
+		# shifting all later cards left. This preserves CM slot identity.
+		_visible_offers[accepted_index] = single
+	else:
+		# Safety fallback: if generation fails, remove the accepted entry cleanly.
+		# We keep this explicit so runtime state is still valid.
+		_visible_offers.remove_at(accepted_index)
+		while _visible_offers.size() < _visible_offer_count:
+			var refill := _generator.generate_single_offer(unlocked_region_ids, _visible_offers)
+			if refill.is_empty():
+				break
+			_visible_offers.append(refill)
 
 	return accepted
 
