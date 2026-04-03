@@ -199,11 +199,12 @@ func _show_commission_board() -> void:
 	# Process ready recovery entries whenever players revisit this screen so crew
 	# burden is visible but does not require a full app restart to clear.
 	var recovered_now := _commission_resolver.process_crew_recovery()
-	# Active rows are timed jobs already in progress; ready rows are complete jobs
-	# waiting for explicit claim. We only promote to "ready" here and do NOT auto-
-	# claim, because payout is now part of a later claim step (not dispatch/open).
+	# Active rows are timed jobs already in progress and may become ready here.
 	var newly_ready := _commission_runtime_manager.process_time_progress()
-	if recovered_now > 0 or newly_ready > 0:
+	# There is currently no per-row claim UI path, so claim ready rows on board
+	# open to ensure completion payload rewards, standing, and crew release happen.
+	var claim_summary := _claim_all_ready_commissions()
+	if recovered_now > 0 or newly_ready > 0 or int(claim_summary.get("claimed_count", 0)) > 0:
 		_save_runtime_state()
 
 	_commission_board_controller.set_board_context(
@@ -558,6 +559,11 @@ func _load_runtime_state() -> void:
 	# Process delayed crew recovery on load so offline time can be honored later.
 	_commission_resolver.process_crew_recovery()
 	_commission_runtime_manager.process_time_progress()
+	# Load must keep a reward/cleanup claim path for jobs that already finished so
+	# assigned crew and rewards do not remain permanently stuck in ready rows.
+	var claim_summary := _claim_all_ready_commissions()
+	if int(claim_summary.get("claimed_count", 0)) > 0:
+		_save_runtime_state()
 	_upgrade_system.restore_owned_upgrade_ids(_to_string_array(save_data.get("owned_upgrades", [])))
 	_codex_system.restore_discoveries(_to_string_array(save_data.get("codex_discoveries", [])))
 	_region_system.restore_player_state(
