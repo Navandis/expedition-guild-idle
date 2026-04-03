@@ -3,33 +3,25 @@ class_name GuildHallController
 
 # File: GuildHallController.gd
 # Guild Hall is the dashboard landing screen for the prototype loop.
-# This controller keeps the screen lightweight by handling only:
-# - resource value text updates (icons are wired in the scene),
-# - compact Crew dropdown behavior for available/assigned/recovering snapshots,
-# - two active expedition cards with compact status text,
-# - completed-card clicks as the report entry point,
-# - shared bottom-nav routing and test-only debug actions.
-# Note for beginners:
-# - the old "Pending Reports..." label was intentionally removed from the UI;
-#   completed slot cards are now the report-entry cue.
-# - the "PP" badge was moved into its own top-left panel in GuildHall.tscn so
-#   the resource row only shows real resource counters.
-# - GuildHall.tscn now uses section-level layout anchors instead of one giant
-#   global SafeArea wrapper. Top widgets, expedition cards, and bottom nav are
-#   now separate containers so they can be positioned independently.
-# - TopSafeArea is explicitly given a bottom offset in the scene so the top
-#   stack has guaranteed height (top-level Controls do not auto-size to children).
-# - ExpeditionSectionFill was removed from the scene because it only consumed
-#   vertical space and prevented expedition cards from using the intended area.
-# - Bottom nav now lives in its own bottom-anchored safe margin container so
-#   it stays visible while the expedition section remains bounded above it.
-# - expedition card labels now use word-wrap + smaller font sizes in the scene
-#   for compact, stable text even when expedition names are long.
+#
+# Why the operations area now uses a TabContainer:
+# - Guild Hall is now the shared status-and-entry surface for both active
+#   Expeditions and active Commissions.
+# - Keeping both views in one TabContainer lets players switch context quickly
+#   without changing screens, while the deeper offer/dispatch workflow still
+#   lives on the dedicated board screens.
+#
+# Why Commission cards mirror Expedition cards:
+# - Matching card grammar (image/title/status + whole-card tap) keeps the
+#   runtime status UI predictable for beginners and reduces UI learning overhead.
+# - The cards are still scene-authored in GuildHall.tscn, while this script only
+#   binds runtime state into those authored controls.
 
 signal open_report_requested
 signal navigate_requested(target_screen: String)
 signal debug_finish_requested
 signal debug_reset_requested
+signal commission_claim_requested(runtime_id: int)
 
 const _STATUS_BORDER_EMPTY := Color(0.95, 0.55, 0.20, 1.0)
 const _STATUS_BORDER_ONGOING := Color(0.95, 0.84, 0.20, 1.0)
@@ -37,6 +29,7 @@ const _STATUS_BORDER_COMPLETED := Color(0.35, 0.85, 0.45, 1.0)
 const _SLOT_VISUAL_EMPTY := "empty"
 const _SLOT_VISUAL_ONGOING := "ongoing"
 const _SLOT_VISUAL_COMPLETED := "completed"
+const _COMMISSION_CARD_COUNT := 3
 
 @onready var _gold_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
 @onready var _crew_dropdown_button: Button = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton
@@ -47,18 +40,40 @@ const _SLOT_VISUAL_COMPLETED := "completed"
 @onready var _supplies_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter/Row/SuppliesValueLabel
 @onready var _debug_finish_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugFinishButton
 @onready var _debug_reset_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugResetButton
-@onready var _expedition_slots_scroller: ScrollContainer = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller
-@onready var _slot_one_card: TouchScrollCardButton = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
-@onready var _slot_two_card: TouchScrollCardButton = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
-@onready var _slot_one_name_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
-@onready var _slot_one_state_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
-@onready var _slot_two_name_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
-@onready var _slot_two_state_label: Label = $ExpeditionSectionPanel/ExpeditionSectionMargin/ExpeditionSectionColumn/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
-@onready var _expedition_section_panel: PanelContainer = $ExpeditionSectionPanel
+
+@onready var _operations_section_panel: PanelContainer = $OperationsSectionPanel
+@onready var _operations_tabs: TabContainer = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs
+@onready var _expedition_slots_scroller: ScrollContainer = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller
+@onready var _slot_one_card: TouchScrollCardButton = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
+@onready var _slot_two_card: TouchScrollCardButton = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
+@onready var _slot_one_name_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
+@onready var _slot_one_state_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
+@onready var _slot_two_name_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
+@onready var _slot_two_state_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
+
+@onready var _commission_slots_scroller: ScrollContainer = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller
+@onready var _commission_slot_cards: Array[TouchScrollCardButton] = [
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard
+]
+@onready var _commission_slot_name_labels: Array[Label] = [
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content/CommissionSlotOneNameLabel,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content/CommissionSlotTwoNameLabel,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content/CommissionSlotThreeNameLabel
+]
+@onready var _commission_slot_state_labels: Array[Label] = [
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content/CommissionSlotOneStateLabel,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content/CommissionSlotTwoStateLabel,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content/CommissionSlotThreeStateLabel
+]
+
 @onready var _bottom_nav_safe: MarginContainer = $BottomNavSafe
 @onready var _bottom_nav: BottomNavBar = $BottomNavSafe/BottomNavBar
 
 var _expedition_manager: ExpeditionManager
+var _commission_runtime_manager: CommissionRuntimeManager
+var _commission_slot_capacity := _COMMISSION_CARD_COUNT
 var _crew_dropdown_presenter := CrewDropdownPresenter.new()
 var _resources := {
 	"gold": 0,
@@ -70,25 +85,37 @@ var _resources := {
 }
 var _slot_is_empty: Array[bool] = [true, true]
 var _slot_visual_states: Array[String] = ["", ""]
+var _commission_slot_actions: Array[String] = ["", "", ""]
+var _commission_slot_runtime_ids: Array[int] = [0, 0, 0]
+var _commission_slot_visual_states: Array[String] = ["", "", ""]
 var _cached_slot_styles: Dictionary = {}
-var _expedition_offset_left := 0.0
-var _expedition_offset_right := 0.0
+var _operations_offset_left := 0.0
+var _operations_offset_right := 0.0
 
 
 func _ready() -> void:
 	_hide_scrollbars(_expedition_slots_scroller)
+	_hide_scrollbars(_commission_slots_scroller)
 	_debug_finish_button.pressed.connect(_on_debug_finish_pressed)
 	_debug_reset_button.pressed.connect(_on_debug_reset_pressed)
-	# Drag-aware taps prevent accidental card activation while swiping slots.
+
+	# Drag-aware taps prevent accidental activation while swiping carousels.
 	_slot_one_card.confirmed_tap.connect(func() -> void:
 		_on_slot_card_pressed(0)
 	)
 	_slot_two_card.confirmed_tap.connect(func() -> void:
 		_on_slot_card_pressed(1)
 	)
+	for i in range(_commission_slot_cards.size()):
+		var card_index := i
+		_commission_slot_cards[i].confirmed_tap.connect(func() -> void:
+			_on_commission_card_pressed(card_index)
+		)
+
 	# Shared bottom nav is the primary cross-screen backbone.
 	_bottom_nav.set_current_screen(BottomNavBar.TARGET_GUILD_HALL)
 	_bottom_nav.navigate_requested.connect(_on_bottom_nav_requested)
+
 	# Keep the top-row Crew counter compact: default state shows Available/Max.
 	# Tap opens a tiny popup with Assigned and Recovering values only.
 	_crew_dropdown_presenter.configure(
@@ -98,21 +125,22 @@ func _ready() -> void:
 		_assigned_crew_value_label,
 		_recovering_crew_value_label
 	)
+
+	# Tab captions are explicit status surfaces for active operations.
+	_operations_tabs.set_tab_title(0, "Expeditions")
+	_operations_tabs.set_tab_title(1, "Commissions")
+
 	_build_cached_slot_styles()
-	# Preserve scene-authored horizontal padding so this script only owns vertical
-	# bounds for the middle section.
-	_expedition_offset_left = _expedition_section_panel.offset_left
-	_expedition_offset_right = _expedition_section_panel.offset_right
-	# Layout is updated at resize/layout events instead of in _process(). This keeps
-	# the middle section stable and avoids per-frame layout churn.
+	_operations_offset_left = _operations_section_panel.offset_left
+	_operations_offset_right = _operations_section_panel.offset_right
+
 	resized.connect(_on_layout_changed)
 	_bottom_nav_safe.resized.connect(_on_layout_changed)
-	# Defer the first pass so all Control nodes have their final initial size.
-	call_deferred("_update_expedition_section_layout")
-	# Polling each frame is acceptable for this prototype-sized status block.
+	call_deferred("_update_operations_section_layout")
 	set_process(true)
 	_refresh_resource_labels()
 	_refresh_active_status()
+	_refresh_commission_status()
 
 
 func _hide_scrollbars(scroll_container: ScrollContainer) -> void:
@@ -128,30 +156,24 @@ func _hide_scrollbars(scroll_container: ScrollContainer) -> void:
 
 func _process(_delta: float) -> void:
 	_refresh_active_status()
+	_refresh_commission_status()
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED:
-		# Theme/safe-area adjustments can move BottomNavSafe without a gameplay event.
-		# This notification can fire before @onready nodes are initialized while the
-		# control is still entering the tree, so defer until the node is ready.
 		if not is_node_ready():
-			call_deferred("_update_expedition_section_layout")
+			call_deferred("_update_operations_section_layout")
 			return
-		# Recompute the bounded expedition area at this safe layout point.
-		_update_expedition_section_layout()
+		_update_operations_section_layout()
 
 
 func _on_layout_changed() -> void:
-	_update_expedition_section_layout()
+	_update_operations_section_layout()
 
 
-func _update_expedition_section_layout() -> void:
-	# Coordinate-space note:
-	# - GuildHall (self), ExpeditionSectionPanel, and BottomNavSafe share the same
-	#   parent/local space, so we use local positions/sizes directly.
-	# - This avoids fragile global/local mixing and keeps math robust if hierarchy
-	#   internals change but these nodes remain siblings.
+func _update_operations_section_layout() -> void:
+	# Guild Hall keeps tabs as a bounded middle section between top summary and
+	# bottom navigation, so operations status cards remain readable on mobile.
 	var parent_height := size.y
 	if parent_height <= 0.0:
 		return
@@ -160,21 +182,27 @@ func _update_expedition_section_layout() -> void:
 	var bottom_nav_top_y := _bottom_nav_safe.position.y
 	var bounded_height: float = maxf(0.0, bottom_nav_top_y - midpoint_y)
 
-	# Keep horizontal behavior from the scene, but drive vertical bounds explicitly:
-	# top = viewport midpoint, bottom = top edge of BottomNavSafe.
-	_expedition_section_panel.anchor_left = 0.0
-	_expedition_section_panel.anchor_right = 1.0
-	_expedition_section_panel.offset_left = _expedition_offset_left
-	_expedition_section_panel.offset_right = _expedition_offset_right
-	_expedition_section_panel.anchor_top = 0.0
-	_expedition_section_panel.anchor_bottom = 0.0
-	_expedition_section_panel.offset_top = midpoint_y
-	_expedition_section_panel.offset_bottom = midpoint_y + bounded_height
+	_operations_section_panel.anchor_left = 0.0
+	_operations_section_panel.anchor_right = 1.0
+	_operations_section_panel.offset_left = _operations_offset_left
+	_operations_section_panel.offset_right = _operations_offset_right
+	_operations_section_panel.anchor_top = 0.0
+	_operations_section_panel.anchor_bottom = 0.0
+	_operations_section_panel.offset_top = midpoint_y
+	_operations_section_panel.offset_bottom = midpoint_y + bounded_height
 
 
 func set_expedition_manager(expedition_manager: ExpeditionManager) -> void:
 	_expedition_manager = expedition_manager
 	_refresh_active_status()
+
+
+func set_commission_runtime(runtime_manager: CommissionRuntimeManager, slot_capacity: int) -> void:
+	# Guild Hall binds to runtime rows only. Commission Board remains the place
+	# where offers are inspected and dispatch prep tiers are selected.
+	_commission_runtime_manager = runtime_manager
+	_commission_slot_capacity = maxi(0, slot_capacity)
+	_refresh_commission_status()
 
 
 func set_resources(resources: Dictionary) -> void:
@@ -183,8 +211,6 @@ func set_resources(resources: Dictionary) -> void:
 
 
 func _refresh_resource_labels() -> void:
-	# Icon textures are assigned in GuildHall.tscn.
-	# Keep this method focused on number updates only.
 	_gold_value_label.text = str(int(_resources.get("gold", 0)))
 	_supplies_value_label.text = str(int(_resources.get("supplies", 0)))
 
@@ -192,13 +218,10 @@ func _refresh_resource_labels() -> void:
 	var max_crew := int(_resources.get("max_crew", 0))
 	var assigned_crew := int(_resources.get("assigned_crew", 0))
 	var recovering_crew := int(_resources.get("recovering_crew", 0))
-	# Collapsed view intentionally shows the most "at a glance" crew signal:
-	# available units now versus hard cap for this profile.
 	_crew_dropdown_presenter.set_values(available_crew, max_crew, assigned_crew, recovering_crew)
 
 
 func _refresh_active_status() -> void:
-	# onready refs can be null during scene teardown/reparenting.
 	if _slot_one_card == null or _slot_two_card == null:
 		return
 
@@ -212,11 +235,7 @@ func _refresh_active_status() -> void:
 	_refresh_slot_card(0, slots)
 	_refresh_slot_card(1, slots)
 
-	# TEMPORARY DEBUG BUTTON: this is test-only and can be removed once QA no longer
-	# needs instant completion during development.
 	_debug_finish_button.visible = _expedition_manager.has_active_expedition()
-	# TEMPORARY DEBUG BUTTON: always available in Guild Hall so testers can quickly
-	# clear save + runtime state and return to a known clean baseline.
 	_debug_reset_button.visible = true
 
 
@@ -237,7 +256,6 @@ func _refresh_slot_card(slot_index: int, slots: Array[Dictionary]) -> void:
 		_set_empty_slot_card(slot_index)
 		return
 
-	# Remove static "Slot X" prefix so each card reads as a compact expedition tile.
 	name_label.text = str(slot_data.get("display_name", "Unknown Expedition"))
 	var status := str(slot_data.get("status", ExpeditionManager.STATUS_IDLE))
 
@@ -250,8 +268,6 @@ func _refresh_slot_card(slot_index: int, slots: Array[Dictionary]) -> void:
 		_apply_status_border(slot_index, card, _SLOT_VISUAL_ONGOING)
 		return
 
-	# Completed cards are now the report interaction entry, replacing the removed
-	# "View Pending Reports" button from the old layout.
 	state_label.text = "Complete · Collect Reward"
 	_slot_is_empty[slot_index] = false
 	card.disabled = false
@@ -274,9 +290,112 @@ func _set_empty_slot_card(slot_index: int) -> void:
 	_apply_status_border(slot_index, card, _SLOT_VISUAL_EMPTY)
 
 
+func _refresh_commission_status() -> void:
+	# Visual binding maps active + ready runtime rows into fixed slot cards.
+	# This keeps Guild Hall status-focused while Commission Board handles offers.
+	if _commission_slot_cards.is_empty():
+		return
+
+	var cards_to_fill := mini(_commission_slot_capacity, _COMMISSION_CARD_COUNT)
+	var ready_rows: Array[Dictionary] = []
+	var active_rows: Array[Dictionary] = []
+	if _commission_runtime_manager != null:
+		# Keep Guild Hall claims responsive by promoting completed active rows
+		# before reading the ready/active buckets for card rendering.
+		_commission_runtime_manager.process_time_progress()
+		ready_rows = _commission_runtime_manager.get_ready_to_claim_entries()
+		active_rows = _commission_runtime_manager.get_active_entries()
+
+	for i in range(_COMMISSION_CARD_COUNT):
+		if i >= cards_to_fill:
+			_set_commission_locked_slot(i)
+			continue
+		if not ready_rows.is_empty():
+			var ready_entry := ready_rows.pop_front()
+			_set_commission_ready_slot(i, ready_entry)
+			continue
+		if not active_rows.is_empty():
+			var active_entry := active_rows.pop_front()
+			_set_commission_active_slot(i, active_entry)
+			continue
+		_set_commission_empty_slot(i)
+
+
+func _set_commission_locked_slot(slot_index: int) -> void:
+	var card := _get_commission_card(slot_index)
+	var name_label := _get_commission_name_label(slot_index)
+	var state_label := _get_commission_state_label(slot_index)
+	if card == null or name_label == null or state_label == null:
+		return
+	name_label.text = "Locked Slot"
+	state_label.text = "Reserved for future capacity"
+	card.disabled = true
+	_commission_slot_actions[slot_index] = "locked"
+	_commission_slot_runtime_ids[slot_index] = 0
+	_apply_commission_status_border(slot_index, card, _SLOT_VISUAL_EMPTY)
+
+
+func _set_commission_empty_slot(slot_index: int) -> void:
+	var card := _get_commission_card(slot_index)
+	var name_label := _get_commission_name_label(slot_index)
+	var state_label := _get_commission_state_label(slot_index)
+	if card == null or name_label == null or state_label == null:
+		return
+	name_label.text = "Empty Slot"
+	state_label.text = "Tap to Open Commission Board"
+	card.disabled = false
+	card.focus_mode = Control.FOCUS_ALL
+	_commission_slot_actions[slot_index] = "open_board"
+	_commission_slot_runtime_ids[slot_index] = 0
+	_apply_commission_status_border(slot_index, card, _SLOT_VISUAL_EMPTY)
+
+
+func _set_commission_active_slot(slot_index: int, entry: Dictionary) -> void:
+	var card := _get_commission_card(slot_index)
+	var name_label := _get_commission_name_label(slot_index)
+	var state_label := _get_commission_state_label(slot_index)
+	if card == null or name_label == null or state_label == null:
+		return
+
+	name_label.text = str(entry.get("title", "Commission"))
+	var now := int(Time.get_unix_time_from_system())
+	var ready_at := int(entry.get("ready_at_unix", now))
+	var remaining := maxi(0, ready_at - now)
+	state_label.text = "In progress · %s left" % _format_remaining_time(remaining)
+	card.disabled = true
+	card.focus_mode = Control.FOCUS_NONE
+	_commission_slot_actions[slot_index] = "in_progress"
+	_commission_slot_runtime_ids[slot_index] = int(entry.get("runtime_id", 0))
+	_apply_commission_status_border(slot_index, card, _SLOT_VISUAL_ONGOING)
+
+
+func _set_commission_ready_slot(slot_index: int, entry: Dictionary) -> void:
+	var card := _get_commission_card(slot_index)
+	var name_label := _get_commission_name_label(slot_index)
+	var state_label := _get_commission_state_label(slot_index)
+	if card == null or name_label == null or state_label == null:
+		return
+
+	name_label.text = str(entry.get("title", "Commission"))
+	state_label.text = "Complete · Collect Reward"
+	card.disabled = false
+	card.focus_mode = Control.FOCUS_ALL
+	_commission_slot_actions[slot_index] = "claim"
+	_commission_slot_runtime_ids[slot_index] = int(entry.get("runtime_id", 0))
+	_apply_commission_status_border(slot_index, card, _SLOT_VISUAL_COMPLETED)
+
+
+func _format_remaining_time(remaining_seconds: int) -> String:
+	if remaining_seconds <= 0:
+		return "0m"
+	var hours := int(remaining_seconds / 3600)
+	var minutes := int((remaining_seconds % 3600) / 60)
+	if hours > 0:
+		return "%dh %02dm" % [hours, minutes]
+	return "%dm" % maxi(1, minutes)
+
+
 func _build_cached_slot_styles() -> void:
-	# Build style resources once, then reuse them. This avoids allocating new
-	# StyleBoxFlat instances every frame while _process refreshes slot status.
 	_cached_slot_styles = {
 		_SLOT_VISUAL_EMPTY: _build_base_slot_style(_STATUS_BORDER_EMPTY),
 		_SLOT_VISUAL_ONGOING: _build_base_slot_style(_STATUS_BORDER_ONGOING),
@@ -285,8 +404,6 @@ func _build_cached_slot_styles() -> void:
 
 
 func _build_base_slot_style(border_color: Color) -> StyleBoxFlat:
-	# Temporary prototype border logic:
-	# - orange: empty, yellow: ongoing, green: completed.
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.12, 0.12, 0.12, 0.92)
 	style.border_width_left = 2
@@ -302,8 +419,6 @@ func _build_base_slot_style(border_color: Color) -> StyleBoxFlat:
 
 
 func _apply_status_border(slot_index: int, card: Button, visual_state: String) -> void:
-	# Reapply only when visual state changed for this slot (empty/ongoing/completed).
-	# Timer text may update every frame, but border styles now stay stable.
 	if slot_index < 0 or slot_index >= _slot_visual_states.size():
 		return
 	if _slot_visual_states[slot_index] == visual_state:
@@ -313,13 +428,28 @@ func _apply_status_border(slot_index: int, card: Button, visual_state: String) -
 	if base_style == null:
 		return
 
-	# We still override all button states so border color remains consistent
-	# for enabled and disabled card states.
 	card.add_theme_stylebox_override("normal", base_style)
 	card.add_theme_stylebox_override("hover", base_style.duplicate())
 	card.add_theme_stylebox_override("pressed", base_style.duplicate())
 	card.add_theme_stylebox_override("disabled", base_style.duplicate())
 	_slot_visual_states[slot_index] = visual_state
+
+
+func _apply_commission_status_border(slot_index: int, card: Button, visual_state: String) -> void:
+	if slot_index < 0 or slot_index >= _commission_slot_visual_states.size():
+		return
+	if _commission_slot_visual_states[slot_index] == visual_state:
+		return
+
+	var base_style := _cached_slot_styles.get(visual_state, null) as StyleBoxFlat
+	if base_style == null:
+		return
+
+	card.add_theme_stylebox_override("normal", base_style)
+	card.add_theme_stylebox_override("hover", base_style.duplicate())
+	card.add_theme_stylebox_override("pressed", base_style.duplicate())
+	card.add_theme_stylebox_override("disabled", base_style.duplicate())
+	_commission_slot_visual_states[slot_index] = visual_state
 
 
 func _get_slot_card(slot_index: int) -> Button:
@@ -346,14 +476,29 @@ func _get_slot_state_label(slot_index: int) -> Label:
 	return null
 
 
+func _get_commission_card(slot_index: int) -> TouchScrollCardButton:
+	if slot_index < 0 or slot_index >= _commission_slot_cards.size():
+		return null
+	return _commission_slot_cards[slot_index]
+
+
+func _get_commission_name_label(slot_index: int) -> Label:
+	if slot_index < 0 or slot_index >= _commission_slot_name_labels.size():
+		return null
+	return _commission_slot_name_labels[slot_index]
+
+
+func _get_commission_state_label(slot_index: int) -> Label:
+	if slot_index < 0 or slot_index >= _commission_slot_state_labels.size():
+		return null
+	return _commission_slot_state_labels[slot_index]
+
+
 func _on_bottom_nav_requested(target_screen: String) -> void:
-	# GH/EB/GU/CX are active routes; XX/XX/SH stay inert in the nav component.
 	navigate_requested.emit(target_screen)
 
 
 func _on_slot_card_pressed(slot_index: int) -> void:
-	# Empty card -> Expedition Board.
-	# Completed card -> Report flow entry (lightweight replacement for removed button).
 	if slot_index < 0 or slot_index >= _slot_is_empty.size():
 		return
 	if _slot_is_empty[slot_index]:
@@ -367,6 +512,19 @@ func _on_slot_card_pressed(slot_index: int) -> void:
 	var slot_data := slots[slot_index]
 	if str(slot_data.get("status", "")) == ExpeditionManager.STATUS_COMPLETED:
 		open_report_requested.emit()
+
+
+func _on_commission_card_pressed(slot_index: int) -> void:
+	if slot_index < 0 or slot_index >= _commission_slot_actions.size():
+		return
+	var action := _commission_slot_actions[slot_index]
+	if action == "open_board":
+		navigate_requested.emit(BottomNavBar.TARGET_COMMISSION_BOARD)
+		return
+	if action == "claim":
+		var runtime_id := _commission_slot_runtime_ids[slot_index]
+		if runtime_id > 0:
+			commission_claim_requested.emit(runtime_id)
 
 
 func _on_debug_finish_pressed() -> void:

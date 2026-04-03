@@ -110,9 +110,14 @@ func _show_guild_hall() -> void:
 		_guild_hall_controller.navigate_requested.connect(_on_global_navigation_requested)
 		_guild_hall_controller.debug_finish_requested.connect(_on_debug_finish_requested)
 		_guild_hall_controller.debug_reset_requested.connect(_on_debug_reset_requested)
+		_guild_hall_controller.commission_claim_requested.connect(_on_commission_claim_requested)
 
 	_show_screen(_guild_hall_controller)
 	_guild_hall_controller.set_expedition_manager(_expedition_manager)
+	_guild_hall_controller.set_commission_runtime(
+		_commission_runtime_manager,
+		int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 0))
+	)
 	_guild_hall_controller.set_resources(_build_guild_hall_resources())
 
 
@@ -201,10 +206,7 @@ func _show_commission_board() -> void:
 	var recovered_now := _commission_resolver.process_crew_recovery()
 	# Active rows are timed jobs already in progress and may become ready here.
 	var newly_ready := _commission_runtime_manager.process_time_progress()
-	# There is currently no per-row claim UI path, so claim ready rows on board
-	# open to ensure completion payload rewards, standing, and crew release happen.
-	var claim_summary := _claim_all_ready_commissions()
-	if recovered_now > 0 or newly_ready > 0 or int(claim_summary.get("claimed_count", 0)) > 0:
+	if recovered_now > 0 or newly_ready > 0:
 		_save_runtime_state()
 
 	_commission_board_controller.set_board_context(
@@ -543,6 +545,43 @@ func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, c
 	)
 
 
+func _on_commission_claim_requested(runtime_id: int) -> void:
+	# Compact claim flow entry from Guild Hall commission cards:
+	# - process time first so any just-finished active rows can enter ready bucket,
+	# - claim exactly one selected runtime row,
+	# - apply completion payload and refresh Guild Hall resource labels.
+	if runtime_id <= 0:
+		return
+
+	var newly_ready := _commission_runtime_manager.process_time_progress()
+	var claimed := _commission_runtime_manager.claim_ready_entry(runtime_id)
+	if claimed.is_empty():
+		# If the selected row was still active, status refresh is enough.
+		if _guild_hall_controller != null:
+			_guild_hall_controller.set_resources(_build_guild_hall_resources())
+			_guild_hall_controller.set_commission_runtime(
+				_commission_runtime_manager,
+				int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 0))
+			)
+		if newly_ready > 0:
+			_save_runtime_state()
+		return
+
+	var completion_payload := claimed.get("completion_payload", {}) as Dictionary
+	_commission_resolver.apply_completion_payload(completion_payload)
+	var gold_payout := maxi(0, int(completion_payload.get("gold_payout", 0)))
+	if gold_payout > 0:
+		_resources["gold"] = int(_resources.get("gold", 0)) + gold_payout
+
+	_save_runtime_state()
+	if _guild_hall_controller != null:
+		_guild_hall_controller.set_resources(_build_guild_hall_resources())
+		_guild_hall_controller.set_commission_runtime(
+			_commission_runtime_manager,
+			int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 0))
+		)
+
+
 func _load_runtime_state() -> void:
 	# Load flow: authored start conditions are already applied as baseline;
 	# saved runtime state overrides them when a save exists.
@@ -559,11 +598,6 @@ func _load_runtime_state() -> void:
 	# Process delayed crew recovery on load so offline time can be honored later.
 	_commission_resolver.process_crew_recovery()
 	_commission_runtime_manager.process_time_progress()
-	# Load must keep a reward/cleanup claim path for jobs that already finished so
-	# assigned crew and rewards do not remain permanently stuck in ready rows.
-	var claim_summary := _claim_all_ready_commissions()
-	if int(claim_summary.get("claimed_count", 0)) > 0:
-		_save_runtime_state()
 	_upgrade_system.restore_owned_upgrade_ids(_to_string_array(save_data.get("owned_upgrades", [])))
 	_codex_system.restore_discoveries(_to_string_array(save_data.get("codex_discoveries", [])))
 	_region_system.restore_player_state(
