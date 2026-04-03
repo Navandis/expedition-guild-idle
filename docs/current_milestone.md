@@ -1,282 +1,291 @@
-# Hall of Ventures — Commission Foundation Milestone
+# Hall of Ventures — Commission Runtime Loop v1 Milestone
 
 ## Purpose
-Introduce the first playable Commission loop as the game’s primary gold-generation and short/medium-duration operational layer, while preserving the existing foundations already built for:
+Convert the current Commission Foundation slice from **immediate resolution on acceptance** into a **live timed operational loop** while preserving the existing foundations already built for:
 - regions
 - expeditions
 - Codex/discovery
 - save/load
 - debug tools
-- screen-based flow
+- Commission generation and board flow
+- Crew/Supplies runtime state
 
-This milestone should establish a working Commission system foundation, not the final version of the economy, UI polish, patron progression, or faction depth.
+This milestone should establish the first playable runtime Commission loop, not the final version of supply procurement, patron depth, officer specialization, or UI polish.
 
 ---
 
 ## Goal
-Add a Commission Board and the underlying authored/runtime systems so the player can:
-- see a finite set of procedurally generated commission offers
-- receive offers only from currently unlocked/reachable regions
-- inspect offers that vary by patron, family, objective, and risk/reward profile
-- immediately dispatch a commission when accepted
-- consume operational inputs (Crew and Supplies), not direct gold dispatch cost
-- receive graded outcomes, gold rewards, and board replenishment on completion
+Extend the current Commission system so the player can:
+- inspect a finite board of visible Commission offers
+- dispatch a Commission immediately if they have enough Crew, Supplies, and an open active Commission slot
+- convert the accepted offer into an active timed Commission rather than an instant payout
+- see active and completed Commissions from Guild Hall in the same broad card/carousel language already used for Expeditions
+- switch between Expedition and Commission runtime views through a shared Guild Hall TabContainer
+- tap an empty Commission slot card to open the Commission Board
+- tap a completed Commission card to collect reward through a compact claim flow
+- experience Crew burden over time through Assigned and Recovering states
+- keep the board replenishing and operational while active work runs in parallel
 
-The outcome should feel like a real second major loop that complements Expeditions rather than replacing them.
+The outcome should feel like a real live gold loop that complements Expeditions without collapsing into "Expeditions but shorter."
 
 ---
 
 ## Design intent
 This milestone should establish the following truths in code and data:
 
-- **Commissions are the primary gold-generation loop.**
-- **Expeditions remain the investment/discovery/knowledge/supplies loop.**
-- **Commission offers are generated only from the player’s currently reachable world.**
-- **Commissions are procedural but authored, just like Expeditions.**
-- **The board is finite, curated, and replenishing, not an endless feed.**
-- **Accepting a commission means immediate dispatch and immediate commitment of resources.**
-- **Commissions consume operational resources (Crew, Supplies, prep quality), not direct gold dispatch cost.**
-- **Commission results are graded outcomes, not primarily hard failures.**
-- **UI should stay utilitarian and readable for now; final visual polish comes later.**
+- **Commissions are the primary live gold-generation loop.**
+- **Commission runtime is time-based, not instant-resolution.**
+- **Board offers and active Commission slots are separate concepts.**
+- **Dispatch still happens immediately on acceptance; there is no accepted-but-unlaunched backlog.**
+- **Board refill happens on dispatch, not on claim.**
+- **Commission completion frees operational capacity before payout is claimed.**
+- **Guild Hall becomes the runtime status-and-entry surface for Commissions.**
+- **Commission Board remains the offer-and-dispatch surface.**
+- **Commission cards in Guild Hall should intentionally reuse the Expedition card pattern where practical.**
+- **Existing Crew/Supplies and outcome scaffolding should be reused where practical rather than replaced.**
+- **This milestone does not solve the Supplies-source question.**
+- **This milestone does not introduce buildings/facilities or passive production systems.**
 
 ---
 
 ## Core locked design rules
-### 1. Reachable-world generation
-Commission offers must be generated only from the player’s currently unlocked/reachable regions.
 
-### 2. Procedural board
-Commission offers are randomly generated, but only inside authored rules and content pools.
+### 1. Immediate dispatch remains locked
+Accepting a Commission still means dispatching it immediately.
+There is still no accepted-but-unlaunched contract inventory.
 
-### 3. Finite visible board
-Visible offers begin at **3**, expandable later by progression.
+### 2. Active slot availability matters
+A Commission can only be dispatched if the player has:
+- enough Crew
+- enough Supplies
+- an open active Commission slot
 
-### 4. Immediate dispatch on acceptance
-There is no “accepted quest backlog.”
-Accepting a commission means dispatching immediately and committing the required resources immediately.
+### 3. Board offers and active slots stay distinct
+The visible board is an offer surface.
+Active Commission slots are a concurrency limit.
 
-### 5. Board replenishment
-When one commission is accepted, the board should generate one new commission to refill the visible slot.
+These may numerically match in v1, but they should remain conceptually separate in code and UI.
 
-### 6. Variety rules
-The board should attempt soft curation:
-- family spread
-- risk spread
-- patron spread
-- region spread where possible
-- avoid duplicate-heavy boards when alternatives exist
+### 4. Board refill remains tied to dispatch
+When a Commission is accepted and dispatched, the emptied board slot should refill immediately.
+Claim timing should not control board replenishment.
 
-### 7. Non-expiring standard offers
-Standard commissions persist until accepted or refreshed.
-Event/special commissions may expire later, but that is out of scope for this milestone.
+### 5. No instant gold payout
+Dispatching a Commission should no longer pay gold immediately.
+Gold is only collected after the timed Commission finishes and the result is claimed.
 
-### 8. Player influence is soft, not deterministic
-Later systems may bias board weights, but the player should not directly choose exact outcomes.
+### 6. Completion frees the slot before claim
+When a Commission timer completes:
+- its active slot should free up
+- the finished Commission should move into a ready-to-claim state
+- committed Crew should leave Assigned and move into Recovering under the current v1 abstraction
 
-### 9. Commission economy
-Commissions do **not** charge direct gold dispatch costs.
-Their operational inputs are:
-- Crew
-- Supplies
-- preparation tier
-- officer/knowledge suitability where applicable
+### 7. Claim flow should stay compact and card-driven
+Completed Commissions should be claimable from Guild Hall through the Commission card state.
+Do not turn this into a full Expedition-style report experience.
 
-### 10. Soft outcomes
-Commission completion should resolve through graded outcomes:
-- Excellent
-- Solid
-- Strained
-- Poor
+### 8. Existing outcome philosophy remains valid
+Excellent / Solid / Strained / Poor remains the correct v1 outcome structure.
+This milestone should reuse that foundation rather than redesign it.
 
-These should mainly affect payout, standing, recovery burden, and side rewards rather than hard binary failure.
+### 9. Commission runtime should stay operational, not exploratory
+Do not add authored-discovery framing, Codex collection beats, or expedition-like narrative wrappers to the Commission completion flow.
+
+### 10. No supply-source solution in this milestone
+Commissions continue to consume Supplies.
+Where Supplies come from remains a separate later milestone.
 
 ---
 
 ## Required authored system scope
 
-### A. Patron tiers and pools
-Implement authored data scaffolding for the first patron tiers and pools:
+### A. Preserve existing Commission authored content
+Continue using the current Commission authored-data foundation under `res://data/commissions/`.
+This milestone is primarily a runtime/state/UI milestone, not a broad authored-content expansion milestone.
 
-- Tier 1: Local Patrons
-- Tier 2: Organized Institutions
-- Tier 3: Regional Powers
-- Tier 4: Sovereign / Grand Factions
+### B. Preserve runtime-needed authored fields
+Generated Commission offers should continue to carry the fields needed to support runtime play, including where relevant:
+- `offer_id`
+- patron/family/region display identity
+- risk/duration data
+- Crew/Supplies requirements
+- reward scaffold data
+- outcome-related inputs already used by the current system
 
-The system does not need all tiers fully content-complete in the first pass, but the model should support them cleanly.
-
-### B. First 4 commission families
-Implement authored support for:
-- Retrieval
-- Escort
-- Survey
-- Security
-
-### C. Board generation rules
-Implement authored/scaffolded rules for:
-- visible offer count
-- family spread
-- risk spread
-- patron spread
-- region spread
-- refill behavior
-- reroll behavior scaffold
-
-### D. Objective templates
-Implement the first wave of commission objective templates across the 4 families.
-
-### E. Requirement tags
-Implement first-pass requirement tag support for:
-- officer tags
-- mission suitability tags
-- environmental/prep tags
-- region knowledge tags
-
-### F. Operational Inputs
-Support first-pass operational input requirements:
-- Crew Required
-- Supplies Required
-- prep tier adjustments
-
-### G. Outcome profile rules
-Support the first outcome profile rules:
-- Excellent
-- Solid
-- Strained
-- Poor
+### C. Keep schema changes minimal
+If a small authored-data adjustment is genuinely needed to support runtime clarity, keep it targeted and avoid broad schema redesign.
 
 ---
 
 ## Required runtime/player-state scope
 
-### A. Commission Board state
-The player should have a persisted/serializable board state containing:
-- current visible offers
-- reroll-related state scaffold if needed
-- last seen/generated offer identity where needed for persistence
+### A. Active Commission runtime state
+Implement a persisted/serializable runtime-state owner for live Commissions containing, at minimum:
+- active dispatched Commissions
+- ready-to-claim completed Commissions
+- whatever small supporting metadata is necessary for safe processing
 
-### B. Crew state
-Implement first-pass Crew resource state:
-- Max Crew
-- Available Crew
-- Assigned Crew
-- Recovering Crew
+This state should not be buried inside the board UI controller.
 
-Crew recovery should continue over time and should be compatible with offline progression logic.
-If full offline recovery is not implemented in this milestone, the data/state structure should still support it cleanly.
+### B. Commission slot-capacity activation
+Make existing Commission slot capacity matter as a real runtime concurrency limit for active Commissions.
 
-### C. Supplies state
-Use one actual v1 supply resource:
-- Supplies
+### C. Dispatch integration
+Dispatching a Commission should:
+- validate slot availability
+- validate Crew and Supplies availability
+- commit Crew and Supplies immediately
+- create a timed active Commission entry
+- remove the accepted offer from the visible board
+- refill the emptied board slot immediately
 
-Do not split into typed supply categories in this milestone.
+### D. Completion processing
+When an active Commission finishes:
+- mark it complete / ready to claim
+- free its active slot
+- move committed Crew out of Assigned and into Recovering according to the current Crew model
+- preserve any reward/outcome data needed for later claim
 
-### D. Commission progression state
-Persist whatever minimum commission-related state is needed for:
-- current board
-- last selected/inspected offer if needed
-- future patron/reputation hooks
-- future unlock expansion
+### E. Claim processing
+Claiming a completed Commission should:
+- grant gold payout
+- grant any existing side reward support already in the Commission system
+- apply any payout-facing standing or reward effects already modeled
+- remove the completed entry from the ready-to-claim state
 
-Do not overbuild this.
+### F. Save/load plus offline-safe timer handling
+Active and ready-to-claim Commission state should persist correctly through save/load.
+If enough real time passes while the game is closed, active Commissions should process into completed/claimable state correctly on load or revisit.
+
+### G. Debug compatibility
+Existing debug/testing practices should remain usable.
+Add small targeted debug support for active Commissions if needed, but do not build a giant debug subsystem.
 
 ---
 
 ## UI/interaction intent for this milestone
-The Commission Board should be functional and readable, but does **not** need final art or final information architecture.
+Guild Hall should become the runtime status hub for the player's ongoing operations.
+Commission Board should remain the surface for reviewing and dispatching offers.
 
-The player should be able to:
-- open the Commission Board
-- inspect 3 visible offers
-- understand the main offer properties
-- open a commission detail view
-- choose a prep tier using a pre-built selector (not raw input fields)
-- dispatch immediately on acceptance
-- see the offer slot refill afterward
+### Guild Hall should gain an operations TabContainer
+The current Expedition carousel and the new Commission carousel should be placed inside a shared TabContainer so the player can switch views cleanly.
 
-### Important UI lock
-Prep tier should be presented through a **pre-built selector** (for example a horizontal 3-step selector), not manual numerical entry for crew/supplies.
+The immediate tabs for this milestone are:
+- Expeditions
+- Commissions
 
-### Important item lock
-Rare/special items are **not** part of per-dispatch prep-tier consumption in v1.
-If referenced at all, they should remain separate global modifiers.
+This should be implemented as a targeted structural UI change, not as a full Guild Hall redesign.
+
+### The Expedition view should keep its existing broad behavior
+The current Expedition cards should remain recognizable and continue to work.
+This milestone should restructure their container placement only as much as needed to fit the new TabContainer cleanly.
+
+### The Commission view should mirror the Expedition card grammar
+The Commission tab should use a horizontal scrolling carousel with cards that follow the same broad pattern the Expedition cards already use:
+- placeholder image area
+- title
+- compact state label
+- whole card acts as the button
+
+### The Commission card states should be:
+- **Empty / idle slot**
+  - state text: Tap to Open Commission Board
+  - tap behavior: open Commission Board
+- **In progress**
+  - state text: In progress plus time remaining
+  - tap behavior: inactive or no-op while running
+- **Complete**
+  - state text: Complete plus Collect Reward
+  - tap behavior: claim reward directly through the compact Commission claim flow
+
+### Placeholder implementation is acceptable
+For this milestone, readable scene-authored placeholder cards are acceptable.
+A small scene-authored set of three Commission cards is acceptable if that is the simplest explicit implementation for the current default slot capacity.
+Do not overbuild a dynamic card-factory system only for future expansion.
+
+### Commission Board remains dispatch-focused
+The Board should still let the player:
+- inspect visible offers
+- choose a prep tier
+- dispatch immediately if requirements and slots allow
+- understand why dispatch is blocked when it fails
+
+The Board does not need to become the main ongoing-status monitor.
 
 ---
 
 ## Scope
 
 ### In scope
-- Commission authored data scaffolding
-- Commission board generation from unlocked regions
-- Finite 3-offer board
-- Commission family/patron/objective template support
-- Board composition rules
-- Commission UI foundation
-- Immediate dispatch on acceptance
-- Crew/Supplies operational inputs
-- Prep tier selector
-- Graded commission outcomes
-- Gold payout and basic standing/reputation scaffold
-- Board refill on acceptance
-- Save/load support for commission state
-- Debug compatibility
+- active Commission runtime state
+- real Commission slot-capacity usage
+- dispatch-to-active-Commission conversion
+- board refill on dispatch
+- active countdown/timer behavior
+- completion-to-claimable-state behavior
+- compact claim handling
+- targeted Guild Hall restructure to introduce the operations TabContainer
+- Commission carousel in Guild Hall
+- keeping the Expedition carousel working inside that shared TabContainer
+- save/load persistence for active and claimable Commission state
+- basic offline-safe completion processing
+- targeted debug/test support if needed
+- comments/documentation updates in touched files
 
 ### Out of scope
-- Final art pass
-- Final Commission Board visual polish
-- Deep patron reputation systems
-- Faction diplomacy systems
-- Typed supply categories
-- Rare item loadout systems
-- Final officer system depth
-- Hard mission failure states
-- Monetization hooks
-- Event commissions
-- Full battle pass/event reward integration
-- Broad rebalance pass across the whole game
+- supply procurement / supply-source system
+- typed Supplies expansion
+- buildings / facilities / hall grounds implementation
+- passive building production
+- deep patron reputation ladders
+- deep officer system expansion
+- Commission suitability / knowledge deepening beyond existing scaffold
+- event/special Commission layer
+- final UI polish / art direction pass
+- broad rebalance across the whole game
+- redesign of the Expedition loop beyond the targeted TabContainer integration
 
 ---
 
 ## Engineering / architecture guardrails
-- Keep authored data separate from player-owned/runtime state.
-- Preserve the existing “expand foundation, do not rebuild” principle.
-- Reuse existing dispatch/report/slot architecture where practical instead of inventing parallel systems unless there is a strong reason not to.
-- Prefer scene-authored UI structures and script-driven data binding over large UI trees built entirely in code.
+- Keep authored content separate from runtime/player-owned state.
+- Preserve the "extend the working foundation, do not rebuild" principle.
+- Reuse existing Commission generation, Crew/Supplies, and outcome-resolution foundations where practical.
+- Keep board state, operational-resource state, and active-runtime state separated where practical.
+- Prefer a small explicit runtime-state owner over burying timed Commission logic inside `CommissionBoardScreenController.gd`.
+- Borrow timer/save/load patterns from the Expedition side only where they are structurally useful.
+- Reuse the existing Guild Hall card/carousel interaction pattern where practical instead of inventing a second home-screen runtime grammar.
+- Keep Guild Hall as a status/entry surface and Commission Board as an offer/dispatch surface.
+- Prefer scene-authored UI plus script-driven data binding for any new visible UI.
 - Keep implementation explicit and beginner-maintainable.
 - Avoid speculative abstractions.
 
 ---
 
 ## Deliverables
-- commission authored data files and/or tables
-- first-pass patron tier/pool definitions
-- first-pass family definitions
-- first-pass objective templates
-- first-pass board generation rules
-- Commission Board runtime generation
-- visible 3-offer board
-- dispatch-on-accept flow
-- Crew and Supplies operational input handling
-- prep tier selector
-- outcome resolution rules
-- gold reward handling
-- board replenishment handling
-- save/load integration
-- updated comments/documentation in touched scripts/scenes/data files
+- Commission runtime-state owner for active and claimable Commissions
+- dispatch integration from board offer to active timed Commission
+- completion and claim handling
+- save/load and offline-safe processing for runtime Commissions
+- Guild Hall operations TabContainer with Expedition and Commission views
+- Commission carousel cards in Guild Hall with status-based behavior
+- Commission Board updates needed to stay aligned with the new runtime model
+- targeted debug support if needed
+- comments/documentation updates
 
 ---
 
 ## Acceptance criteria
-- The player can access a Commission Board with 3 visible offers.
-- Visible commissions are generated only from unlocked/reachable regions.
-- Offers feel procedurally varied but coherent.
-- The board is not duplicate-heavy when valid alternatives exist.
-- Accepting a commission dispatches it immediately and commits resources immediately.
-- There is no staging/holding area for accepted commissions.
-- Commissions consume Crew and Supplies rather than direct gold dispatch cost.
-- Prep tier is selected through a pre-built UI control, not manual numeric entry.
-- Commissions resolve into Excellent / Solid / Strained / Poor outcome bands.
-- Commissions pay gold on completion.
-- Accepted board slots are replenished with newly generated offers.
-- Commission state persists correctly through save/load.
-- Existing expedition/region systems continue to function.
-- No typed supply expansion or overbuilt reputation system is introduced prematurely.
+- Accepting a Commission no longer resolves it immediately
+- Accepting a Commission creates a timed active Commission instead
+- Dispatch requires enough Crew, Supplies, and an open active Commission slot
+- Board refill still happens on dispatch
+- Completed Commissions become ready to claim rather than paying instantly
+- Guild Hall contains a TabContainer that lets the player switch between Expeditions and Commissions
+- The Expedition view continues to function after being moved into that shared TabContainer
+- The Commission view shows a readable horizontal carousel of Commission cards
+- Empty Commission cards can open the Commission Board
+- In-progress Commission cards show remaining time clearly
+- Completed Commission cards can be tapped to collect reward through a compact flow
+- The runtime loop survives save/load and offline elapsed time correctly
+- The implementation remains simple, explicit, and maintainable
