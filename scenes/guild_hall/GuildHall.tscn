@@ -5,8 +5,8 @@
 [ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="2_nav"]
 [ext_resource type="Texture2D" uid="uid://tk3w5radyv80" path="res://assets/Regions/Hollowspire Uplands - v3.png" id="3_elgiq"]
 [ext_resource type="Texture2D" uid="uid://py6ohnws3tte" path="res://assets/UI/ResourceCounters/gold.png" id="3_gold_icon"]
-[ext_resource type="Texture2D" uid="uid://djooculgweyvr" path="res://assets/UI/Frames/Portal_frame2.png" id="4_elgiq"]
 [ext_resource type="Texture2D" uid="uid://bv5xb7c6dh0gp" path="res://assets/UI/ResourceCounters/crew.png" id="4_crew_icon"]
+[ext_resource type="Texture2D" uid="uid://djooculgweyvr" path="res://assets/UI/Frames/Portal_frame2.png" id="4_elgiq"]
 [ext_resource type="Texture2D" uid="uid://ci2mmj6qfgl4r" path="res://assets/Regions/Emberwake Coast - upscaled.png" id="5_0pdko"]
 [ext_resource type="Texture2D" uid="uid://54g82p854pgd" path="res://assets/Regions/Emberwake Coast - sketch v4.png" id="5_513lt"]
 [ext_resource type="Texture2D" uid="uid://bvmnwunr0da8o" path="res://assets/UI/ResourceCounters/supplies.png" id="5_supplies_icon"]
@@ -129,11 +129,12 @@ theme_override_constants/margin_bottom = 0
 
 [node name="ResourceSlots" type="HBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin" unique_id=1494783933]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 6
 
 [node name="GoldCounter" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001001]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.9
 
 [node name="Row" type="HBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter" unique_id=570001002]
 layout_mode = 2
@@ -169,15 +170,15 @@ texture = ExtResource("4_crew_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CrewDropdownButton" type="Button" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row"]
+[node name="CrewDropdownButton" type="Button" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row" unique_id=760596098]
 layout_mode = 2
 size_flags_horizontal = 3
-flat = true
 text = "▼"
-icon_alignment = 2
+flat = true
 alignment = 2
+icon_alignment = 2
 
-[node name="CrewCollapsedValue" type="RichTextLabel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton"]
+[node name="CrewCollapsedValue" type="RichTextLabel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton" unique_id=1346899333]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -186,35 +187,33 @@ offset_left = 4.0
 offset_right = -22.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 bbcode_enabled = true
 text = "[color=#6EEB74]0[/color] / 0"
-horizontal_alignment = 2
-vertical_alignment = 1
 fit_content = true
 scroll_active = false
-mouse_filter = 2
+horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="CrewDropdownPopup" type="PopupPanel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter"]
-initial_position = 0
+[node name="CrewDropdownPopup" type="PopupPanel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter" unique_id=2005853058]
 size = Vector2i(110, 72)
-visible = false
 
-[node name="CrewDropdownMargin" type="MarginContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup"]
+[node name="CrewDropdownMargin" type="MarginContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup" unique_id=502558160]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 6.0
-offset_top = 6.0
-offset_right = -6.0
-offset_bottom = -6.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 106.0
+offset_bottom = 68.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CrewDropdownValues" type="VBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin"]
+[node name="CrewDropdownValues" type="VBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin" unique_id=1260556938]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="AssignedCrewValueLabel" type="RichTextLabel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues"]
+[node name="AssignedCrewValueLabel" type="RichTextLabel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues" unique_id=1411079668]
 layout_mode = 2
 bbcode_enabled = true
 text = "[color=#F5D547]0[/color]"
@@ -222,7 +221,7 @@ fit_content = true
 scroll_active = false
 horizontal_alignment = 2
 
-[node name="RecoveringCrewValueLabel" type="RichTextLabel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues"]
+[node name="RecoveringCrewValueLabel" type="RichTextLabel" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues" unique_id=119377879]
 layout_mode = 2
 bbcode_enabled = true
 text = "[color=#F2A14A]0[/color]"
@@ -233,6 +232,7 @@ horizontal_alignment = 2
 [node name="SuppliesCounter" type="PanelContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=570001007]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.8
 
 [node name="Row" type="HBoxContainer" parent="TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter" unique_id=570001008]
 layout_mode = 2
