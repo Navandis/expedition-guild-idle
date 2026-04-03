@@ -365,7 +365,9 @@ func reset_to_debug_baseline() -> void:
 	_expedition_manager.restore_runtime_state([], [])
 	_commission_runtime_manager.restore_runtime_snapshot({})
 	_expedition_board_offers = []
+	_commission_board_snapshot = {}
 	_discard_expedition_board_controller()
+	_discard_commission_board_controller()
 
 	# Clear persisted progress so app restarts also stay at baseline.
 	var save_cleared := _save_manager.clear_saved_game_state()
@@ -386,6 +388,17 @@ func _discard_expedition_board_controller() -> void:
 		_expedition_board_controller.get_parent().remove_child(_expedition_board_controller)
 	_expedition_board_controller.queue_free()
 	_expedition_board_controller = null
+
+
+func _discard_commission_board_controller() -> void:
+	if _commission_board_controller == null:
+		return
+	if _mounted_screen == _commission_board_controller:
+		_mounted_screen = null
+	if _commission_board_controller.get_parent() != null:
+		_commission_board_controller.get_parent().remove_child(_commission_board_controller)
+	_commission_board_controller.queue_free()
+	_commission_board_controller = null
 
 
 func _on_return_to_guild_hall_requested() -> void:
