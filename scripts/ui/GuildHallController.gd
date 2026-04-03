@@ -300,6 +300,9 @@ func _refresh_commission_status() -> void:
 	var ready_rows: Array[Dictionary] = []
 	var active_rows: Array[Dictionary] = []
 	if _commission_runtime_manager != null:
+		# Keep Guild Hall claims responsive by promoting completed active rows
+		# before reading the ready/active buckets for card rendering.
+		_commission_runtime_manager.process_time_progress()
 		ready_rows = _commission_runtime_manager.get_ready_to_claim_entries()
 		active_rows = _commission_runtime_manager.get_active_entries()
 
