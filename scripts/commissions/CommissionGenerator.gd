@@ -62,7 +62,17 @@ func generate_single_offer(unlocked_region_ids: Array[String], board_so_far: Arr
 	return _generate_offer_for_slot(unlocked_region_ids, board_so_far)
 
 
-func _generate_offer_for_slot(unlocked_region_ids: Array[String], board_so_far: Array[Dictionary]) -> Dictionary:
+func generate_single_offer_for_slot(unlocked_region_ids: Array[String], board_context: Array[Dictionary], destination_slot_index: int) -> Dictionary:
+	# Runtime board replacement helper:
+	# - board_context should include the other visible cards that remain on board.
+	# - destination_slot_index is the CM slot being filled (0=CM1, 1=CM2, 2=CM3).
+	# This keeps risk-target scoring aligned with the real visible slot identity.
+	if unlocked_region_ids.is_empty():
+		return {}
+	return _generate_offer_for_slot(unlocked_region_ids, board_context, destination_slot_index)
+
+
+func _generate_offer_for_slot(unlocked_region_ids: Array[String], board_so_far: Array[Dictionary], destination_slot_index: int = -1) -> Dictionary:
 	var candidates := _build_offer_candidates(unlocked_region_ids)
 	if candidates.is_empty():
 		return {}
@@ -75,7 +85,7 @@ func _generate_offer_for_slot(unlocked_region_ids: Array[String], board_so_far: 
 		# use the same risk result. This keeps risk-spread composition reliable.
 		var candidate_with_plan := candidate.duplicate(true)
 		candidate_with_plan["_planned_risk_band"] = _pick_risk_band(candidate_with_plan)
-		var score := _score_candidate_for_board(candidate_with_plan, board_so_far, composition)
+		var score := _score_candidate_for_board(candidate_with_plan, board_so_far, composition, destination_slot_index)
 		if score <= 0.0:
 			continue
 		var row := candidate_with_plan
@@ -125,7 +135,12 @@ func _build_offer_candidates(unlocked_region_ids: Array[String]) -> Array[Dictio
 	return candidates
 
 
-func _score_candidate_for_board(candidate: Dictionary, board_so_far: Array[Dictionary], composition: Dictionary) -> float:
+func _score_candidate_for_board(
+	candidate: Dictionary,
+	board_so_far: Array[Dictionary],
+	composition: Dictionary,
+	destination_slot_index: int = -1
+) -> float:
 	var score := 1.0
 	var family_id := str(candidate.get("family_id", ""))
 	var patron_id := str((candidate.get("patron", {}) as Dictionary).get("id", ""))
@@ -149,8 +164,12 @@ func _score_candidate_for_board(candidate: Dictionary, board_so_far: Array[Dicti
 	# Soft risk spread: for this first backend, preselecting likely target slot risk
 	# gives simple diversity without overbuilding later risk systems.
 	var target_risks := _to_string_array(composition.get("target_risk_spread", []))
-	if board_so_far.size() < target_risks.size():
-		var target := target_risks[board_so_far.size()]
+	# When replacing an accepted board slot, caller can pass destination_slot_index
+	# so CM1/CM2/CM3 keeps its authored risk profile. Fallback keeps old behavior
+	# for normal append-style generation paths.
+	var target_slot_index := destination_slot_index if destination_slot_index >= 0 else board_so_far.size()
+	if target_slot_index < target_risks.size():
+		var target := target_risks[target_slot_index]
 		if not target.is_empty():
 			var likely_risk := str(candidate.get("_planned_risk_band", "moderate"))
 			if _risk_matches_target(likely_risk, target):

@@ -85,7 +85,13 @@ func accept_offer(offer_id: String, unlocked_region_ids: Array[String]) -> Dicti
 			continue
 		board_without_accepted.append((_visible_offers[i] as Dictionary).duplicate(true))
 
-	var single := _generator.generate_single_offer(unlocked_region_ids, board_without_accepted)
+	# Important: pass accepted_index so generator scores risk spread for the exact
+	# destination slot (CM1 vs CM2 vs CM3), not as a generic "last slot fill".
+	var single := _generator.generate_single_offer_for_slot(
+		unlocked_region_ids,
+		board_without_accepted,
+		accepted_index
+	)
 	if not single.is_empty():
 		# Core bug fix: write the replacement back into the same index instead of
 		# shifting all later cards left. This preserves CM slot identity.
