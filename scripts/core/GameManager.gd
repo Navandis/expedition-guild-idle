@@ -202,7 +202,8 @@ func _show_commission_board() -> void:
 	# Active rows are timed jobs already in progress; ready rows are complete jobs
 	# waiting for explicit claim. We process promotion on screen-open for now.
 	var newly_ready := _commission_runtime_manager.process_time_progress()
-	if recovered_now > 0 or newly_ready > 0:
+	var claimed_summary := _claim_all_ready_commissions()
+	if recovered_now > 0 or newly_ready > 0 or int(claimed_summary.get("claimed_count", 0)) > 0:
 		_save_runtime_state()
 
 	_commission_board_controller.set_board_context(
@@ -217,6 +218,35 @@ func _show_commission_board() -> void:
 	_show_screen(_commission_board_controller)
 
 
+
+
+func _claim_all_ready_commissions() -> Dictionary:
+	# Claim every ready row and apply its pre-rolled completion payload.
+	# This guarantees completion effects are actually granted once a run finishes.
+	var claimed_count := 0
+	var total_gold_payout := 0
+	var ready_rows := _commission_runtime_manager.get_ready_to_claim_entries()
+	for row in ready_rows:
+		var runtime_id := int((row as Dictionary).get("runtime_id", 0))
+		if runtime_id <= 0:
+			continue
+
+		var claimed := _commission_runtime_manager.claim_ready_entry(runtime_id)
+		if claimed.is_empty():
+			continue
+
+		var completion_payload := claimed.get("completion_payload", {}) as Dictionary
+		_commission_resolver.apply_completion_payload(completion_payload)
+		var gold_payout := maxi(0, int(completion_payload.get("gold_payout", 0)))
+		if gold_payout > 0:
+			_resources["gold"] = int(_resources.get("gold", 0)) + gold_payout
+			total_gold_payout += gold_payout
+		claimed_count += 1
+
+	return {
+		"claimed_count": claimed_count,
+		"total_gold_payout": total_gold_payout
+	}
 
 
 func _get_unlocked_region_ids_for_commissions() -> Array[String]:
@@ -523,6 +553,7 @@ func _load_runtime_state() -> void:
 	# Process delayed crew recovery on load so offline time can be honored later.
 	_commission_resolver.process_crew_recovery()
 	_commission_runtime_manager.process_time_progress()
+	_claim_all_ready_commissions()
 	_upgrade_system.restore_owned_upgrade_ids(_to_string_array(save_data.get("owned_upgrades", [])))
 	_codex_system.restore_discoveries(_to_string_array(save_data.get("codex_discoveries", [])))
 	_region_system.restore_player_state(
