@@ -75,6 +75,7 @@ var _new_game_start_conditions := DEFAULT_NEW_GAME_START_CONDITIONS.duplicate(tr
 var _resources := DEFAULT_RESOURCES.duplicate(true)
 var _slot_capacities: Dictionary = DEFAULT_NEW_GAME_START_CONDITIONS.get("starting_slot_capacities", {}).duplicate(true)
 var _expedition_board_offers: Array[Dictionary] = []
+var _commission_board_snapshot: Dictionary = {}
 
 var _guild_hall_controller: GuildHallController
 var _expedition_board_controller: ExpeditionBoardController
@@ -220,6 +221,7 @@ func _show_commission_board() -> void:
 		_commission_board_controller = COMMISSION_BOARD_SCENE.instantiate() as CommissionBoardScreenController
 		_commission_board_controller.navigate_requested.connect(_on_global_navigation_requested)
 		_commission_board_controller.commission_dispatch_requested.connect(_on_commission_dispatch_requested)
+		_commission_board_controller.set_initial_board_snapshot(_commission_board_snapshot)
 
 	# Process ready recovery entries whenever players revisit this screen so crew
 	# burden is visible but does not require a full app restart to clear.
@@ -240,6 +242,10 @@ func _show_commission_board() -> void:
 		_commission_resolver.get_recovering_crew(),
 		_commission_resolver.get_max_crew()
 	)
+	_capture_commission_board_state()
+	# Persist generated/restored board offers immediately so an app restart does
+	# not reroll CommissionBoard entries the player just saw.
+	_save_runtime_state()
 	_show_screen(_commission_board_controller)
 
 
@@ -570,6 +576,8 @@ func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, c
 			commission_capacity
 		]
 	)
+	_capture_commission_board_state()
+	_save_runtime_state()
 
 
 func _on_commission_claim_requested(runtime_id: int) -> void:
@@ -634,6 +642,7 @@ func _load_runtime_state() -> void:
 		save_data.get("pending_reports", save_data.get("pending_report", []))
 	)
 	_expedition_board_offers = _sanitize_board_offers(save_data.get("expedition_board_offers", []))
+	_commission_board_snapshot = _sanitize_board_snapshot(save_data.get("commission_board_snapshot", {}))
 	if runtime_changed:
 		# Save post-load migration/catch-up so offline-finished commissions and
 		# crew transitions persist immediately.
@@ -653,7 +662,8 @@ func _save_runtime_state() -> void:
 		"selected_region_id": _region_system.get_selected_region_id(),
 		"active_expeditions": _expedition_manager.get_active_expeditions(),
 		"pending_reports": _expedition_manager.get_pending_reports(),
-		"expedition_board_offers": _expedition_board_offers
+		"expedition_board_offers": _expedition_board_offers,
+		"commission_board_snapshot": _commission_board_snapshot
 	})
 
 
@@ -777,10 +787,22 @@ func _sanitize_board_offers(value: Variant) -> Array[Dictionary]:
 	return offers
 
 
+func _sanitize_board_snapshot(value: Variant) -> Dictionary:
+	if value is Dictionary:
+		return (value as Dictionary).duplicate(true)
+	return {}
+
+
 func _capture_expedition_board_state() -> void:
 	if _expedition_board_controller == null:
 		return
 	_expedition_board_offers = _expedition_board_controller.get_board_offers()
+
+
+func _capture_commission_board_state() -> void:
+	if _commission_board_controller == null:
+		return
+	_commission_board_snapshot = _commission_board_controller.build_board_snapshot()
 
 
 func _process_commission_runtime_progress(now_unix: int = -1) -> bool:

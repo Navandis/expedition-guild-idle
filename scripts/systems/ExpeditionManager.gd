@@ -192,21 +192,15 @@ func get_remaining_seconds() -> int:
 func get_remaining_time_text() -> String:
 	var remaining := get_remaining_seconds()
 	if remaining <= 0:
-		return "00:00"
-
-	# Avoid integer-division warnings during script reload.
-	var minutes := int(remaining / 60.0)
-	var seconds := remaining % 60
-	return "%02d:%02d" % [minutes, seconds]
+		return "00h00m00s"
+	return TimeFormat.format_seconds_hms(remaining)
 
 
 func get_remaining_time_text_for_slot(slot_index: int) -> String:
 	var remaining := get_remaining_seconds_for_slot(slot_index)
 	if remaining <= 0:
-		return "00:00"
-	var minutes := int(remaining / 60.0)
-	var seconds := remaining % 60
-	return "%02d:%02d" % [minutes, seconds]
+		return "00h00m00s"
+	return TimeFormat.format_seconds_hms(remaining)
 
 
 func get_remaining_seconds_for_slot(slot_index: int) -> int:

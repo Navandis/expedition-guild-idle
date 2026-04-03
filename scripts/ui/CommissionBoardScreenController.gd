@@ -48,6 +48,7 @@ var _max_crew := 0
 var _available_supplies := 0
 var _selected_offer: Dictionary = {}
 var _crew_dropdown_presenter := CrewDropdownPresenter.new()
+var _restored_snapshot: Dictionary = {}
 
 
 func _ready() -> void:
@@ -101,6 +102,20 @@ func set_board_context(
 			_open_detail_for_offer(_selected_offer)
 
 
+func set_initial_board_snapshot(snapshot: Dictionary) -> void:
+	_restored_snapshot = snapshot.duplicate(true)
+	if _unlocked_region_ids.is_empty():
+		return
+	_board_controller.restore_from_save(_restored_snapshot, _unlocked_region_ids)
+	_restored_snapshot = {}
+	if is_node_ready():
+		_bind_board_cards()
+
+
+func build_board_snapshot() -> Dictionary:
+	return _board_controller.build_save_snapshot()
+
+
 func handle_dispatch_result(success: bool, offer_id: String, message: String) -> void:
 	# Accept means immediate dispatch: only remove/refill board after runtime-state
 	# dispatch succeeds so failed starts keep the original offer visible.
@@ -150,6 +165,10 @@ func _lock_placeholder_buttons() -> void:
 
 
 func _ensure_board_generated() -> void:
+	if not _restored_snapshot.is_empty():
+		_board_controller.restore_from_save(_restored_snapshot, _unlocked_region_ids)
+		_restored_snapshot = {}
+		return
 	# Generate only when board is empty so standard offers stay persistent across
 	# navigation until accepted/refreshed later.
 	if _unlocked_region_ids.is_empty():
