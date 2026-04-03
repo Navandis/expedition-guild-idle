@@ -311,11 +311,11 @@ func _refresh_commission_status() -> void:
 			_set_commission_locked_slot(i)
 			continue
 		if not ready_rows.is_empty():
-			var ready_entry := ready_rows.pop_front()
+			var ready_entry: Dictionary = ready_rows.pop_front()
 			_set_commission_ready_slot(i, ready_entry)
 			continue
 		if not active_rows.is_empty():
-			var active_entry := active_rows.pop_front()
+			var active_entry: Dictionary = active_rows.pop_front()
 			_set_commission_active_slot(i, active_entry)
 			continue
 		_set_commission_empty_slot(i)
