@@ -29,6 +29,8 @@ const _STATUS_BORDER_COMPLETED := Color(0.35, 0.85, 0.45, 1.0)
 const _SLOT_VISUAL_EMPTY := "empty"
 const _SLOT_VISUAL_ONGOING := "ongoing"
 const _SLOT_VISUAL_COMPLETED := "completed"
+const _EXPEDITION_CARD_COUNT := 3
+const _EXPEDITION_UNLOCKED_COUNT := 2
 const _COMMISSION_CARD_COUNT := 3
 
 @onready var _gold_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
@@ -46,10 +48,13 @@ const _COMMISSION_CARD_COUNT := 3
 @onready var _expedition_slots_scroller: ScrollContainer = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller
 @onready var _slot_one_card: TouchScrollCardButton = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
 @onready var _slot_two_card: TouchScrollCardButton = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
+@onready var _slot_three_card: TouchScrollCardButton = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard
 @onready var _slot_one_name_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
 @onready var _slot_one_state_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
 @onready var _slot_two_name_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
 @onready var _slot_two_state_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
+@onready var _slot_three_name_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content/SlotThreeNameLabel
+@onready var _slot_three_state_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content/SlotThreeStateLabel
 
 @onready var _commission_slots_scroller: ScrollContainer = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller
 @onready var _commission_slot_cards: Array[TouchScrollCardButton] = [
@@ -83,8 +88,8 @@ var _resources := {
 	"max_crew": 0,
 	"supplies": 0
 }
-var _slot_is_empty: Array[bool] = [true, true]
-var _slot_visual_states: Array[String] = ["", ""]
+var _slot_is_empty: Array[bool] = [true, true, true]
+var _slot_visual_states: Array[String] = ["", "", ""]
 var _commission_slot_actions: Array[String] = ["", "", ""]
 var _commission_slot_runtime_ids: Array[int] = [0, 0, 0]
 var _commission_slot_visual_states: Array[String] = ["", "", ""]
@@ -105,6 +110,9 @@ func _ready() -> void:
 	)
 	_slot_two_card.confirmed_tap.connect(func() -> void:
 		_on_slot_card_pressed(1)
+	)
+	_slot_three_card.confirmed_tap.connect(func() -> void:
+		_on_slot_card_pressed(2)
 	)
 	for i in range(_commission_slot_cards.size()):
 		var card_index := i
@@ -222,18 +230,22 @@ func _refresh_resource_labels() -> void:
 
 
 func _refresh_active_status() -> void:
-	if _slot_one_card == null or _slot_two_card == null:
+	if _slot_one_card == null or _slot_two_card == null or _slot_three_card == null:
 		return
 
 	if _expedition_manager == null:
 		_set_empty_slot_card(0)
 		_set_empty_slot_card(1)
+		_set_locked_slot_card(2)
 		_debug_finish_button.visible = false
 		return
 
 	var slots := _expedition_manager.get_active_expeditions()
-	_refresh_slot_card(0, slots)
-	_refresh_slot_card(1, slots)
+	for i in range(_EXPEDITION_CARD_COUNT):
+		if i >= _EXPEDITION_UNLOCKED_COUNT:
+			_set_locked_slot_card(i)
+			continue
+		_refresh_slot_card(i, slots)
 
 	_debug_finish_button.visible = _expedition_manager.has_active_expedition()
 	_debug_reset_button.visible = true
@@ -287,6 +299,21 @@ func _set_empty_slot_card(slot_index: int) -> void:
 	_slot_is_empty[slot_index] = true
 	card.disabled = false
 	card.focus_mode = Control.FOCUS_ALL
+	_apply_status_border(slot_index, card, _SLOT_VISUAL_EMPTY)
+
+
+func _set_locked_slot_card(slot_index: int) -> void:
+	var card := _get_slot_card(slot_index)
+	var name_label := _get_slot_name_label(slot_index)
+	var state_label := _get_slot_state_label(slot_index)
+	if card == null or name_label == null or state_label == null:
+		return
+
+	name_label.text = "Locked Slot"
+	state_label.text = "Reserved for future unlock hints"
+	_slot_is_empty[slot_index] = false
+	card.disabled = true
+	card.focus_mode = Control.FOCUS_NONE
 	_apply_status_border(slot_index, card, _SLOT_VISUAL_EMPTY)
 
 
@@ -457,6 +484,8 @@ func _get_slot_card(slot_index: int) -> Button:
 		return _slot_one_card
 	if slot_index == 1:
 		return _slot_two_card
+	if slot_index == 2:
+		return _slot_three_card
 	return null
 
 
@@ -465,6 +494,8 @@ func _get_slot_name_label(slot_index: int) -> Label:
 		return _slot_one_name_label
 	if slot_index == 1:
 		return _slot_two_name_label
+	if slot_index == 2:
+		return _slot_three_name_label
 	return null
 
 
@@ -473,6 +504,8 @@ func _get_slot_state_label(slot_index: int) -> Label:
 		return _slot_one_state_label
 	if slot_index == 1:
 		return _slot_two_state_label
+	if slot_index == 2:
+		return _slot_three_state_label
 	return null
 
 
