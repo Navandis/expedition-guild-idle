@@ -102,7 +102,10 @@ func set_board_context(
 
 
 func handle_dispatch_result(success: bool, offer_id: String, message: String) -> void:
-	# Accept means immediate dispatch: only remove from board after resource commit succeeds.
+	# Accept means immediate dispatch: only remove/refill board after runtime-state
+	# dispatch succeeds so failed starts keep the original offer visible.
+	# Refill stays tied to successful dispatch because commission cards are offers,
+	# while active timed runs live in CommissionRuntimeManager.
 	if not success:
 		if _detail_panel.visible:
 			_detail_panel.set_status_message(message, true)
