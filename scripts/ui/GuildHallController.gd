@@ -247,7 +247,12 @@ func _refresh_active_status() -> void:
 			continue
 		_refresh_slot_card(i, slots)
 
-	_debug_finish_button.visible = _expedition_manager.has_active_expedition()
+	var has_active_expeditions := _expedition_manager.has_active_expedition()
+	var has_active_commissions := false
+	if _commission_runtime_manager != null:
+		has_active_commissions = _commission_runtime_manager.get_active_slot_usage() > 0
+	# Debug finish is shared QA tooling for both timed systems.
+	_debug_finish_button.visible = has_active_expeditions or has_active_commissions
 	_debug_reset_button.visible = true
 
 
@@ -327,9 +332,9 @@ func _refresh_commission_status() -> void:
 	var ready_rows: Array[Dictionary] = []
 	var active_rows: Array[Dictionary] = []
 	if _commission_runtime_manager != null:
-		# Keep Guild Hall claims responsive by promoting completed active rows
-		# before reading the ready/active buckets for card rendering.
-		_commission_runtime_manager.process_time_progress()
+		# Guild Hall is a pure renderer for runtime state.
+		# Promotion from active -> ready is processed by GameManager so completion
+		# side-effects (crew transitions/save) stay centralized and deterministic.
 		ready_rows = _commission_runtime_manager.get_ready_to_claim_entries()
 		active_rows = _commission_runtime_manager.get_active_entries()
 

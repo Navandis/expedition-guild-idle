@@ -114,26 +114,42 @@ func start_commission(
 	return row.duplicate(true)
 
 
-func process_time_progress(now_unix: int = -1) -> int:
+func process_time_progress(now_unix: int = -1) -> Array[Dictionary]:
 	# Promote finished active entries into ready-to-claim entries.
+	# Returns promoted rows so caller systems can run completion side-effects
+	# (for example crew transitions) exactly when active -> claimable happens.
 	var now: int = now_unix if now_unix >= 0 else int(Time.get_unix_time_from_system())
 	var active_remaining: Array[Dictionary] = []
 	var ready_claimable := get_ready_to_claim_entries()
-	var promoted_count := 0
+	var promoted_entries: Array[Dictionary] = []
 
 	for entry in get_active_entries():
 		if int(entry.get("ready_at_unix", 0)) <= now:
 			var completed := entry.duplicate(true)
 			completed["state"] = "ready_to_claim"
 			completed["completed_at_unix"] = now
+			completed["crew_transition_applied"] = false
 			ready_claimable.append(completed)
-			promoted_count += 1
+			promoted_entries.append(completed.duplicate(true))
 		else:
 			active_remaining.append(entry)
 
 	_runtime_state["active_entries"] = active_remaining
 	_runtime_state["ready_to_claim_entries"] = ready_claimable
-	return promoted_count
+	return promoted_entries
+
+
+func debug_finish_all_active(now_unix: int = -1) -> Array[Dictionary]:
+	# Debug helper mirrors expedition debug-finish behavior:
+	# force all active commissions to complete through the same promotion logic.
+	var now: int = now_unix if now_unix >= 0 else int(Time.get_unix_time_from_system())
+	var patched_active: Array[Dictionary] = []
+	for entry in get_active_entries():
+		var patched := entry.duplicate(true)
+		patched["ready_at_unix"] = now
+		patched_active.append(patched)
+	_runtime_state["active_entries"] = patched_active
+	return process_time_progress(now)
 
 
 
@@ -150,6 +166,22 @@ func claim_ready_entry(runtime_id: int) -> Dictionary:
 		remaining.append(row)
 	_runtime_state["ready_to_claim_entries"] = remaining
 	return claimed
+
+
+func mark_ready_entries_crew_transition_applied(runtime_ids: Array[int]) -> void:
+	if runtime_ids.is_empty():
+		return
+	var lookup: Dictionary = {}
+	for runtime_id in runtime_ids:
+		lookup[runtime_id] = true
+	var updated: Array[Dictionary] = []
+	for row in get_ready_to_claim_entries():
+		var patched := row.duplicate(true)
+		var runtime_id := int(patched.get("runtime_id", 0))
+		if bool(lookup.get(runtime_id, false)):
+			patched["crew_transition_applied"] = true
+		updated.append(patched)
+	_runtime_state["ready_to_claim_entries"] = updated
 
 
 func _sanitize_runtime_entries(entries: Variant, ready_bucket: bool) -> Array[Dictionary]:
@@ -182,6 +214,7 @@ func _sanitize_runtime_entries(entries: Variant, ready_bucket: bool) -> Array[Di
 			"ready_at_unix": ready_at,
 			"duration_seconds": maxi(30, int(row.get("duration_seconds", ready_at - started_at))),
 			"completed_at_unix": maxi(0, int(row.get("completed_at_unix", 0))),
+			"crew_transition_applied": bool(row.get("crew_transition_applied", false)),
 			"completion_payload": completion_payload.duplicate(true)
 		})
 	return rows
