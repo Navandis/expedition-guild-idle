@@ -1,4 +1,4 @@
-extends Control
+extends VBoxContainer
 class_name PrepTierSelector
 
 # File: PrepTierSelector.gd
@@ -8,6 +8,11 @@ class_name PrepTierSelector
 # - We avoid manual numeric input to keep the flow mobile-friendly.
 # - Designers can edit button text/layout in PrepTierSelector.tscn.
 # - Gameplay scripts consume a simple tier id + multipliers instead of raw fields.
+#
+# Layout note:
+# - The scene root is intentionally a VBoxContainer (not a plain Control) so when this
+#   selector is instanced inside parent containers it participates in normal container flow.
+# - We also collapsed the old SelectorColumn wrapper so this node is now the layout parent.
 
 signal tier_selected(tier_id: String)
 
@@ -41,10 +46,11 @@ const TIERS := {
 	}
 }
 
-@onready var _under_button: Button = $SelectorColumn/TierButtons/UnderPreparedButton
-@onready var _prepared_button: Button = $SelectorColumn/TierButtons/PreparedButton
-@onready var _over_button: Button = $SelectorColumn/TierButtons/OverPreparedButton
-@onready var _summary_label: Label = $SelectorColumn/TierSummaryLabel
+# Buttons/labels are direct children after flattening the old SelectorColumn container.
+@onready var _under_button: Button = $TierButtons/UnderPreparedButton
+@onready var _prepared_button: Button = $TierButtons/PreparedButton
+@onready var _over_button: Button = $TierButtons/OverPreparedButton
+@onready var _summary_label: Label = $TierSummaryLabel
 
 var _selected_tier_id := "prepared"
 
