@@ -144,17 +144,31 @@ func roll_completion_payload(offer: Dictionary, prep_tier_id: String, commitment
 
 
 func apply_completion_payload(completion_payload: Dictionary) -> void:
-	# Claim-time mutation endpoint:
-	# - applies standing deltas,
-	# - moves assigned crew into recovering,
-	# - grants side-reward supplies.
-	var standing_delta := int(completion_payload.get("standing_delta", 0))
-	_runtime_state["standing"] = int(_runtime_state.get("standing", 0)) + standing_delta
+	# Backward-compatible endpoint kept for older immediate-resolution paths.
+	# Runtime-loop v1 now splits completion work into:
+	# - completion-time crew transition (active -> claimable moment),
+	# - claim-time rewards/standing grants.
+	apply_completion_crew_transition(completion_payload)
+	apply_completion_claim_rewards(completion_payload)
 
+
+func apply_completion_crew_transition(completion_payload: Dictionary) -> void:
+	# Completion-time mutation:
+	# when a timed commission finishes, committed crew leaves Assigned and enters
+	# Recovering immediately even before claim. This frees the active slot while
+	# still preserving crew fatigue/recovery pacing.
 	var crew_to_recovering := maxi(0, int(completion_payload.get("crew_to_recovering", 0)))
 	var recovery_seconds := maxi(0, int(completion_payload.get("recovery_seconds", 0)))
 	var source := "commission_%s" % str(completion_payload.get("outcome_band", "solid"))
 	move_assigned_crew_to_recovering(crew_to_recovering, recovery_seconds, source)
+
+
+func apply_completion_claim_rewards(completion_payload: Dictionary) -> void:
+	# Claim-time mutation:
+	# - apply standing/reputation scaffold,
+	# - grant side reward support already scaffolded in payload.
+	var standing_delta := int(completion_payload.get("standing_delta", 0))
+	_runtime_state["standing"] = int(_runtime_state.get("standing", 0)) + standing_delta
 
 	var side_reward := completion_payload.get("side_reward", {}) as Dictionary
 	if not side_reward.is_empty() and str(side_reward.get("type", "")).to_lower() == "supplies":

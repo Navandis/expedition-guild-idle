@@ -84,6 +84,8 @@ var _upgrades_controller: UpgradesController
 var _codex_controller: CodexController
 var _commission_board_controller: CommissionBoardScreenController
 var _mounted_screen: Control
+var _commission_tick_accumulator := 0.0
+const COMMISSION_TICK_SECONDS := 1.0
 
 @onready var _ui_root: Control = $CanvasLayer/UIRoot
 
@@ -94,6 +96,24 @@ func _ready() -> void:
 	_apply_new_game_start_conditions_baseline()
 	_load_runtime_state()
 	_show_guild_hall()
+	set_process(true)
+
+
+func _process(delta: float) -> void:
+	# Lightweight runtime tick keeps commission timers and offline-like catch-up
+	# behavior consistent even while the player stays on Guild Hall.
+	_commission_tick_accumulator += delta
+	if _commission_tick_accumulator < COMMISSION_TICK_SECONDS:
+		return
+	_commission_tick_accumulator = 0.0
+
+	var state_changed := _process_commission_runtime_progress()
+	var recovered_now := _commission_resolver.process_crew_recovery()
+	if recovered_now > 0:
+		state_changed = true
+	if state_changed:
+		_save_runtime_state()
+		_refresh_guild_hall_commission_and_resources()
 
 
 func get_selected_expedition_for_activation() -> Dictionary:
@@ -205,8 +225,10 @@ func _show_commission_board() -> void:
 	# burden is visible but does not require a full app restart to clear.
 	var recovered_now := _commission_resolver.process_crew_recovery()
 	# Active rows are timed jobs already in progress and may become ready here.
-	var newly_ready := _commission_runtime_manager.process_time_progress()
-	if recovered_now > 0 or newly_ready > 0:
+	var state_changed := _process_commission_runtime_progress()
+	if recovered_now > 0:
+		state_changed = true
+	if state_changed:
 		_save_runtime_state()
 
 	_commission_board_controller.set_board_context(
@@ -239,7 +261,7 @@ func _claim_all_ready_commissions() -> Dictionary:
 			continue
 
 		var completion_payload := claimed.get("completion_payload", {}) as Dictionary
-		_commission_resolver.apply_completion_payload(completion_payload)
+		_commission_resolver.apply_completion_claim_rewards(completion_payload)
 		var gold_payout := maxi(0, int(completion_payload.get("gold_payout", 0)))
 		if gold_payout > 0:
 			_resources["gold"] = int(_resources.get("gold", 0)) + gold_payout
@@ -307,8 +329,15 @@ func _on_global_navigation_requested(target_screen: String) -> void:
 func _on_debug_finish_requested() -> void:
 	# Debug-complete reuses ExpeditionManager's real slot completion path.
 	_expedition_manager.complete_all_active_expeditions_for_debug()
+	# Debug helper now also force-completes in-progress commissions so QA can
+	# verify active -> claimable transitions without waiting full durations.
+	var forced_rows := _commission_runtime_manager.debug_finish_all_active()
+	for row in forced_rows:
+		var payload := (row as Dictionary).get("completion_payload", {}) as Dictionary
+		_commission_resolver.apply_completion_crew_transition(payload)
 	# Persist immediately so force-completed slots/reports survive app restarts.
 	_save_runtime_state()
+	_refresh_guild_hall_commission_and_resources()
 	if _expedition_manager.has_pending_report():
 		_show_report_screen()
 
@@ -554,32 +583,26 @@ func _on_commission_claim_requested(runtime_id: int) -> void:
 		return
 
 	var newly_ready := _commission_runtime_manager.process_time_progress()
+	if not newly_ready.is_empty():
+		for row in newly_ready:
+			var payload := (row as Dictionary).get("completion_payload", {}) as Dictionary
+			_commission_resolver.apply_completion_crew_transition(payload)
 	var claimed := _commission_runtime_manager.claim_ready_entry(runtime_id)
 	if claimed.is_empty():
 		# If the selected row was still active, status refresh is enough.
-		if _guild_hall_controller != null:
-			_guild_hall_controller.set_resources(_build_guild_hall_resources())
-			_guild_hall_controller.set_commission_runtime(
-				_commission_runtime_manager,
-				int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 0))
-			)
-		if newly_ready > 0:
+		_refresh_guild_hall_commission_and_resources()
+		if not newly_ready.is_empty():
 			_save_runtime_state()
 		return
 
 	var completion_payload := claimed.get("completion_payload", {}) as Dictionary
-	_commission_resolver.apply_completion_payload(completion_payload)
+	_commission_resolver.apply_completion_claim_rewards(completion_payload)
 	var gold_payout := maxi(0, int(completion_payload.get("gold_payout", 0)))
 	if gold_payout > 0:
 		_resources["gold"] = int(_resources.get("gold", 0)) + gold_payout
 
 	_save_runtime_state()
-	if _guild_hall_controller != null:
-		_guild_hall_controller.set_resources(_build_guild_hall_resources())
-		_guild_hall_controller.set_commission_runtime(
-			_commission_runtime_manager,
-			int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 0))
-		)
+	_refresh_guild_hall_commission_and_resources()
 
 
 func _load_runtime_state() -> void:
@@ -596,8 +619,10 @@ func _load_runtime_state() -> void:
 	_commission_runtime_manager.restore_runtime_snapshot(save_data.get("commission_runtime", {}))
 	_slot_capacities = _sanitize_slot_capacities(save_data.get("slot_capacities", {}))
 	# Process delayed crew recovery on load so offline time can be honored later.
-	_commission_resolver.process_crew_recovery()
-	_commission_runtime_manager.process_time_progress()
+	var recovered_now := _commission_resolver.process_crew_recovery()
+	var runtime_changed := _process_commission_runtime_progress()
+	if recovered_now > 0:
+		runtime_changed = true
 	_upgrade_system.restore_owned_upgrade_ids(_to_string_array(save_data.get("owned_upgrades", [])))
 	_codex_system.restore_discoveries(_to_string_array(save_data.get("codex_discoveries", [])))
 	_region_system.restore_player_state(
@@ -609,6 +634,10 @@ func _load_runtime_state() -> void:
 		save_data.get("pending_reports", save_data.get("pending_report", []))
 	)
 	_expedition_board_offers = _sanitize_board_offers(save_data.get("expedition_board_offers", []))
+	if runtime_changed:
+		# Save post-load migration/catch-up so offline-finished commissions and
+		# crew transitions persist immediately.
+		_save_runtime_state()
 
 
 func _save_runtime_state() -> void:
@@ -752,6 +781,35 @@ func _capture_expedition_board_state() -> void:
 	if _expedition_board_controller == null:
 		return
 	_expedition_board_offers = _expedition_board_controller.get_board_offers()
+
+
+func _process_commission_runtime_progress(now_unix: int = -1) -> bool:
+	# Runtime-loop v1 completion processing:
+	# - move finished commissions from active -> ready-to-claim,
+	# - free active slots before claim so board capacity updates immediately,
+	# - move committed crew from Assigned -> Recovering on completion.
+	#
+	# Offline-safe behavior: this helper is called on load and regular runtime
+	# ticks, so any elapsed wall-clock time can promote overdue entries.
+	var promoted_rows := _commission_runtime_manager.process_time_progress(now_unix)
+	if promoted_rows.is_empty():
+		return false
+	for row in promoted_rows:
+		var payload := (row as Dictionary).get("completion_payload", {}) as Dictionary
+		_commission_resolver.apply_completion_crew_transition(payload)
+	return true
+
+
+func _refresh_guild_hall_commission_and_resources() -> void:
+	# Guild Hall cards are a projection of runtime commission buckets:
+	# empty / active / complete states are rebuilt from manager data each refresh.
+	if _guild_hall_controller == null:
+		return
+	_guild_hall_controller.set_resources(_build_guild_hall_resources())
+	_guild_hall_controller.set_commission_runtime(
+		_commission_runtime_manager,
+		int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 0))
+	)
 
 
 func _on_region_selected(region_id: String) -> void:
