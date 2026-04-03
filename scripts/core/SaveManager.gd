@@ -6,11 +6,12 @@ class_name SaveManager
 # - authored-state references (selected_region_id),
 # - player-owned per-region progress (region_progress),
 # - commission runtime resources (Crew pools + Supplies),
+# - commission active/ready-to-claim runtime rows,
 # - runtime slot-capacity ownership state (current/max for expedition/commission),
 # while keeping previous keys for expedition loop persistence.
 
 const SAVE_PATH := "user://prototype_save.json"
-const SAVE_SCHEMA_VERSION := 4
+const SAVE_SCHEMA_VERSION := 5
 
 
 func load_game_state() -> Dictionary:
@@ -49,6 +50,7 @@ func save_game_state(state: Dictionary) -> bool:
 		"saved_at_unix": Time.get_unix_time_from_system(),
 		"resources": _coerce_resources(state.get("resources", {})),
 		"commission_resources": _coerce_commission_resources(state.get("commission_resources", {})),
+		"commission_runtime": _coerce_commission_runtime(state.get("commission_runtime", {})),
 		"slot_capacities": _coerce_slot_capacities(state.get("slot_capacities", {})),
 		"owned_upgrades": _coerce_string_array(state.get("owned_upgrades", [])),
 		"codex_discoveries": _coerce_string_array(state.get("codex_discoveries", [])),
@@ -117,6 +119,17 @@ func _coerce_commission_resources(value: Variant) -> Dictionary:
 		"standing": int(source.get("standing", 0)),
 		# Keep entries serializable now so later offline/passive recovery can read them.
 		"crew_recovery_entries": entries
+	}
+
+
+func _coerce_commission_runtime(value: Variant) -> Dictionary:
+	# Separate runtime owner for dispatched commissions.
+	# This keeps board offers independent from active/claimable commission rows.
+	var source := _coerce_dictionary(value)
+	return {
+		"active_entries": _coerce_dictionary_array(source.get("active_entries", [])),
+		"ready_to_claim_entries": _coerce_dictionary_array(source.get("ready_to_claim_entries", [])),
+		"next_runtime_id": maxi(1, int(source.get("next_runtime_id", 1)))
 	}
 
 

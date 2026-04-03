@@ -14,9 +14,10 @@ extends Node
 # - persists per-region player progress + selected region id,
 # - passes selected-region constraints into expedition board generation.
 #
-# Commission resource foundation slice:
+# Commission runtime foundation slice:
 # - stores Crew (max/available/assigned/recovering) as runtime player state,
 # - stores Supplies as a single v1 operational resource,
+# - stores active/ready-to-claim commission runtime rows separately from board offers,
 # - keeps these values in save data instead of authored commission JSON.
 #
 # New-game baseline slice:
@@ -68,6 +69,7 @@ var _upgrade_system := UpgradeSystem.new()
 var _codex_system := CodexSystem.new()
 var _region_system := RegionSystem.new()
 var _commission_resolver := CommissionResolver.new()
+var _commission_runtime_manager := CommissionRuntimeManager.new()
 var _save_manager := SaveManager.new()
 var _new_game_start_conditions := DEFAULT_NEW_GAME_START_CONDITIONS.duplicate(true)
 var _resources := DEFAULT_RESOURCES.duplicate(true)
@@ -197,7 +199,11 @@ func _show_commission_board() -> void:
 	# Process ready recovery entries whenever players revisit this screen so crew
 	# burden is visible but does not require a full app restart to clear.
 	var recovered_now := _commission_resolver.process_crew_recovery()
-	if recovered_now > 0:
+	# Active rows are timed jobs already in progress; ready rows are complete jobs
+	# waiting for explicit claim. We process promotion on screen-open for now.
+	var newly_ready := _commission_runtime_manager.process_time_progress()
+	var claimed_summary := _claim_all_ready_commissions()
+	if recovered_now > 0 or newly_ready > 0 or int(claimed_summary.get("claimed_count", 0)) > 0:
 		_save_runtime_state()
 
 	_commission_board_controller.set_board_context(
@@ -212,6 +218,35 @@ func _show_commission_board() -> void:
 	_show_screen(_commission_board_controller)
 
 
+
+
+func _claim_all_ready_commissions() -> Dictionary:
+	# Claim every ready row and apply its pre-rolled completion payload.
+	# This guarantees completion effects are actually granted once a run finishes.
+	var claimed_count := 0
+	var total_gold_payout := 0
+	var ready_rows := _commission_runtime_manager.get_ready_to_claim_entries()
+	for row in ready_rows:
+		var runtime_id := int((row as Dictionary).get("runtime_id", 0))
+		if runtime_id <= 0:
+			continue
+
+		var claimed := _commission_runtime_manager.claim_ready_entry(runtime_id)
+		if claimed.is_empty():
+			continue
+
+		var completion_payload := claimed.get("completion_payload", {}) as Dictionary
+		_commission_resolver.apply_completion_payload(completion_payload)
+		var gold_payout := maxi(0, int(completion_payload.get("gold_payout", 0)))
+		if gold_payout > 0:
+			_resources["gold"] = int(_resources.get("gold", 0)) + gold_payout
+			total_gold_payout += gold_payout
+		claimed_count += 1
+
+	return {
+		"claimed_count": claimed_count,
+		"total_gold_payout": total_gold_payout
+	}
 
 
 func _get_unlocked_region_ids_for_commissions() -> Array[String]:
@@ -292,6 +327,7 @@ func reset_to_debug_baseline() -> void:
 	_codex_system.restore_discoveries([])
 	_region_system.restore_player_state({}, "")
 	_expedition_manager.restore_runtime_state([], [])
+	_commission_runtime_manager.restore_runtime_snapshot({})
 	_expedition_board_offers = []
 	_discard_expedition_board_controller()
 
@@ -421,11 +457,21 @@ func _on_report_close_requested() -> void:
 
 
 func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, commitment: Dictionary, offer_snapshot: Dictionary) -> void:
-	# Commission accept in this prototype is also immediate dispatch + completion.
-	# This keeps the first gold loop simple: accept -> resolve outcome -> payout.
-	# Board replenishment still happens on acceptance via handle_dispatch_result().
+	# Commission board offers and active commissioned runs are intentionally split:
+	# - the board is just the offer surface,
+	# - CommissionRuntimeManager owns dispatched rows over time.
+	# This keeps timed runtime rows stable even if board offers reroll.
 	var crew_cost := maxi(0, int(commitment.get("crew_commitment", 0)))
 	var supplies_cost := maxi(0, int(commitment.get("supplies_commitment", 0)))
+	var commission_capacity := int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 0))
+
+	if not _commission_runtime_manager.can_start_commission(commission_capacity):
+		_commission_board_controller.handle_dispatch_result(
+			false,
+			offer_id,
+			"Dispatch failed: no open Commission slot."
+		)
+		return
 
 	if crew_cost > _commission_resolver.get_available_crew() or supplies_cost > _commission_resolver.get_supplies():
 		_commission_board_controller.handle_dispatch_result(
@@ -436,9 +482,12 @@ func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, c
 		return
 
 	# No manual raw number entry in UI: these values are derived from prep tier.
-	var crew_committed := _commission_resolver.assign_crew_to_commission(crew_cost)
+	# Spend supplies first so a rare crew-commit failure can be cleanly refunded.
 	var supplies_committed := _commission_resolver.spend_supplies(supplies_cost)
-	if not crew_committed or not supplies_committed:
+	var crew_committed := _commission_resolver.assign_crew_to_commission(crew_cost)
+	if not supplies_committed or not crew_committed:
+		if supplies_committed:
+			_commission_resolver.add_supplies(supplies_cost)
 		_commission_board_controller.handle_dispatch_result(
 			false,
 			offer_id,
@@ -446,16 +495,26 @@ func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, c
 		)
 		return
 
-	# Outcome resolution is centralized in CommissionResolver to keep UI scripts
-	# data-binding focused and to avoid mixing authored offer content with runtime
-	# mutable state such as payout/standing/recovery burdens.
-	var completion := _commission_resolver.resolve_commission_completion(
+	# Outcome values are rolled now and stored on the active row.
+	# This keeps future completion/claim deterministic across save/load.
+	var completion_payload := _commission_resolver.roll_completion_payload(
 		offer_snapshot,
 		prep_tier_id,
 		commitment
 	)
-	var gold_payout := maxi(0, int(completion.get("gold_payout", 0)))
-	_resources["gold"] = int(_resources.get("gold", 0)) + gold_payout
+	var active_row := _commission_runtime_manager.start_commission(
+		offer_snapshot,
+		prep_tier_id,
+		commitment,
+		completion_payload,
+		commission_capacity
+	)
+	if active_row.is_empty():
+		# Safety rollback if slot-state changed between checks.
+		_commission_resolver.add_supplies(supplies_cost)
+		_commission_resolver.move_assigned_crew_to_available(crew_cost)
+		_commission_board_controller.handle_dispatch_result(false, offer_id, "Dispatch failed: no open Commission slot.")
+		return
 
 	_save_runtime_state()
 	_commission_board_controller.set_board_context(
@@ -467,15 +526,14 @@ func _on_commission_dispatch_requested(offer_id: String, prep_tier_id: String, c
 		_commission_resolver.get_recovering_crew(),
 		_commission_resolver.get_max_crew()
 	)
-	var outcome_label := str(completion.get("outcome_label", "Solid"))
-	var side_reward := completion.get("side_reward", {}) as Dictionary
-	var side_text := ""
-	if not side_reward.is_empty():
-		side_text = " %s" % str(side_reward.get("label", "")).strip_edges()
 	_commission_board_controller.handle_dispatch_result(
 		true,
 		offer_id,
-		"%s outcome: +%d Gold. Crew moved to Recovering.%s" % [outcome_label, gold_payout, side_text]
+		"Dispatched. Active slots: %d/%d. Ready to claim: %d." % [
+			_commission_runtime_manager.get_active_slot_usage(),
+			commission_capacity,
+			_commission_runtime_manager.get_ready_to_claim_entries().size()
+		]
 	)
 
 
@@ -490,9 +548,12 @@ func _load_runtime_state() -> void:
 	# Missing keys are safe: each system uses default fallback values.
 	_resources = _sanitize_resources(save_data.get("resources", {}))
 	_commission_resolver.restore_runtime_snapshot(save_data.get("commission_resources", {}))
+	_commission_runtime_manager.restore_runtime_snapshot(save_data.get("commission_runtime", {}))
 	_slot_capacities = _sanitize_slot_capacities(save_data.get("slot_capacities", {}))
 	# Process delayed crew recovery on load so offline time can be honored later.
 	_commission_resolver.process_crew_recovery()
+	_commission_runtime_manager.process_time_progress()
+	_claim_all_ready_commissions()
 	_upgrade_system.restore_owned_upgrade_ids(_to_string_array(save_data.get("owned_upgrades", [])))
 	_codex_system.restore_discoveries(_to_string_array(save_data.get("codex_discoveries", [])))
 	_region_system.restore_player_state(
@@ -511,6 +572,7 @@ func _save_runtime_state() -> void:
 	_save_manager.save_game_state({
 		"resources": _resources,
 		"commission_resources": _commission_resolver.build_runtime_snapshot(),
+		"commission_runtime": _commission_runtime_manager.build_runtime_snapshot(),
 		"slot_capacities": _slot_capacities,
 		"owned_upgrades": _upgrade_system.get_owned_upgrade_ids(),
 		"codex_discoveries": _codex_system.get_discovered_entries(),

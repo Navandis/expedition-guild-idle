@@ -109,31 +109,26 @@ func restore_runtime_snapshot(snapshot: Variant) -> void:
 
 
 func resolve_commission_completion(offer: Dictionary, prep_tier_id: String, commitment: Dictionary) -> Dictionary:
-	# Runtime resolution is intentionally separate from authored commission files.
-	# Offer data is read as input, while output values are computed per-run.
+	# Backward-compatible helper used by older immediate-resolution flow.
+	var payload := roll_completion_payload(offer, prep_tier_id, commitment)
+	apply_completion_payload(payload)
+	return payload
+
+
+func roll_completion_payload(offer: Dictionary, prep_tier_id: String, commitment: Dictionary) -> Dictionary:
+	# Pure outcome roll: no runtime mutation here.
+	# This lets dispatch store a deterministic completion payload for later claim.
 	var crew_committed := maxi(0, int(commitment.get("crew_commitment", 0)))
 	var prep_modifier := clampf(float(commitment.get("success_weight_modifier", 0.0)), -0.50, 0.50)
 	var base_score := _build_base_outcome_score(offer, prep_tier_id)
 	var swing := randf_range(-0.16, 0.16)
 	var final_score := clampf(base_score + prep_modifier + swing, 0.0, 1.0)
 	var outcome_band := _resolve_outcome_band_from_score(final_score)
-
-	# Gold payout is the primary reward channel and scales by outcome band.
 	var base_gold := _resolve_base_gold(offer)
 	var gold_payout := maxi(0, int(round(float(base_gold) * float(OUTCOME_GOLD_MULTIPLIERS.get(outcome_band, 1.0)))))
-
-	# First-pass standing scaffold: tiny deltas only, so it is safe to keep simple.
 	var standing_delta := int(OUTCOME_STANDING_DELTA.get(outcome_band, 0))
-	_runtime_state["standing"] = int(_runtime_state.get("standing", 0)) + standing_delta
-
-	# Crew leaves the assigned pool and enters Recovering on completion.
 	var recovery_seconds := _resolve_recovery_seconds(offer, outcome_band)
-	move_assigned_crew_to_recovering(crew_committed, recovery_seconds, "commission_%s" % outcome_band)
-
-	# Optional side reward chance: small bonus supplies grant to keep v1 light.
 	var side_reward := _roll_side_reward(offer, outcome_band)
-	if not side_reward.is_empty():
-		add_supplies(int(side_reward.get("amount", 0)))
 
 	return {
 		"outcome_band": outcome_band,
@@ -148,6 +143,24 @@ func resolve_commission_completion(offer: Dictionary, prep_tier_id: String, comm
 	}
 
 
+func apply_completion_payload(completion_payload: Dictionary) -> void:
+	# Claim-time mutation endpoint:
+	# - applies standing deltas,
+	# - moves assigned crew into recovering,
+	# - grants side-reward supplies.
+	var standing_delta := int(completion_payload.get("standing_delta", 0))
+	_runtime_state["standing"] = int(_runtime_state.get("standing", 0)) + standing_delta
+
+	var crew_to_recovering := maxi(0, int(completion_payload.get("crew_to_recovering", 0)))
+	var recovery_seconds := maxi(0, int(completion_payload.get("recovery_seconds", 0)))
+	var source := "commission_%s" % str(completion_payload.get("outcome_band", "solid"))
+	move_assigned_crew_to_recovering(crew_to_recovering, recovery_seconds, source)
+
+	var side_reward := completion_payload.get("side_reward", {}) as Dictionary
+	if not side_reward.is_empty() and str(side_reward.get("type", "")).to_lower() == "supplies":
+		add_supplies(int(side_reward.get("amount", 0)))
+
+
 func assign_crew_to_commission(crew_amount: int) -> bool:
 	# Reserve crew into assigned pool when a commission starts.
 	var amount := maxi(0, crew_amount)
@@ -156,6 +169,21 @@ func assign_crew_to_commission(crew_amount: int) -> bool:
 	if amount > get_available_crew():
 		return false
 	_runtime_state["assigned_crew"] = get_assigned_crew() + amount
+	_runtime_state = _normalize_crew_state(_runtime_state)
+	return true
+
+
+
+
+func move_assigned_crew_to_available(crew_amount: int) -> bool:
+	# Rollback helper for failed dispatch starts before runtime row is recorded.
+	var amount := maxi(0, crew_amount)
+	if amount == 0:
+		return true
+	if amount > get_assigned_crew():
+		return false
+	_runtime_state["assigned_crew"] = get_assigned_crew() - amount
+	_runtime_state["available_crew"] = get_available_crew() + amount
 	_runtime_state = _normalize_crew_state(_runtime_state)
 	return true
 
