@@ -87,6 +87,7 @@ func start_commission(
 	var duration_seconds := _resolve_duration_seconds(offer_snapshot)
 	var runtime_id := _next_runtime_id
 	_next_runtime_id += 1
+	var player_facing_title := _resolve_player_facing_title_from_offer(offer_snapshot)
 
 	var row := {
 		"runtime_id": runtime_id,
@@ -95,8 +96,11 @@ func start_commission(
 		"patron_id": str(offer_snapshot.get("patron_id", "")),
 		"family_id": str(offer_snapshot.get("family_id", "")),
 		"region_id": str(offer_snapshot.get("region_id", "")),
-		"title": str(offer_snapshot.get("title", "Commission")),
-		"brief": str(offer_snapshot.get("brief", "")),
+		# Runtime rows must copy a player-facing title at dispatch time because
+		# board offers can reroll/disappear while the timed commission is active.
+		# This is intentionally narrow: board/runtime ownership stays unchanged.
+		"title": player_facing_title,
+		"brief": player_facing_title,
 		"prep_tier_id": prep_tier_id.strip_edges(),
 		"crew_committed": maxi(0, int(commitment.get("crew_commitment", 0))),
 		"supplies_committed": maxi(0, int(commitment.get("supplies_commitment", 0))),
@@ -198,6 +202,7 @@ func _sanitize_runtime_entries(entries: Variant, ready_bucket: bool) -> Array[Di
 		var started_at := maxi(0, int(row.get("started_at_unix", 0)))
 		var ready_at := maxi(started_at, int(row.get("ready_at_unix", started_at)))
 		var completion_payload := row.get("completion_payload", {}) as Dictionary
+		var normalized_title := _resolve_player_facing_title_from_runtime_row(row)
 		rows.append({
 			"runtime_id": runtime_id,
 			"state": state,
@@ -205,8 +210,10 @@ func _sanitize_runtime_entries(entries: Variant, ready_bucket: bool) -> Array[Di
 			"patron_id": str(row.get("patron_id", "")),
 			"family_id": str(row.get("family_id", "")),
 			"region_id": str(row.get("region_id", "")),
-			"title": str(row.get("title", "Commission")),
-			"brief": str(row.get("brief", "")),
+			# Save fallback for older rows that were persisted with generic
+			# "Commission" title text. Prefer any stored player-facing text.
+			"title": normalized_title,
+			"brief": normalized_title,
 			"prep_tier_id": str(row.get("prep_tier_id", "")),
 			"crew_committed": maxi(0, int(row.get("crew_committed", 0))),
 			"supplies_committed": maxi(0, int(row.get("supplies_committed", 0))),
@@ -235,3 +242,36 @@ func _resolve_duration_seconds(offer_snapshot: Dictionary) -> int:
 	if minutes <= 0:
 		minutes = maxi(1, int(offer_snapshot.get("duration_hours", 1)) * 60)
 	return maxi(30, minutes * 60)
+
+
+func _resolve_player_facing_title_from_offer(offer_snapshot: Dictionary) -> String:
+	# Commission board/detail already presents brief_text to players as the
+	# commission name, so runtime rows should persist the same field explicitly.
+	var brief_text := str(offer_snapshot.get("brief_text", "")).strip_edges()
+	if not brief_text.is_empty():
+		return brief_text
+	var title := str(offer_snapshot.get("title", "")).strip_edges()
+	if not title.is_empty():
+		return title
+	var brief := str(offer_snapshot.get("brief", "")).strip_edges()
+	if not brief.is_empty():
+		return brief
+	return "Commission"
+
+
+func _resolve_player_facing_title_from_runtime_row(row: Dictionary) -> String:
+	# Tiny compatibility fallback:
+	# some saved rows may still have generic title text from earlier runtime data.
+	# If that happens, recover the best available human-readable text.
+	var title := str(row.get("title", "")).strip_edges()
+	if not title.is_empty() and title != "Commission":
+		return title
+	var brief := str(row.get("brief", "")).strip_edges()
+	if not brief.is_empty() and brief != "Commission":
+		return brief
+	var brief_text := str(row.get("brief_text", "")).strip_edges()
+	if not brief_text.is_empty():
+		return brief_text
+	if not title.is_empty():
+		return title
+	return "Commission"
