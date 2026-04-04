@@ -494,7 +494,7 @@ theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
-metadata/_tab_index = 1
+metadata/_tab_index = 2
 
 [node name="CommissionSlotsScroller" type="ScrollContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab" unique_id=570001017]
 layout_mode = 2
@@ -688,6 +688,214 @@ layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
 text = "Tap to Open Commission Board"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+max_lines_visible = 4
+
+[node name="SupplyRunsTab" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+metadata/_tab_index = 1
+
+[node name="SupplyRunSlotsScroller" type="ScrollContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 0
+
+[node name="SupplyRunSlotsRow" type="HBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="SupplyRunSlotOneCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow"]
+custom_minimum_size = Vector2(150, 196)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("6_touch_card")
+
+[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="SupplyRunSlotOneImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("5_0pdko")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="SupplyRunSlotOneImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+text = "IMG"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SupplyRunSlotOneNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 10
+text = "Empty Slot"
+horizontal_alignment = 1
+autowrap_mode = 2
+text_overrun_behavior = 3
+max_lines_visible = 2
+
+[node name="SupplyRunSlotOneStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 9
+text = "Tap to Open Supply Board"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+max_lines_visible = 4
+
+[node name="SupplyRunSlotTwoCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow"]
+custom_minimum_size = Vector2(150, 196)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("6_touch_card")
+
+[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="SupplyRunSlotTwoImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("5_513lt")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="SupplyRunSlotTwoImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content"]
+visible = false
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_vertical = 1
+text = "IMG"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SupplyRunSlotTwoNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 10
+text = "Empty Slot"
+horizontal_alignment = 1
+autowrap_mode = 2
+text_overrun_behavior = 3
+max_lines_visible = 2
+
+[node name="SupplyRunSlotTwoStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 9
+text = "Tap to Open Supply Board"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+max_lines_visible = 4
+
+[node name="SupplyRunSlotThreeCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow"]
+custom_minimum_size = Vector2(150, 196)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("6_touch_card")
+
+[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="SupplyRunSlotThreeImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("7_o7uwm")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="SupplyRunSlotThreeImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content"]
+visible = false
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_vertical = 1
+text = "IMG"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SupplyRunSlotThreeNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 10
+text = "Empty Slot"
+horizontal_alignment = 1
+autowrap_mode = 2
+text_overrun_behavior = 3
+max_lines_visible = 2
+
+[node name="SupplyRunSlotThreeStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 9
+text = "Tap to Open Supply Board"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2

@@ -37,6 +37,7 @@ const EXPEDITION_REPORT_SCENE := preload("res://scenes/report/ExpeditionReport.t
 const GUILD_UPGRADES_SCENE := preload("res://scenes/upgrades/GuildUpgrades.tscn")
 const CODEX_SCREEN_SCENE := preload("res://scenes/codex/CodexScreen.tscn")
 const COMMISSION_BOARD_SCENE := preload("res://scenes/commissions/CommissionBoard.tscn")
+const SUPPLY_BOARD_SCENE := preload("res://scenes/supply_runs/SupplyBoard.tscn")
 const NEW_GAME_START_CONDITIONS_PATH := "res://data/progression/new_game_start_conditions.json"
 const DEFAULT_NEW_GAME_START_CONDITIONS := {
 	"schema_version": 1,
@@ -96,6 +97,7 @@ var _report_controller: ReportController
 var _upgrades_controller: UpgradesController
 var _codex_controller: CodexController
 var _commission_board_controller: CommissionBoardScreenController
+var _supply_board_screen_controller: SupplyBoardScreenController
 var _mounted_screen: Control
 var _commission_tick_accumulator := 0.0
 const COMMISSION_TICK_SECONDS := 1.0
@@ -130,6 +132,7 @@ func _process(delta: float) -> void:
 	if state_changed:
 		_save_runtime_state()
 		_refresh_guild_hall_commission_and_resources()
+		_refresh_supply_board_context()
 
 
 func get_selected_expedition_for_activation() -> Dictionary:
@@ -147,12 +150,17 @@ func _show_guild_hall() -> void:
 		_guild_hall_controller.debug_finish_requested.connect(_on_debug_finish_requested)
 		_guild_hall_controller.debug_reset_requested.connect(_on_debug_reset_requested)
 		_guild_hall_controller.commission_claim_requested.connect(_on_commission_claim_requested)
+		_guild_hall_controller.supply_run_claim_requested.connect(_on_supply_run_claim_requested)
 
 	_show_screen(_guild_hall_controller)
 	_guild_hall_controller.set_expedition_manager(_expedition_manager)
 	_guild_hall_controller.set_commission_runtime(
 		_commission_runtime_manager,
 		int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 0))
+	)
+	_guild_hall_controller.set_supply_run_runtime(
+		_supply_run_runtime_manager,
+		int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0))
 	)
 	_guild_hall_controller.set_resources(_build_guild_hall_resources())
 
@@ -264,6 +272,23 @@ func _show_commission_board() -> void:
 	_show_screen(_commission_board_controller)
 
 
+func _show_supply_board() -> void:
+	if _supply_board_screen_controller == null:
+		_supply_board_screen_controller = SUPPLY_BOARD_SCENE.instantiate() as SupplyBoardScreenController
+		_supply_board_screen_controller.navigate_requested.connect(_on_global_navigation_requested)
+		_supply_board_screen_controller.supply_dispatch_requested.connect(_on_supply_dispatch_requested)
+	_ensure_supply_board_ready()
+	_supply_board_screen_controller.set_supply_board_context(
+		_supply_board_controller.get_visible_offers(),
+		_commission_resolver.get_available_crew(),
+		int(_resources.get("gold", 0)),
+		_commission_resolver.get_supplies(),
+		_supply_run_runtime_manager.get_active_slot_usage(),
+		int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0))
+	)
+	_show_screen(_supply_board_screen_controller)
+
+
 
 
 func _claim_all_ready_commissions() -> Dictionary:
@@ -332,8 +357,8 @@ func _on_open_report_requested() -> void:
 
 
 func _on_global_navigation_requested(target_screen: String) -> void:
-	# Shared bottom-nav routes for GH/EB/GU/CX/CB.
-	# Placeholder buttons (XX-right/SH) are intentionally inert and emit nothing.
+	# Shared bottom-nav routes for GH/EB/GU/CX/CB + Supply Board (Logistics).
+	# Only the far-right shop placeholder remains intentionally inert.
 	match target_screen:
 		BottomNavBar.TARGET_GUILD_HALL:
 			_show_guild_hall()
@@ -345,6 +370,8 @@ func _on_global_navigation_requested(target_screen: String) -> void:
 			_show_codex_screen()
 		BottomNavBar.TARGET_COMMISSION_BOARD:
 			_show_commission_board()
+		BottomNavBar.TARGET_SUPPLY_BOARD:
+			_show_supply_board()
 
 
 func _on_debug_finish_requested() -> void:
@@ -354,6 +381,8 @@ func _on_debug_finish_requested() -> void:
 	# verify active -> claimable transitions without waiting full durations.
 	var forced_rows := _commission_runtime_manager.debug_finish_all_active()
 	_apply_completion_crew_transition_for_rows(forced_rows)
+	var forced_supply_rows := _supply_run_runtime_manager.debug_finish_all_active()
+	_apply_supply_run_completion_rows(forced_supply_rows)
 	# Persist immediately so force-completed slots/reports survive app restarts.
 	_save_runtime_state()
 	_refresh_guild_hall_commission_and_resources()
@@ -386,6 +415,7 @@ func reset_to_debug_baseline() -> void:
 	_supply_board_snapshot = {}
 	_discard_expedition_board_controller()
 	_discard_commission_board_controller()
+	_discard_supply_board_controller()
 
 	# Clear persisted progress so app restarts also stay at baseline.
 	var save_cleared := _save_manager.clear_saved_game_state()
@@ -417,6 +447,17 @@ func _discard_commission_board_controller() -> void:
 		_commission_board_controller.get_parent().remove_child(_commission_board_controller)
 	_commission_board_controller.queue_free()
 	_commission_board_controller = null
+
+
+func _discard_supply_board_controller() -> void:
+	if _supply_board_screen_controller == null:
+		return
+	if _mounted_screen == _supply_board_screen_controller:
+		_mounted_screen = null
+	if _supply_board_screen_controller.get_parent() != null:
+		_supply_board_screen_controller.get_parent().remove_child(_supply_board_screen_controller)
+	_supply_board_screen_controller.queue_free()
+	_supply_board_screen_controller = null
 
 
 func _on_return_to_guild_hall_requested() -> void:
@@ -642,6 +683,29 @@ func _on_commission_claim_requested(runtime_id: int) -> void:
 
 	_save_runtime_state()
 	_refresh_guild_hall_commission_and_resources()
+
+
+func _on_supply_run_claim_requested(runtime_id: int) -> void:
+	var result := claim_supply_run(runtime_id)
+	_refresh_supply_board_context()
+	if _supply_board_screen_controller != null and _mounted_screen == _supply_board_screen_controller:
+		_supply_board_screen_controller.handle_dispatch_result(
+			bool(result.get("success", false)),
+			str(result.get("message", "")),
+			_supply_board_controller.get_visible_offers()
+		)
+
+
+func _on_supply_dispatch_requested(offer_id: String) -> void:
+	var result := try_dispatch_supply_run(offer_id)
+	_refresh_supply_board_context()
+	if _supply_board_screen_controller == null:
+		return
+	_supply_board_screen_controller.handle_dispatch_result(
+		bool(result.get("success", false)),
+		str(result.get("message", "")),
+		_supply_board_controller.get_visible_offers()
+	)
 
 
 func try_dispatch_supply_run(offer_id: String) -> Dictionary:
@@ -1024,6 +1088,23 @@ func _refresh_guild_hall_commission_and_resources() -> void:
 	_guild_hall_controller.set_commission_runtime(
 		_commission_runtime_manager,
 		int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 0))
+	)
+	_guild_hall_controller.set_supply_run_runtime(
+		_supply_run_runtime_manager,
+		int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0))
+	)
+
+
+func _refresh_supply_board_context() -> void:
+	if _supply_board_screen_controller == null:
+		return
+	_supply_board_screen_controller.set_supply_board_context(
+		_supply_board_controller.get_visible_offers(),
+		_commission_resolver.get_available_crew(),
+		int(_resources.get("gold", 0)),
+		_commission_resolver.get_supplies(),
+		_supply_run_runtime_manager.get_active_slot_usage(),
+		int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0))
 	)
 
 

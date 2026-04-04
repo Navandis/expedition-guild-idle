@@ -5,8 +5,8 @@ class_name GuildHallController
 # Guild Hall is the dashboard landing screen for the prototype loop.
 #
 # Why the operations area now uses a TabContainer:
-# - Guild Hall is now the shared status-and-entry surface for both active
-#   Expeditions and active Commissions.
+# - Guild Hall is now the shared status-and-entry surface for Expeditions,
+#   Commissions, and Supply Runs.
 # - Keeping both views in one TabContainer lets players switch context quickly
 #   without changing screens, while the deeper offer/dispatch workflow still
 #   lives on the dedicated board screens.
@@ -27,6 +27,7 @@ signal navigate_requested(target_screen: String)
 signal debug_finish_requested
 signal debug_reset_requested
 signal commission_claim_requested(runtime_id: int)
+signal supply_run_claim_requested(runtime_id: int)
 
 const _STATUS_BORDER_EMPTY := Color(0.95, 0.55, 0.20, 1.0)
 const _STATUS_BORDER_ONGOING := Color(0.95, 0.84, 0.20, 1.0)
@@ -37,6 +38,7 @@ const _SLOT_VISUAL_COMPLETED := "completed"
 const _EXPEDITION_CARD_COUNT := 3
 const _EXPEDITION_UNLOCKED_COUNT := 2
 const _COMMISSION_CARD_COUNT := 3
+const _SUPPLY_RUN_CARD_COUNT := 3
 const _COMMISSION_SETTLEMENT_POPUP_SCENE := preload("res://scenes/components/CommissionSettlementPopup.tscn")
 
 @onready var _gold_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
@@ -78,13 +80,31 @@ const _COMMISSION_SETTLEMENT_POPUP_SCENE := preload("res://scenes/components/Com
 	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content/CommissionSlotTwoStateLabel,
 	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content/CommissionSlotThreeStateLabel
 ]
+@onready var _supply_run_slots_scroller: ScrollContainer = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller
+@onready var _supply_run_slot_cards: Array[TouchScrollCardButton] = [
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard
+]
+@onready var _supply_run_slot_name_labels: Array[Label] = [
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content/SupplyRunSlotOneNameLabel,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content/SupplyRunSlotTwoNameLabel,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content/SupplyRunSlotThreeNameLabel
+]
+@onready var _supply_run_slot_state_labels: Array[Label] = [
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content/SupplyRunSlotOneStateLabel,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content/SupplyRunSlotTwoStateLabel,
+	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content/SupplyRunSlotThreeStateLabel
+]
 
 @onready var _bottom_nav_safe: MarginContainer = $BottomNavSafe
 @onready var _bottom_nav: BottomNavBar = $BottomNavSafe/BottomNavBar
 
 var _expedition_manager: ExpeditionManager
 var _commission_runtime_manager: CommissionRuntimeManager
+var _supply_run_runtime_manager: SupplyRunRuntimeManager
 var _commission_slot_capacity := _COMMISSION_CARD_COUNT
+var _supply_run_slot_capacity := _SUPPLY_RUN_CARD_COUNT
 var _crew_dropdown_presenter := CrewDropdownPresenter.new()
 var _resources := {
 	"gold": 0,
@@ -100,6 +120,9 @@ var _commission_slot_actions: Array[String] = ["", "", ""]
 var _commission_slot_runtime_ids: Array[int] = [0, 0, 0]
 var _commission_slot_visual_states: Array[String] = ["", "", ""]
 var _commission_ready_entries_by_runtime_id: Dictionary = {}
+var _supply_run_slot_actions: Array[String] = ["", "", ""]
+var _supply_run_slot_runtime_ids: Array[int] = [0, 0, 0]
+var _supply_run_slot_visual_states: Array[String] = ["", "", ""]
 var _cached_slot_styles: Dictionary = {}
 var _operations_offset_left := 0.0
 var _operations_offset_right := 0.0
@@ -109,6 +132,7 @@ var _commission_settlement_popup: CommissionSettlementPopup
 func _ready() -> void:
 	_hide_scrollbars(_expedition_slots_scroller)
 	_hide_scrollbars(_commission_slots_scroller)
+	_hide_scrollbars(_supply_run_slots_scroller)
 	_debug_finish_button.pressed.connect(_on_debug_finish_pressed)
 	_debug_reset_button.pressed.connect(_on_debug_reset_pressed)
 
@@ -126,6 +150,11 @@ func _ready() -> void:
 		var card_index := i
 		_commission_slot_cards[i].confirmed_tap.connect(func() -> void:
 			_on_commission_card_pressed(card_index)
+		)
+	for i in range(_supply_run_slot_cards.size()):
+		var supply_card_index := i
+		_supply_run_slot_cards[i].confirmed_tap.connect(func() -> void:
+			_on_supply_run_card_pressed(supply_card_index)
 		)
 	_build_commission_settlement_popup()
 
@@ -146,6 +175,8 @@ func _ready() -> void:
 	# Tab captions are explicit status surfaces for active operations.
 	_operations_tabs.set_tab_title(0, "Expeditions")
 	_operations_tabs.set_tab_title(1, "Commissions")
+	# Third tab keeps Guild Hall aligned with the milestone's three-lane identity.
+	_operations_tabs.set_tab_title(2, "Supply Runs")
 
 	_build_cached_slot_styles()
 	_operations_offset_left = _operations_section_panel.offset_left
@@ -158,6 +189,7 @@ func _ready() -> void:
 	_refresh_resource_labels()
 	_refresh_active_status()
 	_refresh_commission_status()
+	_refresh_supply_run_status()
 
 
 func _hide_scrollbars(scroll_container: ScrollContainer) -> void:
@@ -174,6 +206,7 @@ func _hide_scrollbars(scroll_container: ScrollContainer) -> void:
 func _process(_delta: float) -> void:
 	_refresh_active_status()
 	_refresh_commission_status()
+	_refresh_supply_run_status()
 
 
 func _notification(what: int) -> void:
@@ -222,6 +255,14 @@ func set_commission_runtime(runtime_manager: CommissionRuntimeManager, slot_capa
 	_refresh_commission_status()
 
 
+func set_supply_run_runtime(runtime_manager: SupplyRunRuntimeManager, slot_capacity: int) -> void:
+	# Guild Hall only projects timed Supply Run status and entry points.
+	# Offer inspection + dispatch remain on the dedicated Supply Board screen.
+	_supply_run_runtime_manager = runtime_manager
+	_supply_run_slot_capacity = maxi(0, slot_capacity)
+	_refresh_supply_run_status()
+
+
 func set_resources(resources: Dictionary) -> void:
 	_resources = resources.duplicate(true)
 	_refresh_resource_labels()
@@ -260,8 +301,11 @@ func _refresh_active_status() -> void:
 	var has_active_commissions := false
 	if _commission_runtime_manager != null:
 		has_active_commissions = _commission_runtime_manager.get_active_slot_usage() > 0
+	var has_active_supply_runs := false
+	if _supply_run_runtime_manager != null:
+		has_active_supply_runs = _supply_run_runtime_manager.get_active_slot_usage() > 0
 	# Debug finish is shared QA tooling for both timed systems.
-	_debug_finish_button.visible = has_active_expeditions or has_active_commissions
+	_debug_finish_button.visible = has_active_expeditions or has_active_commissions or has_active_supply_runs
 	_debug_reset_button.visible = true
 
 
@@ -441,6 +485,94 @@ func _format_remaining_time(remaining_seconds: int) -> String:
 	return "%dm" % maxi(1, minutes)
 
 
+func _refresh_supply_run_status() -> void:
+	# Supply cards intentionally reuse the same card grammar as other operations:
+	# image/title/state + whole-card tap keeps the lane switch predictable.
+	if _supply_run_slot_cards.is_empty():
+		return
+
+	var cards_to_fill := mini(_supply_run_slot_capacity, _SUPPLY_RUN_CARD_COUNT)
+	var ready_rows: Array[Dictionary] = []
+	var active_rows: Array[Dictionary] = []
+	if _supply_run_runtime_manager != null:
+		ready_rows = _supply_run_runtime_manager.get_ready_to_claim_entries()
+		active_rows = _supply_run_runtime_manager.get_active_entries()
+
+	for i in range(_SUPPLY_RUN_CARD_COUNT):
+		if i >= cards_to_fill:
+			_set_supply_run_locked_slot(i)
+			continue
+		if not ready_rows.is_empty():
+			_set_supply_run_ready_slot(i, ready_rows.pop_front())
+			continue
+		if not active_rows.is_empty():
+			_set_supply_run_active_slot(i, active_rows.pop_front())
+			continue
+		_set_supply_run_empty_slot(i)
+
+
+func _set_supply_run_locked_slot(slot_index: int) -> void:
+	var card := _get_supply_run_card(slot_index)
+	var name_label := _get_supply_run_name_label(slot_index)
+	var state_label := _get_supply_run_state_label(slot_index)
+	if card == null or name_label == null or state_label == null:
+		return
+	name_label.text = "Locked Slot"
+	state_label.text = "Reserved for future capacity"
+	card.disabled = true
+	_supply_run_slot_actions[slot_index] = "locked"
+	_supply_run_slot_runtime_ids[slot_index] = 0
+	_apply_supply_run_status_border(slot_index, card, _SLOT_VISUAL_EMPTY)
+
+
+func _set_supply_run_empty_slot(slot_index: int) -> void:
+	var card := _get_supply_run_card(slot_index)
+	var name_label := _get_supply_run_name_label(slot_index)
+	var state_label := _get_supply_run_state_label(slot_index)
+	if card == null or name_label == null or state_label == null:
+		return
+	name_label.text = "Empty Slot"
+	state_label.text = "Tap to Open Supply Board"
+	card.disabled = false
+	card.focus_mode = Control.FOCUS_ALL
+	_supply_run_slot_actions[slot_index] = "open_board"
+	_supply_run_slot_runtime_ids[slot_index] = 0
+	_apply_supply_run_status_border(slot_index, card, _SLOT_VISUAL_EMPTY)
+
+
+func _set_supply_run_active_slot(slot_index: int, entry: Dictionary) -> void:
+	var card := _get_supply_run_card(slot_index)
+	var name_label := _get_supply_run_name_label(slot_index)
+	var state_label := _get_supply_run_state_label(slot_index)
+	if card == null or name_label == null or state_label == null:
+		return
+	name_label.text = str(entry.get("title", "Supply Run"))
+	var now := int(Time.get_unix_time_from_system())
+	var ready_at := int(entry.get("ready_at_unix", now))
+	var remaining := maxi(0, ready_at - now)
+	state_label.text = "In progress · %s left" % _format_remaining_time(remaining)
+	card.disabled = true
+	card.focus_mode = Control.FOCUS_NONE
+	_supply_run_slot_actions[slot_index] = "in_progress"
+	_supply_run_slot_runtime_ids[slot_index] = int(entry.get("runtime_id", 0))
+	_apply_supply_run_status_border(slot_index, card, _SLOT_VISUAL_ONGOING)
+
+
+func _set_supply_run_ready_slot(slot_index: int, entry: Dictionary) -> void:
+	var card := _get_supply_run_card(slot_index)
+	var name_label := _get_supply_run_name_label(slot_index)
+	var state_label := _get_supply_run_state_label(slot_index)
+	if card == null or name_label == null or state_label == null:
+		return
+	name_label.text = str(entry.get("title", "Supply Run"))
+	state_label.text = "Complete · Collect Supplies"
+	card.disabled = false
+	card.focus_mode = Control.FOCUS_ALL
+	_supply_run_slot_actions[slot_index] = "claim"
+	_supply_run_slot_runtime_ids[slot_index] = int(entry.get("runtime_id", 0))
+	_apply_supply_run_status_border(slot_index, card, _SLOT_VISUAL_COMPLETED)
+
+
 func _build_cached_slot_styles() -> void:
 	_cached_slot_styles = {
 		_SLOT_VISUAL_EMPTY: _build_base_slot_style(_STATUS_BORDER_EMPTY),
@@ -498,6 +630,21 @@ func _apply_commission_status_border(slot_index: int, card: Button, visual_state
 	_commission_slot_visual_states[slot_index] = visual_state
 
 
+func _apply_supply_run_status_border(slot_index: int, card: Button, visual_state: String) -> void:
+	if slot_index < 0 or slot_index >= _supply_run_slot_visual_states.size():
+		return
+	if _supply_run_slot_visual_states[slot_index] == visual_state:
+		return
+	var base_style := _cached_slot_styles.get(visual_state, null) as StyleBoxFlat
+	if base_style == null:
+		return
+	card.add_theme_stylebox_override("normal", base_style)
+	card.add_theme_stylebox_override("hover", base_style.duplicate())
+	card.add_theme_stylebox_override("pressed", base_style.duplicate())
+	card.add_theme_stylebox_override("disabled", base_style.duplicate())
+	_supply_run_slot_visual_states[slot_index] = visual_state
+
+
 func _get_slot_card(slot_index: int) -> Button:
 	if slot_index == 0:
 		return _slot_one_card
@@ -546,6 +693,24 @@ func _get_commission_state_label(slot_index: int) -> Label:
 	return _commission_slot_state_labels[slot_index]
 
 
+func _get_supply_run_card(slot_index: int) -> TouchScrollCardButton:
+	if slot_index < 0 or slot_index >= _supply_run_slot_cards.size():
+		return null
+	return _supply_run_slot_cards[slot_index]
+
+
+func _get_supply_run_name_label(slot_index: int) -> Label:
+	if slot_index < 0 or slot_index >= _supply_run_slot_name_labels.size():
+		return null
+	return _supply_run_slot_name_labels[slot_index]
+
+
+func _get_supply_run_state_label(slot_index: int) -> Label:
+	if slot_index < 0 or slot_index >= _supply_run_slot_state_labels.size():
+		return null
+	return _supply_run_slot_state_labels[slot_index]
+
+
 func _on_bottom_nav_requested(target_screen: String) -> void:
 	navigate_requested.emit(target_screen)
 
@@ -579,6 +744,20 @@ func _on_commission_card_pressed(slot_index: int) -> void:
 			# Completed cards now open a compact settlement popup first so players
 			# can review outcome details before explicitly pressing Claim.
 			_open_commission_settlement_popup(runtime_id)
+
+
+func _on_supply_run_card_pressed(slot_index: int) -> void:
+	if slot_index < 0 or slot_index >= _supply_run_slot_actions.size():
+		return
+	var action := _supply_run_slot_actions[slot_index]
+	if action == "open_board":
+		navigate_requested.emit(BottomNavBar.TARGET_SUPPLY_BOARD)
+		return
+	if action == "claim":
+		var runtime_id := _supply_run_slot_runtime_ids[slot_index]
+		if runtime_id > 0:
+			# Compact flow for v1: completed card tap can claim directly.
+			supply_run_claim_requested.emit(runtime_id)
 
 
 func _on_debug_finish_pressed() -> void:

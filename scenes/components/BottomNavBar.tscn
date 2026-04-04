@@ -187,7 +187,7 @@ stretch_mode = 5
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
-disabled = true
+tooltip_text = "Logistics"
 
 [node name="IconMargin" type="MarginContainer" parent="Panel/Margin/ButtonsRow/XXButtonRight" unique_id=1414679353]
 layout_mode = 1
