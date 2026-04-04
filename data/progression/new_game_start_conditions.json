@@ -18,6 +18,10 @@
     "commission": {
       "current_commission_slot_capacity": 3,
       "max_commission_slot_capacity": 4
+    },
+    "supply_run": {
+      "current_supply_run_slot_capacity": 2,
+      "max_supply_run_slot_capacity": 3
     }
   }
 }

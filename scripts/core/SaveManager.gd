@@ -7,11 +7,12 @@ class_name SaveManager
 # - player-owned per-region progress (region_progress),
 # - commission runtime resources (Crew pools + Supplies),
 # - commission active/ready-to-claim runtime rows,
-# - runtime slot-capacity ownership state (current/max for expedition/commission),
+# - supply-run active/ready-to-claim runtime rows,
+# - runtime slot-capacity ownership state (expedition/commission/supply-run),
 # while keeping previous keys for expedition loop persistence.
 
 const SAVE_PATH := "user://prototype_save.json"
-const SAVE_SCHEMA_VERSION := 5
+const SAVE_SCHEMA_VERSION := 6
 
 
 func load_game_state() -> Dictionary:
@@ -51,6 +52,7 @@ func save_game_state(state: Dictionary) -> bool:
 		"resources": _coerce_resources(state.get("resources", {})),
 		"commission_resources": _coerce_commission_resources(state.get("commission_resources", {})),
 		"commission_runtime": _coerce_commission_runtime(state.get("commission_runtime", {})),
+		"supply_run_runtime": _coerce_supply_run_runtime(state.get("supply_run_runtime", {})),
 		"slot_capacities": _coerce_slot_capacities(state.get("slot_capacities", {})),
 		"owned_upgrades": _coerce_string_array(state.get("owned_upgrades", [])),
 		"codex_discoveries": _coerce_string_array(state.get("codex_discoveries", [])),
@@ -59,7 +61,8 @@ func save_game_state(state: Dictionary) -> bool:
 		"active_expeditions": _coerce_dictionary_array(state.get("active_expeditions", [])),
 		"pending_reports": _coerce_dictionary_array(state.get("pending_reports", [])),
 		"expedition_board_offers": _coerce_dictionary_array(state.get("expedition_board_offers", [])),
-		"commission_board_snapshot": _coerce_dictionary(state.get("commission_board_snapshot", {}))
+		"commission_board_snapshot": _coerce_dictionary(state.get("commission_board_snapshot", {})),
+		"supply_board_snapshot": _coerce_dictionary(state.get("supply_board_snapshot", {}))
 	}
 
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -134,6 +137,17 @@ func _coerce_commission_runtime(value: Variant) -> Dictionary:
 	}
 
 
+func _coerce_supply_run_runtime(value: Variant) -> Dictionary:
+	# Separate runtime owner for active/claimable Supply Runs.
+	# This prevents board offers from overwriting live timed run rows.
+	var source := _coerce_dictionary(value)
+	return {
+		"active_entries": _coerce_dictionary_array(source.get("active_entries", [])),
+		"ready_to_claim_entries": _coerce_dictionary_array(source.get("ready_to_claim_entries", [])),
+		"next_runtime_id": maxi(1, int(source.get("next_runtime_id", 1)))
+	}
+
+
 func _coerce_slot_capacities(value: Variant) -> Dictionary:
 	# Slot capacities are runtime/player progression state and are persisted in
 	# saves. Authored JSON only supplies brand-new profile baselines.
@@ -144,6 +158,9 @@ func _coerce_slot_capacities(value: Variant) -> Dictionary:
 	var expedition_max := maxi(expedition_current, int(expedition.get("max_expedition_slot_capacity", 3)))
 	var commission_current := maxi(0, int(commission.get("current_commission_slot_capacity", 3)))
 	var commission_max := maxi(commission_current, int(commission.get("max_commission_slot_capacity", 4)))
+	var supply_run := _coerce_dictionary(source.get("supply_run", {}))
+	var supply_run_current := maxi(0, int(supply_run.get("current_supply_run_slot_capacity", 2)))
+	var supply_run_max := maxi(supply_run_current, int(supply_run.get("max_supply_run_slot_capacity", 3)))
 
 	return {
 		"expedition": {
@@ -153,6 +170,10 @@ func _coerce_slot_capacities(value: Variant) -> Dictionary:
 		"commission": {
 			"current_commission_slot_capacity": commission_current,
 			"max_commission_slot_capacity": commission_max
+		},
+		"supply_run": {
+			"current_supply_run_slot_capacity": supply_run_current,
+			"max_supply_run_slot_capacity": supply_run_max
 		}
 	}
 
