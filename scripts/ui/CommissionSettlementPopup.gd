@@ -61,23 +61,30 @@ func open_for_entry(entry: Dictionary) -> void:
 	var recovery_delta_percent := _resolve_delta_percent(payload, "recovery_delta_percent", "recovery_multiplier", outcome_band, false)
 	var delta_color_tag := "[color=%s]" % _to_html_color(outcome_color)
 	var delta_close_tag := "[/color]"
+	var show_delta := outcome_band != "solid"
 	# Delta color matches the outcome color to reinforce "these effects came from
 	# this outcome band" without redesigning the full popup visuals.
-	_gold_label.text = "Gold Payout: %d (%s%s%s)" % [
-		gold_payout,
-		delta_color_tag,
-		_format_signed_percent(gold_delta_percent),
-		delta_close_tag
-	]
+	if show_delta:
+		_gold_label.text = "Gold Payout: %d (%s%s%s)" % [
+			gold_payout,
+			delta_color_tag,
+			_format_signed_percent(gold_delta_percent),
+			delta_close_tag
+		]
+	else:
+		_gold_label.text = "Gold Payout: %d" % gold_payout
 	_side_reward_label.text = "Side Reward: %s" % _format_side_reward(payload.get("side_reward", {}) as Dictionary)
 	_standing_label.text = "Standing Change: %s" % _format_signed(int(payload.get("standing_delta", 0)))
 	_recovering_label.text = "Crew Sent to Recovering: %d" % maxi(0, int(payload.get("crew_to_recovering", 0)))
-	_recovery_time_label.text = "Recovery Time: %s (%s%s%s)" % [
-		TimeFormat.format_seconds_hms(recovery_seconds),
-		delta_color_tag,
-		_format_signed_percent(recovery_delta_percent),
-		delta_close_tag
-	]
+	if show_delta:
+		_recovery_time_label.text = "Recovery Time: %s (%s%s%s)" % [
+			TimeFormat.format_seconds_hms(recovery_seconds),
+			delta_color_tag,
+			_format_signed_percent(recovery_delta_percent),
+			delta_close_tag
+		]
+	else:
+		_recovery_time_label.text = "Recovery Time: %s" % TimeFormat.format_seconds_hms(recovery_seconds)
 	# Summary row removed because outcome + payout/recovery deltas already explain
 	# the settlement result in a more direct and compact way.
 
