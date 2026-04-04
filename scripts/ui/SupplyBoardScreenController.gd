@@ -36,8 +36,10 @@ var _offers: Array[Dictionary] = []
 var _selected_offer: Dictionary = {}
 var _available_crew := 0
 var _current_gold := 0
+var _available_supplies := 0
 var _slot_usage := 0
 var _slot_capacity := 0
+var _ui_ready := false
 
 
 func _ready() -> void:
@@ -53,8 +55,10 @@ func _ready() -> void:
 			_open_offer_at_index(index)
 		)
 	_dispatch_button.pressed.connect(_on_dispatch_pressed)
+	_ui_ready = true
 	_bind_offer_cards()
 	_refresh_dispatch_panel()
+	_apply_header_resources()
 
 
 func set_supply_board_context(
@@ -71,11 +75,22 @@ func set_supply_board_context(
 	_current_gold = maxi(0, current_gold)
 	_slot_usage = maxi(0, slot_usage)
 	_slot_capacity = maxi(0, slot_capacity)
-	_gold_value_label.text = str(_current_gold)
-	_crew_value_label.text = str(_available_crew)
-	_supplies_value_label.text = str(maxi(0, available_supplies))
+	_available_supplies = maxi(0, available_supplies)
+	_apply_header_resources()
+	if not _ui_ready:
+		return
 	_bind_offer_cards()
 	_refresh_dispatch_panel()
+
+
+func _apply_header_resources() -> void:
+	# GameManager can bind context before this scene has finished _ready.
+	# Guarding here avoids nil-label assignment errors during first open.
+	if not _ui_ready:
+		return
+	_gold_value_label.text = str(_current_gold)
+	_crew_value_label.text = str(_available_crew)
+	_supplies_value_label.text = str(_available_supplies)
 
 
 func handle_dispatch_result(success: bool, message: String, offers: Array[Dictionary]) -> void:
