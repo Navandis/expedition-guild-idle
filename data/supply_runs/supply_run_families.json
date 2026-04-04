@@ -1,0 +1,52 @@
+{
+  "families": [
+    {
+      "id": "forage_gathering",
+      "name": "Forage / Gathering",
+      "duration_minutes": {"min": 25, "max": 50},
+      "crew_required": {"min": 2, "max": 4},
+      "gold_cost": {"min": 0, "max": 0},
+      "supplies_yield_estimate": {"min": 10, "max": 15},
+      "risk_text_options": [
+        "Weather can reduce haul quality.",
+        "Pack losses are possible on rough paths."
+      ],
+      "note_text_options": [
+        "Low-cost gather route using known local grounds.",
+        "Reliable provisioning pass through nearby resource pockets."
+      ]
+    },
+    {
+      "id": "procurement_trade",
+      "name": "Procurement / Trade",
+      "duration_minutes": {"min": 30, "max": 65},
+      "crew_required": {"min": 2, "max": 3},
+      "gold_cost": {"min": 25, "max": 80},
+      "supplies_yield_estimate": {"min": 12, "max": 20},
+      "risk_text_options": [
+        "Market scarcity may trim final stock.",
+        "Caravan delays can push delivery windows."
+      ],
+      "note_text_options": [
+        "Uses guild coin to secure known stock quickly.",
+        "Targets trusted local vendors for stable supply lots."
+      ]
+    },
+    {
+      "id": "salvage_recovery",
+      "name": "Salvage / Recovery",
+      "duration_minutes": {"min": 35, "max": 75},
+      "crew_required": {"min": 3, "max": 5},
+      "gold_cost": {"min": 0, "max": 20},
+      "supplies_yield_estimate": {"min": 11, "max": 19},
+      "risk_text_options": [
+        "Recovered goods may include damaged crates.",
+        "Route hazards can force partial retrieval."
+      ],
+      "note_text_options": [
+        "Recovers abandoned stock from known routes.",
+        "Trades speed for potential extra salvage volume."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "templates": [
+    {
+      "id": "forage_route_sweep",
+      "family_id": "forage_gathering",
+      "title_template": "{region_name} Route Sweep",
+      "compatible_region_ids": []
+    },
+    {
+      "id": "forage_herb_dry_goods",
+      "family_id": "forage_gathering",
+      "title_template": "{region_name} Herb & Dry Goods Gather",
+      "compatible_region_ids": []
+    },
+    {
+      "id": "trade_caravan_purchase",
+      "family_id": "procurement_trade",
+      "title_template": "{region_name} Caravan Purchase Circuit",
+      "compatible_region_ids": []
+    },
+    {
+      "id": "trade_wharf_exchange",
+      "family_id": "procurement_trade",
+      "title_template": "{region_name} Exchange Brokerage",
+      "compatible_region_ids": []
+    },
+    {
+      "id": "salvage_waystation_recovery",
+      "family_id": "salvage_recovery",
+      "title_template": "{region_name} Waystation Recovery",
+      "compatible_region_ids": []
+    },
+    {
+      "id": "salvage_convoy_cleanup",
+      "family_id": "salvage_recovery",
+      "title_template": "{region_name} Convoy Salvage Sweep",
+      "compatible_region_ids": []
+    }
+  ]
+}
