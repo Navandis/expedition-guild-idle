@@ -20,6 +20,11 @@ extends Node
 # - stores active/ready-to-claim commission runtime rows separately from board offers,
 # - keeps these values in save data instead of authored commission JSON.
 #
+# Supply Runs foundation slice:
+# - keeps Supply Board offers separate from live timed Supply Run runtime rows,
+# - stores active/ready-to-claim Supply Runs in a dedicated runtime manager,
+# - uses progression-owned Supply Run slot capacity from start-conditions/save.
+#
 # New-game baseline slice:
 # - reads authored start conditions from res://data/progression/new_game_start_conditions.json,
 # - applies those values only when no save exists yet,
@@ -53,6 +58,10 @@ const DEFAULT_NEW_GAME_START_CONDITIONS := {
 		"commission": {
 			"current_commission_slot_capacity": 3,
 			"max_commission_slot_capacity": 4
+		},
+		"supply_run": {
+			"current_supply_run_slot_capacity": 2,
+			"max_supply_run_slot_capacity": 3
 		}
 	}
 }
@@ -70,12 +79,15 @@ var _codex_system := CodexSystem.new()
 var _region_system := RegionSystem.new()
 var _commission_resolver := CommissionResolver.new()
 var _commission_runtime_manager := CommissionRuntimeManager.new()
+var _supply_board_controller := SupplyBoardController.new()
+var _supply_run_runtime_manager := SupplyRunRuntimeManager.new()
 var _save_manager := SaveManager.new()
 var _new_game_start_conditions := DEFAULT_NEW_GAME_START_CONDITIONS.duplicate(true)
 var _resources := DEFAULT_RESOURCES.duplicate(true)
 var _slot_capacities: Dictionary = DEFAULT_NEW_GAME_START_CONDITIONS.get("starting_slot_capacities", {}).duplicate(true)
 var _expedition_board_offers: Array[Dictionary] = []
 var _commission_board_snapshot: Dictionary = {}
+var _supply_board_snapshot: Dictionary = {}
 
 var _guild_hall_controller: GuildHallController
 var _expedition_board_controller: ExpeditionBoardController
@@ -109,6 +121,9 @@ func _process(delta: float) -> void:
 	_commission_tick_accumulator = 0.0
 
 	var state_changed := _process_commission_runtime_progress()
+	var supply_state_changed := _process_supply_run_runtime_progress()
+	if supply_state_changed:
+		state_changed = true
 	var recovered_now := _commission_resolver.process_crew_recovery()
 	if recovered_now > 0:
 		state_changed = true
@@ -364,8 +379,11 @@ func reset_to_debug_baseline() -> void:
 	_region_system.restore_player_state({}, "")
 	_expedition_manager.restore_runtime_state([], [])
 	_commission_runtime_manager.restore_runtime_snapshot({})
+	_supply_run_runtime_manager.restore_runtime_snapshot({})
+	_supply_board_controller.clear_board()
 	_expedition_board_offers = []
 	_commission_board_snapshot = {}
+	_supply_board_snapshot = {}
 	_discard_expedition_board_controller()
 	_discard_commission_board_controller()
 
@@ -626,6 +644,84 @@ func _on_commission_claim_requested(runtime_id: int) -> void:
 	_refresh_guild_hall_commission_and_resources()
 
 
+func try_dispatch_supply_run(offer_id: String) -> Dictionary:
+	# Supply Board stays the offer surface while SupplyRunRuntimeManager owns
+	# dispatched/claimable runtime rows. This keeps board rerolls from mutating
+	# live timed entries and keeps save behavior explicit.
+	var clean_offer_id := offer_id.strip_edges()
+	if clean_offer_id.is_empty():
+		return {"success": false, "message": "Dispatch failed: invalid offer id."}
+
+	_ensure_supply_board_ready()
+	var offer := _find_supply_offer_by_id(clean_offer_id)
+	if offer.is_empty():
+		return {"success": false, "message": "Dispatch failed: offer no longer available."}
+
+	var supply_run_capacity := int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0))
+	if not _supply_run_runtime_manager.can_start_supply_run(supply_run_capacity):
+		return {"success": false, "message": "Dispatch failed: no open Supply Run slot."}
+
+	var crew_cost := maxi(0, int(offer.get("crew_required", 0)))
+	var gold_cost := maxi(0, int(offer.get("gold_cost", 0)))
+	if crew_cost > _commission_resolver.get_available_crew():
+		return {"success": false, "message": "Dispatch failed: insufficient Crew."}
+	if gold_cost > int(_resources.get("gold", 0)):
+		return {"success": false, "message": "Dispatch failed: insufficient Gold."}
+
+	# Locked rule for this milestone:
+	# Supply Runs never spend Supplies on dispatch.
+	var crew_committed := _commission_resolver.assign_crew_to_commission(crew_cost)
+	if not crew_committed:
+		return {"success": false, "message": "Dispatch failed while committing Crew."}
+	_resources["gold"] = maxi(0, int(_resources.get("gold", 0)) - gold_cost)
+
+	var active_row := _supply_run_runtime_manager.start_supply_run(offer, supply_run_capacity)
+	if active_row.is_empty():
+		# Safety rollback if slot state changed between pre-check and commit.
+		_commission_resolver.move_assigned_crew_to_available(crew_cost)
+		_resources["gold"] = int(_resources.get("gold", 0)) + gold_cost
+		return {"success": false, "message": "Dispatch failed: no open Supply Run slot."}
+
+	# Successful dispatch consumes the offer immediately and refills that slot.
+	# This preserves board-offer behavior while active rows live elsewhere.
+	_safely_accept_supply_offer(clean_offer_id)
+	_capture_supply_board_state()
+	_save_runtime_state()
+	_refresh_guild_hall_commission_and_resources()
+	return {
+		"success": true,
+		"message": "Supply Run dispatched.",
+		"active_entry": active_row,
+		"active_slot_usage": _supply_run_runtime_manager.get_active_slot_usage(),
+		"slot_capacity": supply_run_capacity
+	}
+
+
+func claim_supply_run(runtime_id: int) -> Dictionary:
+	if runtime_id <= 0:
+		return {"success": false, "message": "Claim failed: invalid runtime id."}
+	var newly_ready := _supply_run_runtime_manager.process_time_progress()
+	if not newly_ready.is_empty():
+		_apply_supply_run_completion_rows(newly_ready)
+
+	var claimed := _supply_run_runtime_manager.claim_ready_entry(runtime_id)
+	if claimed.is_empty():
+		return {"success": false, "message": "Claim failed: run is not ready."}
+
+	var payload := claimed.get("completion_payload", {}) as Dictionary
+	var supplies_payout := maxi(0, int(payload.get("supplies_payout", 0)))
+	if supplies_payout > 0:
+		_commission_resolver.add_supplies(supplies_payout)
+
+	_save_runtime_state()
+	_refresh_guild_hall_commission_and_resources()
+	return {
+		"success": true,
+		"message": "Supplies claimed.",
+		"supplies_payout": supplies_payout
+	}
+
+
 func _load_runtime_state() -> void:
 	# Load flow: authored start conditions are already applied as baseline;
 	# saved runtime state overrides them when a save exists.
@@ -638,10 +734,14 @@ func _load_runtime_state() -> void:
 	_resources = _sanitize_resources(save_data.get("resources", {}))
 	_commission_resolver.restore_runtime_snapshot(save_data.get("commission_resources", {}))
 	_commission_runtime_manager.restore_runtime_snapshot(save_data.get("commission_runtime", {}))
+	_supply_run_runtime_manager.restore_runtime_snapshot(save_data.get("supply_run_runtime", {}))
 	_slot_capacities = _sanitize_slot_capacities(save_data.get("slot_capacities", {}))
 	# Process delayed crew recovery on load so offline time can be honored later.
 	var recovered_now := _commission_resolver.process_crew_recovery()
 	var runtime_changed := _process_commission_runtime_progress()
+	var supply_runtime_changed := _process_supply_run_runtime_progress()
+	if supply_runtime_changed:
+		runtime_changed = true
 	if recovered_now > 0:
 		runtime_changed = true
 	_upgrade_system.restore_owned_upgrade_ids(_to_string_array(save_data.get("owned_upgrades", [])))
@@ -656,6 +756,8 @@ func _load_runtime_state() -> void:
 	)
 	_expedition_board_offers = _sanitize_board_offers(save_data.get("expedition_board_offers", []))
 	_commission_board_snapshot = _sanitize_board_snapshot(save_data.get("commission_board_snapshot", {}))
+	_supply_board_snapshot = _sanitize_board_snapshot(save_data.get("supply_board_snapshot", {}))
+	_restore_supply_board_state()
 	if runtime_changed:
 		# Save post-load migration/catch-up so offline-finished commissions and
 		# crew transitions persist immediately.
@@ -668,6 +770,7 @@ func _save_runtime_state() -> void:
 		"resources": _resources,
 		"commission_resources": _commission_resolver.build_runtime_snapshot(),
 		"commission_runtime": _commission_runtime_manager.build_runtime_snapshot(),
+		"supply_run_runtime": _supply_run_runtime_manager.build_runtime_snapshot(),
 		"slot_capacities": _slot_capacities,
 		"owned_upgrades": _upgrade_system.get_owned_upgrade_ids(),
 		"codex_discoveries": _codex_system.get_discovered_entries(),
@@ -676,7 +779,8 @@ func _save_runtime_state() -> void:
 		"active_expeditions": _expedition_manager.get_active_expeditions(),
 		"pending_reports": _expedition_manager.get_pending_reports(),
 		"expedition_board_offers": _expedition_board_offers,
-		"commission_board_snapshot": _commission_board_snapshot
+		"commission_board_snapshot": _commission_board_snapshot,
+		"supply_board_snapshot": _supply_board_snapshot
 	})
 
 
@@ -763,10 +867,13 @@ func _sanitize_slot_capacities(value: Variant) -> Dictionary:
 	var source := value as Dictionary if value is Dictionary else {}
 	var expedition := source.get("expedition", {}) as Dictionary
 	var commission := source.get("commission", {}) as Dictionary
+	var supply_run := source.get("supply_run", {}) as Dictionary
 	var expedition_current := maxi(0, int(expedition.get("current_expedition_slot_capacity", int(_slot_capacities.get("expedition", {}).get("current_expedition_slot_capacity", 2)))))
 	var expedition_max := maxi(expedition_current, int(expedition.get("max_expedition_slot_capacity", int(_slot_capacities.get("expedition", {}).get("max_expedition_slot_capacity", 3)))))
 	var commission_current := maxi(0, int(commission.get("current_commission_slot_capacity", int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 3)))))
 	var commission_max := maxi(commission_current, int(commission.get("max_commission_slot_capacity", int(_slot_capacities.get("commission", {}).get("max_commission_slot_capacity", 4)))))
+	var supply_run_current := maxi(0, int(supply_run.get("current_supply_run_slot_capacity", int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 2)))))
+	var supply_run_max := maxi(supply_run_current, int(supply_run.get("max_supply_run_slot_capacity", int(_slot_capacities.get("supply_run", {}).get("max_supply_run_slot_capacity", 3)))))
 
 	return {
 		"expedition": {
@@ -776,6 +883,10 @@ func _sanitize_slot_capacities(value: Variant) -> Dictionary:
 		"commission": {
 			"current_commission_slot_capacity": commission_current,
 			"max_commission_slot_capacity": commission_max
+		},
+		"supply_run": {
+			"current_supply_run_slot_capacity": supply_run_current,
+			"max_supply_run_slot_capacity": supply_run_max
 		}
 	}
 
@@ -818,6 +929,35 @@ func _capture_commission_board_state() -> void:
 	_commission_board_snapshot = _commission_board_controller.build_board_snapshot()
 
 
+func _capture_supply_board_state() -> void:
+	_supply_board_snapshot = _supply_board_controller.build_save_snapshot()
+
+
+func _restore_supply_board_state() -> void:
+	if _supply_board_snapshot.is_empty():
+		return
+	_supply_board_controller.restore_from_save(_supply_board_snapshot, _get_unlocked_regions_for_supply_runs())
+	_capture_supply_board_state()
+
+
+func _ensure_supply_board_ready() -> void:
+	if _supply_board_controller.get_visible_offers().is_empty():
+		_supply_board_controller.generate_board_for_regions(_get_unlocked_regions_for_supply_runs())
+		_capture_supply_board_state()
+
+
+func _find_supply_offer_by_id(offer_id: String) -> Dictionary:
+	for offer in _supply_board_controller.get_visible_offers():
+		var row := offer as Dictionary
+		if str(row.get("offer_id", "")) == offer_id:
+			return row.duplicate(true)
+	return {}
+
+
+func _safely_accept_supply_offer(offer_id: String) -> void:
+	_supply_board_controller.accept_offer(offer_id, _get_unlocked_regions_for_supply_runs())
+
+
 func _process_commission_runtime_progress(now_unix: int = -1) -> bool:
 	# Runtime-loop v1 completion processing:
 	# - move finished commissions from active -> ready-to-claim,
@@ -831,6 +971,28 @@ func _process_commission_runtime_progress(now_unix: int = -1) -> bool:
 		return false
 	_apply_completion_crew_transition_for_rows(promoted_rows)
 	return true
+
+
+func _process_supply_run_runtime_progress(now_unix: int = -1) -> bool:
+	# Supply Run completion side effect is intentionally light in v1:
+	# when a run finishes, committed crew returns directly to Available.
+	var promoted_rows := _supply_run_runtime_manager.process_time_progress(now_unix)
+	if promoted_rows.is_empty():
+		return false
+	_apply_supply_run_completion_rows(promoted_rows)
+	return true
+
+
+func _apply_supply_run_completion_rows(rows: Array[Dictionary]) -> void:
+	if rows.is_empty():
+		return
+	var transitioned_runtime_ids: Array[int] = []
+	for row in rows:
+		var crew_committed := maxi(0, int((row as Dictionary).get("crew_committed", 0)))
+		if crew_committed > 0:
+			_commission_resolver.move_assigned_crew_to_available(crew_committed)
+		transitioned_runtime_ids.append(int((row as Dictionary).get("runtime_id", 0)))
+	_supply_run_runtime_manager.mark_ready_entries_crew_return_applied(transitioned_runtime_ids)
 
 
 func _apply_completion_crew_transition_for_rows(rows: Array[Dictionary]) -> void:
@@ -854,6 +1016,20 @@ func _refresh_guild_hall_commission_and_resources() -> void:
 		_commission_runtime_manager,
 		int(_slot_capacities.get("commission", {}).get("current_commission_slot_capacity", 0))
 	)
+
+
+func _get_unlocked_regions_for_supply_runs() -> Array[Dictionary]:
+	var rows: Array[Dictionary] = []
+	for region in _region_system.get_region_list_for_ui():
+		if not bool((region as Dictionary).get("is_visible", false)):
+			continue
+		if not bool((region as Dictionary).get("is_unlocked", false)):
+			continue
+		rows.append({
+			"id": str((region as Dictionary).get("id", "")),
+			"name": str((region as Dictionary).get("name", "Unknown Region"))
+		})
+	return rows
 
 
 func _on_region_selected(region_id: String) -> void:
