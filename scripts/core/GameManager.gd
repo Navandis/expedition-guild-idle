@@ -132,6 +132,7 @@ func _process(delta: float) -> void:
 	if state_changed:
 		_save_runtime_state()
 		_refresh_guild_hall_commission_and_resources()
+		_refresh_supply_board_context()
 
 
 func get_selected_expedition_for_activation() -> Dictionary:
@@ -686,6 +687,7 @@ func _on_commission_claim_requested(runtime_id: int) -> void:
 
 func _on_supply_run_claim_requested(runtime_id: int) -> void:
 	var result := claim_supply_run(runtime_id)
+	_refresh_supply_board_context()
 	if _supply_board_screen_controller != null and _mounted_screen == _supply_board_screen_controller:
 		_supply_board_screen_controller.handle_dispatch_result(
 			bool(result.get("success", false)),
@@ -696,16 +698,9 @@ func _on_supply_run_claim_requested(runtime_id: int) -> void:
 
 func _on_supply_dispatch_requested(offer_id: String) -> void:
 	var result := try_dispatch_supply_run(offer_id)
+	_refresh_supply_board_context()
 	if _supply_board_screen_controller == null:
 		return
-	_supply_board_screen_controller.set_supply_board_context(
-		_supply_board_controller.get_visible_offers(),
-		_commission_resolver.get_available_crew(),
-		int(_resources.get("gold", 0)),
-		_commission_resolver.get_supplies(),
-		_supply_run_runtime_manager.get_active_slot_usage(),
-		int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0))
-	)
 	_supply_board_screen_controller.handle_dispatch_result(
 		bool(result.get("success", false)),
 		str(result.get("message", "")),
@@ -1096,6 +1091,19 @@ func _refresh_guild_hall_commission_and_resources() -> void:
 	)
 	_guild_hall_controller.set_supply_run_runtime(
 		_supply_run_runtime_manager,
+		int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0))
+	)
+
+
+func _refresh_supply_board_context() -> void:
+	if _supply_board_screen_controller == null:
+		return
+	_supply_board_screen_controller.set_supply_board_context(
+		_supply_board_controller.get_visible_offers(),
+		_commission_resolver.get_available_crew(),
+		int(_resources.get("gold", 0)),
+		_commission_resolver.get_supplies(),
+		_supply_run_runtime_manager.get_active_slot_usage(),
 		int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0))
 	)
 
