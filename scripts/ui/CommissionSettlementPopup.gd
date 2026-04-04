@@ -43,6 +43,12 @@ func _ready() -> void:
 
 
 func open_for_entry(entry: Dictionary) -> void:
+	# First-open safety:
+	# If this popup is asked to open in the same frame it is instantiated,
+	# wait until the node and child controls are fully ready before binding UI.
+	if not is_node_ready():
+		await ready
+
 	_runtime_id = maxi(0, int(entry.get("runtime_id", 0)))
 	var payload := entry.get("completion_payload", {}) as Dictionary
 
