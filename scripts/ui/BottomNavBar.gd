@@ -8,6 +8,7 @@ class_name BottomNavBar
 # on smaller/mobile screens.
 # This script keeps screen-to-screen navigation in one place and clearly marks
 # which buttons are active routes versus placeholder slots.
+# XXButtonRight is now the Logistics entry for Supply Board.
 # It also recalculates button/icon size on resize so the full bar stays usable
 # on narrow/mobile widths without adding internal scrolling or clipping.
 
@@ -18,6 +19,7 @@ const TARGET_EXPEDITION_BOARD := "expedition_board"
 const TARGET_GUILD_UPGRADES := "guild_upgrades"
 const TARGET_CODEX := "codex"
 const TARGET_COMMISSION_BOARD := "commission_board"
+const TARGET_SUPPLY_BOARD := "supply_board"
 
 @export var current_screen: String = ""
 
@@ -27,6 +29,7 @@ const TARGET_COMMISSION_BOARD := "commission_board"
 @onready var _guild_upgrades_button: Button = $Panel/Margin/ButtonsRow/GUButton
 @onready var _codex_button: Button = $Panel/Margin/ButtonsRow/CXButton
 @onready var _commission_board_button: Button = $Panel/Margin/ButtonsRow/CBButton
+@onready var _supply_board_button: Button = $Panel/Margin/ButtonsRow/XXButtonRight
 @onready var _all_buttons: Array[Button] = [
 	$Panel/Margin/ButtonsRow/GHButton,
 	$Panel/Margin/ButtonsRow/EBButton,
@@ -50,7 +53,7 @@ const TARGET_COMMISSION_BOARD := "commission_board"
 func _ready() -> void:
 	# Reflow nav button sizes whenever the control width changes.
 	resized.connect(_update_responsive_button_sizes)
-	# Active routes wired for this milestone: GH, EB, GU, CX, and CB.
+	# Active routes wired for this milestone: GH, EB, GU, CX, CB, and Supply Board.
 	_guild_hall_button.pressed.connect(func() -> void:
 		navigate_requested.emit(TARGET_GUILD_HALL)
 	)
@@ -65,6 +68,9 @@ func _ready() -> void:
 	)
 	_commission_board_button.pressed.connect(func() -> void:
 		navigate_requested.emit(TARGET_COMMISSION_BOARD)
+	)
+	_supply_board_button.pressed.connect(func() -> void:
+		navigate_requested.emit(TARGET_SUPPLY_BOARD)
 	)
 	_refresh_active_state()
 	_update_responsive_button_sizes()
@@ -84,6 +90,7 @@ func _refresh_active_state() -> void:
 	_guild_upgrades_button.disabled = current_screen == TARGET_GUILD_UPGRADES
 	_codex_button.disabled = current_screen == TARGET_CODEX
 	_commission_board_button.disabled = current_screen == TARGET_COMMISSION_BOARD
+	_supply_board_button.disabled = current_screen == TARGET_SUPPLY_BOARD
 
 
 func _update_responsive_button_sizes() -> void:
