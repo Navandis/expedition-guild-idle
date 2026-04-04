@@ -15,17 +15,23 @@ class_name CommissionSettlementPopup
 signal claim_requested(runtime_id: int)
 
 @onready var _title_label: Label = $PopupMargin/PopupColumn/TitleLabel
-@onready var _outcome_label: Label = $PopupMargin/PopupColumn/OutcomeLabel
-@onready var _gold_label: Label = $PopupMargin/PopupColumn/GoldLabel
+@onready var _outcome_label: RichTextLabel = $PopupMargin/PopupColumn/OutcomeLabel
+@onready var _gold_label: RichTextLabel = $PopupMargin/PopupColumn/GoldLabel
 @onready var _side_reward_label: Label = $PopupMargin/PopupColumn/SideRewardLabel
 @onready var _standing_label: Label = $PopupMargin/PopupColumn/StandingLabel
 @onready var _recovering_label: Label = $PopupMargin/PopupColumn/RecoveringLabel
-@onready var _recovery_time_label: Label = $PopupMargin/PopupColumn/RecoveryTimeLabel
-@onready var _summary_label: Label = $PopupMargin/PopupColumn/SummaryLabel
+@onready var _recovery_time_label: RichTextLabel = $PopupMargin/PopupColumn/RecoveryTimeLabel
 @onready var _close_button: Button = $PopupMargin/PopupColumn/ButtonsRow/CloseButton
 @onready var _claim_button: Button = $PopupMargin/PopupColumn/ButtonsRow/ClaimButton
 
 var _runtime_id := 0
+
+const _OUTCOME_COLOR_BY_BAND := {
+	"poor": Color(1.0, 0.6, 0.2, 1.0), # Orange
+	"strained": Color(0.95, 0.85, 0.2, 1.0), # Yellow
+	"solid": Color(1.0, 1.0, 1.0, 1.0), # Default white
+	"excellent": Color(0.35, 0.85, 0.45, 1.0) # Green
+}
 
 
 func _ready() -> void:
@@ -41,13 +47,39 @@ func open_for_entry(entry: Dictionary) -> void:
 	var payload := entry.get("completion_payload", {}) as Dictionary
 
 	_title_label.text = str(entry.get("title", "Commission"))
-	_outcome_label.text = "Outcome: %s" % str(payload.get("outcome_label", "Unknown"))
-	_gold_label.text = "Gold Payout: %d" % maxi(0, int(payload.get("gold_payout", 0)))
+	# Only the outcome value is colorized so row labels keep consistent styling.
+	var outcome_band := str(payload.get("outcome_band", "solid")).to_lower()
+	var outcome_label := str(payload.get("outcome_label", "Unknown"))
+	var outcome_color := _get_outcome_color(outcome_band)
+	_outcome_label.text = "Outcome: [color=%s]%s[/color]" % [_to_html_color(outcome_color), outcome_label]
+
+	var gold_payout := maxi(0, int(payload.get("gold_payout", 0)))
+	var recovery_seconds := maxi(0, int(payload.get("recovery_seconds", 0)))
+	# Delta values come from completion payload runtime data so popup text matches
+	# the exact modifiers already used by commission resolution.
+	var gold_delta_percent := _resolve_delta_percent(payload, "gold_delta_percent", "gold_multiplier", outcome_band, true)
+	var recovery_delta_percent := _resolve_delta_percent(payload, "recovery_delta_percent", "recovery_multiplier", outcome_band, false)
+	var delta_color_tag := "[color=%s]" % _to_html_color(outcome_color)
+	var delta_close_tag := "[/color]"
+	# Delta color matches the outcome color to reinforce "these effects came from
+	# this outcome band" without redesigning the full popup visuals.
+	_gold_label.text = "Gold Payout: %d (%s%s%s)" % [
+		gold_payout,
+		delta_color_tag,
+		_format_signed_percent(gold_delta_percent),
+		delta_close_tag
+	]
 	_side_reward_label.text = "Side Reward: %s" % _format_side_reward(payload.get("side_reward", {}) as Dictionary)
 	_standing_label.text = "Standing Change: %s" % _format_signed(int(payload.get("standing_delta", 0)))
 	_recovering_label.text = "Crew Sent to Recovering: %d" % maxi(0, int(payload.get("crew_to_recovering", 0)))
-	_recovery_time_label.text = "Recovery Time: %s" % TimeFormat.format_seconds_hms(maxi(0, int(payload.get("recovery_seconds", 0))))
-	_summary_label.text = str(payload.get("summary", "No additional notes."))
+	_recovery_time_label.text = "Recovery Time: %s (%s%s%s)" % [
+		TimeFormat.format_seconds_hms(recovery_seconds),
+		delta_color_tag,
+		_format_signed_percent(recovery_delta_percent),
+		delta_close_tag
+	]
+	# Summary row removed because outcome + payout/recovery deltas already explain
+	# the settlement result in a more direct and compact way.
 
 	popup_centered()
 
@@ -78,3 +110,45 @@ func _format_signed(value: int) -> String:
 	if value > 0:
 		return "+%d" % value
 	return str(value)
+
+
+func _format_signed_percent(value: int) -> String:
+	if value > 0:
+		return "+%d%%" % value
+	return "%d%%" % value
+
+
+func _resolve_delta_percent(payload: Dictionary, delta_key: String, multiplier_key: String, outcome_band: String, is_gold: bool) -> int:
+	if payload.has(delta_key):
+		return int(payload.get(delta_key, 0))
+	if payload.has(multiplier_key):
+		var multiplier := float(payload.get(multiplier_key, 1.0))
+		return int(round((multiplier - 1.0) * 100.0))
+	# Save-compat fallback for older payload rows created before explicit deltas.
+	if is_gold:
+		match outcome_band:
+			"excellent":
+				return 30
+			"strained":
+				return -30
+			"poor":
+				return -60
+			_:
+				return 0
+	match outcome_band:
+		"excellent":
+			return -25
+		"strained":
+			return 20
+		"poor":
+			return 45
+		_:
+			return 0
+
+
+func _get_outcome_color(outcome_band: String) -> Color:
+	return _OUTCOME_COLOR_BY_BAND.get(outcome_band, Color.WHITE)
+
+
+func _to_html_color(color: Color) -> String:
+	return color.to_html(false)

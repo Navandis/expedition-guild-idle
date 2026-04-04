@@ -4,7 +4,7 @@
 
 [node name="CommissionSettlementPopup" type="PopupPanel"]
 initial_position = 1
-size = Vector2i(420, 330)
+size = Vector2i(420, 300)
 unresizable = true
 script = ExtResource("1_settlement_script")
 
@@ -32,12 +32,18 @@ layout_mode = 2
 text = "Commission"
 autowrap_mode = 3
 
-[node name="OutcomeLabel" type="Label" parent="PopupMargin/PopupColumn"]
+[node name="OutcomeLabel" type="RichTextLabel" parent="PopupMargin/PopupColumn"]
 layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
 text = "Outcome: --"
 
-[node name="GoldLabel" type="Label" parent="PopupMargin/PopupColumn"]
+[node name="GoldLabel" type="RichTextLabel" parent="PopupMargin/PopupColumn"]
 layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
 text = "Gold Payout: 0"
 
 [node name="SideRewardLabel" type="Label" parent="PopupMargin/PopupColumn"]
@@ -52,15 +58,12 @@ text = "Standing Change: 0"
 layout_mode = 2
 text = "Crew Sent to Recovering: 0"
 
-[node name="RecoveryTimeLabel" type="Label" parent="PopupMargin/PopupColumn"]
+[node name="RecoveryTimeLabel" type="RichTextLabel" parent="PopupMargin/PopupColumn"]
 layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
 text = "Recovery Time: 00h00m00s"
-
-[node name="SummaryLabel" type="Label" parent="PopupMargin/PopupColumn"]
-layout_mode = 2
-size_flags_vertical = 3
-text = "Summary"
-autowrap_mode = 3
 
 [node name="ButtonsRow" type="HBoxContainer" parent="PopupMargin/PopupColumn"]
 layout_mode = 2
