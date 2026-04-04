@@ -143,12 +143,17 @@ func _finalize_offer(candidate: Dictionary) -> Dictionary:
 	var generation := _data.get("generation_config", {}) as Dictionary
 	var supplies_band := _to_min_max_dictionary(family.get("supplies_yield_estimate", {}), 10, 20)
 	var target_band := _to_min_max_dictionary(generation.get("target_supplies_band", {}), 10, 20)
+	var duration_band := _to_min_max_dictionary(family.get("duration_minutes", {}), 20, 45)
+	var global_duration_band := _to_min_max_dictionary(generation.get("duration_minutes_band", {}), 20, 75)
 
 	# Keep v1 payouts inside the provisional working range (10-20 supplies).
 	supplies_band["min"] = clampi(int(supplies_band.get("min", 10)), int(target_band.get("min", 10)), int(target_band.get("max", 20)))
 	supplies_band["max"] = clampi(int(supplies_band.get("max", 20)), int(supplies_band.get("min", 10)), int(target_band.get("max", 20)))
+	# Match supplies behavior: clamp family durations to the authored global
+	# generation band so config edits always constrain runtime offer rolls.
+	duration_band["min"] = clampi(int(duration_band.get("min", 20)), int(global_duration_band.get("min", 20)), int(global_duration_band.get("max", 75)))
+	duration_band["max"] = clampi(int(duration_band.get("max", 75)), int(duration_band.get("min", 20)), int(global_duration_band.get("max", 75)))
 
-	var duration_band := _to_min_max_dictionary(family.get("duration_minutes", {}), 20, 45)
 	var crew_band := _to_min_max_dictionary(family.get("crew_required", {}), 2, 3)
 	var gold_band := _to_min_max_dictionary(family.get("gold_cost", {}), 0, 0)
 
