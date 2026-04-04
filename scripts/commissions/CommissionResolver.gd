@@ -125,7 +125,9 @@ func roll_completion_payload(offer: Dictionary, prep_tier_id: String, commitment
 	var final_score := clampf(base_score + prep_modifier + swing, 0.0, 1.0)
 	var outcome_band := _resolve_outcome_band_from_score(final_score)
 	var base_gold := _resolve_base_gold(offer)
-	var gold_payout := maxi(0, int(round(float(base_gold) * float(OUTCOME_GOLD_MULTIPLIERS.get(outcome_band, 1.0)))))
+	var gold_multiplier := float(OUTCOME_GOLD_MULTIPLIERS.get(outcome_band, 1.0))
+	var recovery_multiplier := float(OUTCOME_RECOVERY_MULTIPLIERS.get(outcome_band, 1.0))
+	var gold_payout := maxi(0, int(round(float(base_gold) * gold_multiplier)))
 	var standing_delta := int(OUTCOME_STANDING_DELTA.get(outcome_band, 0))
 	var recovery_seconds := _resolve_recovery_seconds(offer, outcome_band)
 	var side_reward := _roll_side_reward(offer, outcome_band)
@@ -138,6 +140,13 @@ func roll_completion_payload(offer: Dictionary, prep_tier_id: String, commitment
 		"standing_delta": standing_delta,
 		"crew_to_recovering": crew_committed,
 		"recovery_seconds": recovery_seconds,
+		# Store explicit multiplier/delta display data in the payload so claim UI
+		# can present readable "(+/-X%)" values without recalculating from copied
+		# balance constants in another script.
+		"gold_multiplier": gold_multiplier,
+		"recovery_multiplier": recovery_multiplier,
+		"gold_delta_percent": _multiplier_to_percent_delta(gold_multiplier),
+		"recovery_delta_percent": _multiplier_to_percent_delta(recovery_multiplier),
 		"side_reward": side_reward,
 		"summary": _build_outcome_summary(outcome_band, gold_payout, recovery_seconds)
 	}
@@ -395,6 +404,11 @@ func _build_outcome_summary(outcome_band: String, gold_payout: int, recovery_sec
 			return "Strained outcome: reduced payout (%d gold) and longer recovery (~%d min)." % [gold_payout, recovery_minutes]
 		_:
 			return "Poor outcome: low payout (%d gold) and heavy recovery burden (~%d min)." % [gold_payout, recovery_minutes]
+
+
+func _multiplier_to_percent_delta(multiplier: float) -> int:
+	# Example: 1.2 -> +20, 0.7 -> -30.
+	return int(round((multiplier - 1.0) * 100.0))
 
 
 func _sanitize_recovery_entries(value: Variant) -> Array[Dictionary]:
