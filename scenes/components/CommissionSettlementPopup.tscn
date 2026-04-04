@@ -1,21 +1,24 @@
 [gd_scene format=3 uid="uid://cw0a71a0kyp1c"]
 
-[ext_resource type="Script" path="res://scripts/ui/CommissionSettlementPopup.gd" id="1_settlement_script"]
+[ext_resource type="Script" uid="uid://bjrrs4c3vn83e" path="res://scripts/ui/CommissionSettlementPopup.gd" id="1_settlement_script"]
 
-[node name="CommissionSettlementPopup" type="PopupPanel"]
+[node name="CommissionSettlementPopup" type="PopupPanel" unique_id=1686449843]
+transparent_bg = false
+oversampling_override = 1.0
 initial_position = 1
-size = Vector2i(420, 300)
-unresizable = true
+size = Vector2i(296, 251)
+visible = true
+transparent = false
 script = ExtResource("1_settlement_script")
 
-[node name="PopupMargin" type="MarginContainer" parent="."]
+[node name="PopupMargin" type="MarginContainer" parent="." unique_id=411265063]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = -10.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 8
@@ -23,58 +26,58 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="PopupColumn" type="VBoxContainer" parent="PopupMargin"]
+[node name="PopupColumn" type="VBoxContainer" parent="PopupMargin" unique_id=1538780753]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="TitleLabel" type="Label" parent="PopupMargin/PopupColumn"]
+[node name="TitleLabel" type="Label" parent="PopupMargin/PopupColumn" unique_id=1539957222]
 layout_mode = 2
 text = "Commission"
 autowrap_mode = 3
 
-[node name="OutcomeLabel" type="RichTextLabel" parent="PopupMargin/PopupColumn"]
+[node name="OutcomeLabel" type="RichTextLabel" parent="PopupMargin/PopupColumn" unique_id=895906390]
 layout_mode = 2
 bbcode_enabled = true
-fit_content = true
-scroll_active = false
 text = "Outcome: --"
-
-[node name="GoldLabel" type="RichTextLabel" parent="PopupMargin/PopupColumn"]
-layout_mode = 2
-bbcode_enabled = true
 fit_content = true
 scroll_active = false
-text = "Gold Payout: 0"
 
-[node name="SideRewardLabel" type="Label" parent="PopupMargin/PopupColumn"]
+[node name="GoldLabel" type="RichTextLabel" parent="PopupMargin/PopupColumn" unique_id=497666695]
+layout_mode = 2
+bbcode_enabled = true
+text = "Gold Payout: 0"
+fit_content = true
+scroll_active = false
+
+[node name="SideRewardLabel" type="Label" parent="PopupMargin/PopupColumn" unique_id=2142831433]
 layout_mode = 2
 text = "Side Reward: None"
 
-[node name="StandingLabel" type="Label" parent="PopupMargin/PopupColumn"]
+[node name="StandingLabel" type="Label" parent="PopupMargin/PopupColumn" unique_id=1340570637]
 layout_mode = 2
 text = "Standing Change: 0"
 
-[node name="RecoveringLabel" type="Label" parent="PopupMargin/PopupColumn"]
+[node name="RecoveringLabel" type="Label" parent="PopupMargin/PopupColumn" unique_id=1665012939]
 layout_mode = 2
 text = "Crew Sent to Recovering: 0"
 
-[node name="RecoveryTimeLabel" type="RichTextLabel" parent="PopupMargin/PopupColumn"]
+[node name="RecoveryTimeLabel" type="RichTextLabel" parent="PopupMargin/PopupColumn" unique_id=489225552]
 layout_mode = 2
 bbcode_enabled = true
+text = "Recovery Time: 00h00m00s"
 fit_content = true
 scroll_active = false
-text = "Recovery Time: 00h00m00s"
 
-[node name="ButtonsRow" type="HBoxContainer" parent="PopupMargin/PopupColumn"]
+[node name="ButtonsRow" type="HBoxContainer" parent="PopupMargin/PopupColumn" unique_id=1578598318]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="CloseButton" type="Button" parent="PopupMargin/PopupColumn/ButtonsRow"]
+[node name="CloseButton" type="Button" parent="PopupMargin/PopupColumn/ButtonsRow" unique_id=1771451750]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Close"
 
-[node name="ClaimButton" type="Button" parent="PopupMargin/PopupColumn/ButtonsRow"]
+[node name="ClaimButton" type="Button" parent="PopupMargin/PopupColumn/ButtonsRow" unique_id=1128820933]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Claim"
