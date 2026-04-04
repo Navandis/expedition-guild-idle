@@ -1,0 +1,10 @@
+{
+  "visible_offer_count": 3,
+  "standard_offers_expire": false,
+  "refill_behavior": "refill_single_slot_on_accept",
+  "composition_rules": {
+    "avoid_family_duplicates_if_possible": true,
+    "avoid_same_region_duplicates_if_possible": true,
+    "avoid_exact_title_duplicates_if_possible": true
+  }
+}
