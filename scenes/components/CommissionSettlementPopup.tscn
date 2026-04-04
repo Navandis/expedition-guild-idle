@@ -1,0 +1,77 @@
+[gd_scene format=3 uid="uid://cw0a71a0kyp1c"]
+
+[ext_resource type="Script" path="res://scripts/ui/CommissionSettlementPopup.gd" id="1_settlement_script"]
+
+[node name="CommissionSettlementPopup" type="PopupPanel"]
+initial_position = 1
+size = Vector2i(420, 330)
+unresizable = true
+script = ExtResource("1_settlement_script")
+
+[node name="PopupMargin" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="PopupColumn" type="VBoxContainer" parent="PopupMargin"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="TitleLabel" type="Label" parent="PopupMargin/PopupColumn"]
+layout_mode = 2
+text = "Commission"
+autowrap_mode = 3
+
+[node name="OutcomeLabel" type="Label" parent="PopupMargin/PopupColumn"]
+layout_mode = 2
+text = "Outcome: --"
+
+[node name="GoldLabel" type="Label" parent="PopupMargin/PopupColumn"]
+layout_mode = 2
+text = "Gold Payout: 0"
+
+[node name="SideRewardLabel" type="Label" parent="PopupMargin/PopupColumn"]
+layout_mode = 2
+text = "Side Reward: None"
+
+[node name="StandingLabel" type="Label" parent="PopupMargin/PopupColumn"]
+layout_mode = 2
+text = "Standing Change: 0"
+
+[node name="RecoveringLabel" type="Label" parent="PopupMargin/PopupColumn"]
+layout_mode = 2
+text = "Crew Sent to Recovering: 0"
+
+[node name="RecoveryTimeLabel" type="Label" parent="PopupMargin/PopupColumn"]
+layout_mode = 2
+text = "Recovery Time: 00h00m00s"
+
+[node name="SummaryLabel" type="Label" parent="PopupMargin/PopupColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Summary"
+autowrap_mode = 3
+
+[node name="ButtonsRow" type="HBoxContainer" parent="PopupMargin/PopupColumn"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CloseButton" type="Button" parent="PopupMargin/PopupColumn/ButtonsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Close"
+
+[node name="ClaimButton" type="Button" parent="PopupMargin/PopupColumn/ButtonsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Claim"
