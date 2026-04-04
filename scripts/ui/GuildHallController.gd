@@ -16,6 +16,11 @@ class_name GuildHallController
 #   runtime status UI predictable for beginners and reduces UI learning overhead.
 # - The cards are still scene-authored in GuildHall.tscn, while this script only
 #   binds runtime state into those authored controls.
+#
+# Commission settlement popup note:
+# - Completed commission cards now open a compact popup summary first.
+# - Claim is now explicit via popup button, so "tap card" no longer consumes
+#   rewards immediately and players can close the popup without losing claim.
 
 signal open_report_requested
 signal navigate_requested(target_screen: String)
@@ -32,6 +37,7 @@ const _SLOT_VISUAL_COMPLETED := "completed"
 const _EXPEDITION_CARD_COUNT := 3
 const _EXPEDITION_UNLOCKED_COUNT := 2
 const _COMMISSION_CARD_COUNT := 3
+const _COMMISSION_SETTLEMENT_POPUP_SCENE := preload("res://scenes/components/CommissionSettlementPopup.tscn")
 
 @onready var _gold_value_label: Label = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
 @onready var _crew_dropdown_button: Button = $TopSafeArea/TopStack/TopPanelsRow/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton
@@ -93,9 +99,11 @@ var _slot_visual_states: Array[String] = ["", "", ""]
 var _commission_slot_actions: Array[String] = ["", "", ""]
 var _commission_slot_runtime_ids: Array[int] = [0, 0, 0]
 var _commission_slot_visual_states: Array[String] = ["", "", ""]
+var _commission_ready_entries_by_runtime_id: Dictionary = {}
 var _cached_slot_styles: Dictionary = {}
 var _operations_offset_left := 0.0
 var _operations_offset_right := 0.0
+var _commission_settlement_popup: CommissionSettlementPopup
 
 
 func _ready() -> void:
@@ -119,6 +127,7 @@ func _ready() -> void:
 		_commission_slot_cards[i].confirmed_tap.connect(func() -> void:
 			_on_commission_card_pressed(card_index)
 		)
+	_build_commission_settlement_popup()
 
 	# Shared bottom nav is the primary cross-screen backbone.
 	_bottom_nav.set_current_screen(BottomNavBar.TARGET_GUILD_HALL)
@@ -327,6 +336,7 @@ func _refresh_commission_status() -> void:
 	# This keeps Guild Hall status-focused while Commission Board handles offers.
 	if _commission_slot_cards.is_empty():
 		return
+	_commission_ready_entries_by_runtime_id.clear()
 
 	var cards_to_fill := mini(_commission_slot_capacity, _COMMISSION_CARD_COUNT)
 	var ready_rows: Array[Dictionary] = []
@@ -413,7 +423,11 @@ func _set_commission_ready_slot(slot_index: int, entry: Dictionary) -> void:
 	card.disabled = false
 	card.focus_mode = Control.FOCUS_ALL
 	_commission_slot_actions[slot_index] = "claim"
-	_commission_slot_runtime_ids[slot_index] = int(entry.get("runtime_id", 0))
+	var runtime_id := int(entry.get("runtime_id", 0))
+	_commission_slot_runtime_ids[slot_index] = runtime_id
+	# Guild Hall settlement popup reads from already-stored completion payload
+	# on this ready runtime row, not from a second recalculation path.
+	_commission_ready_entries_by_runtime_id[runtime_id] = entry.duplicate(true)
 	_apply_commission_status_border(slot_index, card, _SLOT_VISUAL_COMPLETED)
 
 
@@ -562,7 +576,9 @@ func _on_commission_card_pressed(slot_index: int) -> void:
 	if action == "claim":
 		var runtime_id := _commission_slot_runtime_ids[slot_index]
 		if runtime_id > 0:
-			commission_claim_requested.emit(runtime_id)
+			# Completed cards now open a compact settlement popup first so players
+			# can review outcome details before explicitly pressing Claim.
+			_open_commission_settlement_popup(runtime_id)
 
 
 func _on_debug_finish_pressed() -> void:
@@ -571,3 +587,24 @@ func _on_debug_finish_pressed() -> void:
 
 func _on_debug_reset_pressed() -> void:
 	debug_reset_requested.emit()
+
+
+func _build_commission_settlement_popup() -> void:
+	if _commission_settlement_popup != null:
+		return
+	_commission_settlement_popup = _COMMISSION_SETTLEMENT_POPUP_SCENE.instantiate() as CommissionSettlementPopup
+	add_child(_commission_settlement_popup)
+	_commission_settlement_popup.claim_requested.connect(func(runtime_id: int) -> void:
+		commission_claim_requested.emit(runtime_id)
+	)
+
+
+func _open_commission_settlement_popup(runtime_id: int) -> void:
+	if _commission_settlement_popup == null:
+		return
+	var entry := _commission_ready_entries_by_runtime_id.get(runtime_id, {}) as Dictionary
+	if entry.is_empty():
+		return
+	# Closing this popup must not consume the entry; claim happens only when the
+	# popup's Claim button emits claim_requested.
+	_commission_settlement_popup.open_for_entry(entry)
