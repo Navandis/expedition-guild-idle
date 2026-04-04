@@ -700,12 +700,21 @@ func try_dispatch_supply_run(offer_id: String) -> Dictionary:
 func claim_supply_run(runtime_id: int) -> Dictionary:
 	if runtime_id <= 0:
 		return {"success": false, "message": "Claim failed: invalid runtime id."}
+	var state_changed := false
 	var newly_ready := _supply_run_runtime_manager.process_time_progress()
 	if not newly_ready.is_empty():
 		_apply_supply_run_completion_rows(newly_ready)
+		state_changed = true
 
 	var claimed := _supply_run_runtime_manager.claim_ready_entry(runtime_id)
 	if claimed.is_empty():
+		# Stale-id safety:
+		# even if this specific runtime_id is not claimable, processing above may
+		# have promoted other rows and returned crew. Persist + refresh now so
+		# those changes are not delayed until an unrelated future save tick.
+		if state_changed:
+			_save_runtime_state()
+			_refresh_guild_hall_commission_and_resources()
 		return {"success": false, "message": "Claim failed: run is not ready."}
 
 	var payload := claimed.get("completion_payload", {}) as Dictionary
