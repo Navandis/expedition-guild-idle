@@ -23,9 +23,9 @@ This file exists to make Codex and other repo-aware agents read the correct proj
 ## Required read order before making changes
 Before implementing a task, read these files in this order:
 
-1. `hall_of_ventures_design_canon_v2_3.docx`
+1. `docs/hall_of_ventures_design_canon_v2_3.docx`
 2. `docs/current_milestone.md`
-3. `06_decisions_and_non_decisions_log.md`
+3. `docs/06_decisions_and_non_decisions_log.md`
 
 Use system references or archive material only if the active docs above are insufficient.
 
@@ -105,9 +105,9 @@ Combat stays abstract and off-screen.
 ## If documents disagree
 Use this priority order unless the human explicitly instructs otherwise:
 1. direct human task instructions
-2. `06_decisions_and_non_decisions_log.md`
+2. `docs/06_decisions_and_non_decisions_log.md`
 3. `docs/current_milestone.md`
-4. `hall_of_ventures_design_canon_v2_3.docx`
+4. `docs/hall_of_ventures_design_canon_v2_3.docx`
 5. older reference or archive docs
 
 If there is a meaningful conflict, state it clearly before making a broad assumption.
