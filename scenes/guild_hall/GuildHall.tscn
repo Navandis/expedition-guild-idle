@@ -296,6 +296,7 @@ theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
+metadata/_tab_index = 0
 
 [node name="ExpeditionSlotsScroller" type="ScrollContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab" unique_id=570001014]
 layout_mode = 2
@@ -430,7 +431,7 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="SlotThreeCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow"]
+[node name="SlotThreeCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=693119290]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -438,7 +439,7 @@ size_flags_vertical = 3
 disabled = true
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard"]
+[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard" unique_id=1803411273]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -451,13 +452,13 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin"]
+[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin" unique_id=544864210]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SlotThreeImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content"]
+[node name="SlotThreeImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=108482318]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
@@ -465,7 +466,7 @@ text = "LOCKED"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SlotThreeNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content"]
+[node name="SlotThreeNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=1380264170]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -474,7 +475,7 @@ horizontal_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 2
 
-[node name="SlotThreeStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content"]
+[node name="SlotThreeStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=352267861]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -485,6 +486,7 @@ autowrap_mode = 2
 max_lines_visible = 4
 
 [node name="CommissionsTab" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs" unique_id=570001016]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -492,6 +494,7 @@ theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
+metadata/_tab_index = 1
 
 [node name="CommissionSlotsScroller" type="ScrollContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab" unique_id=570001017]
 layout_mode = 2
@@ -553,6 +556,7 @@ theme_override_font_sizes/font_size = 10
 text = "Empty Slot"
 horizontal_alignment = 1
 autowrap_mode = 2
+text_overrun_behavior = 3
 max_lines_visible = 2
 
 [node name="CommissionSlotOneStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content" unique_id=570001024]
@@ -614,6 +618,7 @@ theme_override_font_sizes/font_size = 10
 text = "Empty Slot"
 horizontal_alignment = 1
 autowrap_mode = 2
+text_overrun_behavior = 3
 max_lines_visible = 2
 
 [node name="CommissionSlotTwoStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content" unique_id=570001031]
@@ -675,6 +680,7 @@ theme_override_font_sizes/font_size = 10
 text = "Empty Slot"
 horizontal_alignment = 1
 autowrap_mode = 2
+text_overrun_behavior = 3
 max_lines_visible = 2
 
 [node name="CommissionSlotThreeStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content" unique_id=570001038]
