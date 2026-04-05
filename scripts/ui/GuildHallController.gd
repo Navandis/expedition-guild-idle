@@ -51,54 +51,54 @@ const _COMMISSION_SETTLEMENT_POPUP_SCENE := preload("res://scenes/components/Com
 @onready var _debug_finish_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugFinishButton
 @onready var _debug_reset_button: Button = $TopSafeArea/TopStack/TopRightToolsRow/DebugResetButton
 
-@onready var _operations_section_panel: PanelContainer = $OperationsSectionPanel
-@onready var _operations_tabs: TabContainer = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs
-@onready var _expedition_slots_scroller: ScrollContainer = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller
-@onready var _slot_one_card: TouchScrollCardButton = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
-@onready var _slot_two_card: TouchScrollCardButton = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
-@onready var _slot_three_card: TouchScrollCardButton = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard
-@onready var _slot_one_name_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
-@onready var _slot_one_state_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
-@onready var _slot_two_name_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
-@onready var _slot_two_state_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
-@onready var _slot_three_name_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content/SlotThreeNameLabel
-@onready var _slot_three_state_label: Label = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content/SlotThreeStateLabel
+# Operations panel + bottom nav now share OperationsBottomStack in scene layout.
+@onready var _operations_tabs: TabContainer = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs
+@onready var _expedition_slots_scroller: ScrollContainer = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller
+@onready var _slot_one_card: TouchScrollCardButton = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard
+@onready var _slot_two_card: TouchScrollCardButton = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard
+@onready var _slot_three_card: TouchScrollCardButton = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard
+@onready var _slot_one_name_label: Label = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneNameLabel
+@onready var _slot_one_state_label: Label = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content/SlotOneStateLabel
+@onready var _slot_two_name_label: Label = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoNameLabel
+@onready var _slot_two_state_label: Label = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content/SlotTwoStateLabel
+@onready var _slot_three_name_label: Label = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content/SlotThreeNameLabel
+@onready var _slot_three_state_label: Label = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content/SlotThreeStateLabel
 
-@onready var _commission_slots_scroller: ScrollContainer = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller
+@onready var _commission_slots_scroller: ScrollContainer = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller
 @onready var _commission_slot_cards: Array[TouchScrollCardButton] = [
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard
 ]
 @onready var _commission_slot_name_labels: Array[Label] = [
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content/CommissionSlotOneNameLabel,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content/CommissionSlotTwoNameLabel,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content/CommissionSlotThreeNameLabel
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content/CommissionSlotOneNameLabel,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content/CommissionSlotTwoNameLabel,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content/CommissionSlotThreeNameLabel
 ]
 @onready var _commission_slot_state_labels: Array[Label] = [
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content/CommissionSlotOneStateLabel,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content/CommissionSlotTwoStateLabel,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content/CommissionSlotThreeStateLabel
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content/CommissionSlotOneStateLabel,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content/CommissionSlotTwoStateLabel,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content/CommissionSlotThreeStateLabel
 ]
-@onready var _supply_run_slots_scroller: ScrollContainer = $OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller
+@onready var _supply_run_slots_scroller: ScrollContainer = $OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller
 @onready var _supply_run_slot_cards: Array[TouchScrollCardButton] = [
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard
 ]
 @onready var _supply_run_slot_name_labels: Array[Label] = [
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content/SupplyRunSlotOneNameLabel,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content/SupplyRunSlotTwoNameLabel,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content/SupplyRunSlotThreeNameLabel
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content/SupplyRunSlotOneNameLabel,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content/SupplyRunSlotTwoNameLabel,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content/SupplyRunSlotThreeNameLabel
 ]
 @onready var _supply_run_slot_state_labels: Array[Label] = [
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content/SupplyRunSlotOneStateLabel,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content/SupplyRunSlotTwoStateLabel,
-	$OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content/SupplyRunSlotThreeStateLabel
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content/SupplyRunSlotOneStateLabel,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content/SupplyRunSlotTwoStateLabel,
+	$OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content/SupplyRunSlotThreeStateLabel
 ]
 
-@onready var _bottom_nav_safe: MarginContainer = $BottomNavSafe
-@onready var _bottom_nav: BottomNavBar = $BottomNavSafe/BottomNavBar
+@onready var _bottom_nav_safe: MarginContainer = $OperationsBottomStack/BottomNavSafe
+@onready var _bottom_nav: BottomNavBar = $OperationsBottomStack/BottomNavSafe/BottomNavBar
 
 var _expedition_manager: ExpeditionManager
 var _commission_runtime_manager: CommissionRuntimeManager
@@ -124,8 +124,6 @@ var _supply_run_slot_actions: Array[String] = ["", "", ""]
 var _supply_run_slot_runtime_ids: Array[int] = [0, 0, 0]
 var _supply_run_slot_visual_states: Array[String] = ["", "", ""]
 var _cached_slot_styles: Dictionary = {}
-var _operations_offset_left := 0.0
-var _operations_offset_right := 0.0
 var _commission_settlement_popup: CommissionSettlementPopup
 
 
@@ -179,12 +177,6 @@ func _ready() -> void:
 	_operations_tabs.set_tab_title(2, "Supply Runs")
 
 	_build_cached_slot_styles()
-	_operations_offset_left = _operations_section_panel.offset_left
-	_operations_offset_right = _operations_section_panel.offset_right
-
-	resized.connect(_on_layout_changed)
-	_bottom_nav_safe.resized.connect(_on_layout_changed)
-	call_deferred("_update_operations_section_layout")
 	set_process(true)
 	_refresh_resource_labels()
 	_refresh_active_status()
@@ -207,39 +199,6 @@ func _process(_delta: float) -> void:
 	_refresh_active_status()
 	_refresh_commission_status()
 	_refresh_supply_run_status()
-
-
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_THEME_CHANGED:
-		if not is_node_ready():
-			call_deferred("_update_operations_section_layout")
-			return
-		_update_operations_section_layout()
-
-
-func _on_layout_changed() -> void:
-	_update_operations_section_layout()
-
-
-func _update_operations_section_layout() -> void:
-	# Guild Hall keeps tabs as a bounded middle section between top summary and
-	# bottom navigation, so operations status cards remain readable on mobile.
-	var parent_height := size.y
-	if parent_height <= 0.0:
-		return
-
-	var midpoint_y := parent_height * 0.5
-	var bottom_nav_top_y := _bottom_nav_safe.position.y
-	var bounded_height: float = maxf(0.0, bottom_nav_top_y - midpoint_y)
-
-	_operations_section_panel.anchor_left = 0.0
-	_operations_section_panel.anchor_right = 1.0
-	_operations_section_panel.offset_left = _operations_offset_left
-	_operations_section_panel.offset_right = _operations_offset_right
-	_operations_section_panel.anchor_top = 0.0
-	_operations_section_panel.anchor_bottom = 0.0
-	_operations_section_panel.offset_top = midpoint_y
-	_operations_section_panel.offset_bottom = midpoint_y + bounded_height
 
 
 func set_expedition_manager(expedition_manager: ExpeditionManager) -> void:
