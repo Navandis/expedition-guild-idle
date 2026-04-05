@@ -23,6 +23,7 @@ signal claim_requested(runtime_id: int)
 @onready var _recovery_time_label: RichTextLabel = $PopupMargin/PopupColumn/RecoveryTimeLabel
 @onready var _close_button: Button = $PopupMargin/PopupColumn/ButtonsRow/CloseButton
 @onready var _claim_button: Button = $PopupMargin/PopupColumn/ButtonsRow/ClaimButton
+@onready var _popup_margin: MarginContainer = $PopupMargin
 
 var _runtime_id := 0
 
@@ -103,7 +104,11 @@ func open_for_entry(entry: Dictionary) -> void:
 
 func _show_bound_popup() -> void:
 	await get_tree().process_frame
-	popup_centered()
+	# PopupPanel is a Window in Godot 4, so it can be shown with clamped sizing.
+	# We size from inner content minimums (not fixed screen coordinates) so the
+	# first open stays readable across different viewport sizes and UI scales.
+	var content_minimum := _popup_margin.get_combined_minimum_size().ceil()
+	popup_centered_clamped(content_minimum, 0.9)
 
 
 func _on_close_pressed() -> void:
