@@ -246,7 +246,7 @@ func _roll_supplies_payout(offer_snapshot: Dictionary) -> int:
 
 func _resolve_payout_band(offer_snapshot: Dictionary) -> Dictionary:
 	# New offers provide an authored dispatch band directly.
-	var raw_band := offer_snapshot.get("supplies_payout_band", {})
+	var raw_band = offer_snapshot.get("supplies_payout_band", {})
 	if raw_band is Dictionary:
 		var band := raw_band as Dictionary
 		var minimum := maxi(0, int(band.get("min", DEFAULT_SUPPLIES_PAYOUT_MIN)))
