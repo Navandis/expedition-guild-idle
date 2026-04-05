@@ -117,6 +117,9 @@ func process_time_progress(now_unix: int = -1) -> Array[Dictionary]:
 
 	for entry in get_active_entries():
 		if int(entry.get("ready_at_unix", 0)) <= now:
+			# Active -> ready happens here as the timer boundary is crossed.
+			# We move rows into ready_to_claim immediately so active-slot usage drops
+			# before claim, which keeps Guild Hall capacity/status truthful.
 			var completed := entry.duplicate(true)
 			completed["state"] = "ready_to_claim"
 			completed["completed_at_unix"] = now

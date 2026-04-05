@@ -767,6 +767,8 @@ func claim_supply_run(runtime_id: int) -> Dictionary:
 	var state_changed := false
 	var newly_ready := _supply_run_runtime_manager.process_time_progress()
 	if not newly_ready.is_empty():
+		# Completion processing runs before claim so timers can free active slots
+		# and return crew as soon as runs finish, including offline catch-up.
 		_apply_supply_run_completion_rows(newly_ready)
 		state_changed = true
 
@@ -782,6 +784,13 @@ func claim_supply_run(runtime_id: int) -> Dictionary:
 		return {"success": false, "message": "Claim failed: run is not ready."}
 
 	var payload := claimed.get("completion_payload", {}) as Dictionary
+	if not bool(claimed.get("crew_return_applied", false)):
+		# Migration safety: if an old ready row exists without completion-side
+		# crew return, apply it once now so v1 state remains consistent.
+		var legacy_crew_committed := maxi(0, int(claimed.get("crew_committed", 0)))
+		if legacy_crew_committed > 0:
+			_commission_resolver.move_assigned_crew_to_available(legacy_crew_committed)
+		state_changed = true
 	var supplies_payout := maxi(0, int(payload.get("supplies_payout", 0)))
 	if supplies_payout > 0:
 		_commission_resolver.add_supplies(supplies_payout)
@@ -1049,6 +1058,8 @@ func _process_commission_runtime_progress(now_unix: int = -1) -> bool:
 func _process_supply_run_runtime_progress(now_unix: int = -1) -> bool:
 	# Supply Run completion side effect is intentionally light in v1:
 	# when a run finishes, committed crew returns directly to Available.
+	# Offline-safe note: this helper is called both during live ticks and load
+	# catch-up, so overdue runs are promoted without requiring manual waits.
 	var promoted_rows := _supply_run_runtime_manager.process_time_progress(now_unix)
 	if promoted_rows.is_empty():
 		return false
@@ -1063,6 +1074,8 @@ func _apply_supply_run_completion_rows(rows: Array[Dictionary]) -> void:
 	for row in rows:
 		var crew_committed := maxi(0, int((row as Dictionary).get("crew_committed", 0)))
 		if crew_committed > 0:
+			# v1 simplification: Supply Runs skip the deeper recovery model and send
+			# committed crew directly back to Available on completion.
 			_commission_resolver.move_assigned_crew_to_available(crew_committed)
 		transitioned_runtime_ids.append(int((row as Dictionary).get("runtime_id", 0)))
 	_supply_run_runtime_manager.mark_ready_entries_crew_return_applied(transitioned_runtime_ids)
