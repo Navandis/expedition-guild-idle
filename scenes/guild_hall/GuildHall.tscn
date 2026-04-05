@@ -285,19 +285,19 @@ layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 1.0
 
-[node name="OperationsSectionMargin" type="MarginContainer" parent="OperationsSectionPanel" unique_id=570001012]
+[node name="OperationsSectionMargin" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel" unique_id=570001012]
 layout_mode = 2
 theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
-[node name="OperationsTabs" type="TabContainer" parent="OperationsSectionPanel/OperationsSectionMargin" unique_id=1370000004]
+[node name="OperationsTabs" type="TabContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin" unique_id=1370000004]
 layout_mode = 2
 size_flags_vertical = 3
 current_tab = 0
 
-[node name="ExpeditionsTab" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs" unique_id=570001013]
+[node name="ExpeditionsTab" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs" unique_id=570001013]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -307,26 +307,26 @@ theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 metadata/_tab_index = 0
 
-[node name="ExpeditionSlotsScroller" type="ScrollContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab" unique_id=570001014]
+[node name="ExpeditionSlotsScroller" type="ScrollContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab" unique_id=570001014]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 3
 vertical_scroll_mode = 0
 
-[node name="ExpeditionSlotsRow" type="HBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller" unique_id=1205453616]
+[node name="ExpeditionSlotsRow" type="HBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller" unique_id=1205453616]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="SlotOneCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1849938802]
+[node name="SlotOneCard" type="Button" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1849938802]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard" unique_id=1742571574]
+[node name="Margin" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard" unique_id=1742571574]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -339,20 +339,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin" unique_id=1597555090]
+[node name="Content" type="VBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin" unique_id=1597555090]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SlotOneImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1361455259]
+[node name="SlotOneImage" type="TextureRect" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1361455259]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("5_513lt")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="SlotOneImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=980786867]
+[node name="SlotOneImagePlaceholder" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=980786867]
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
@@ -360,7 +360,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SlotOneNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1411912238]
+[node name="SlotOneNameLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1411912238]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -369,7 +369,7 @@ horizontal_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 2
 
-[node name="SlotOneStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1241231002]
+[node name="SlotOneStateLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotOneCard/Margin/Content" unique_id=1241231002]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -379,14 +379,14 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="SlotTwoCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1880540343]
+[node name="SlotTwoCard" type="Button" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=1880540343]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard" unique_id=2041278820]
+[node name="Margin" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard" unique_id=2041278820]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -399,20 +399,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin" unique_id=221270952]
+[node name="Content" type="VBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin" unique_id=221270952]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SlotTwoImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1948435946]
+[node name="SlotTwoImage" type="TextureRect" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1948435946]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("5_0pdko")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="SlotTwoImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1361604704]
+[node name="SlotTwoImagePlaceholder" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=1361604704]
 visible = false
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
@@ -421,7 +421,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SlotTwoNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=760266556]
+[node name="SlotTwoNameLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=760266556]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -430,7 +430,7 @@ horizontal_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 2
 
-[node name="SlotTwoStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=570001015]
+[node name="SlotTwoStateLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotTwoCard/Margin/Content" unique_id=570001015]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -440,7 +440,7 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="SlotThreeCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=693119290]
+[node name="SlotThreeCard" type="Button" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow" unique_id=693119290]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -448,7 +448,7 @@ size_flags_vertical = 3
 disabled = true
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard" unique_id=1803411273]
+[node name="Margin" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard" unique_id=1803411273]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -461,13 +461,13 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin" unique_id=544864210]
+[node name="Content" type="VBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin" unique_id=544864210]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SlotThreeImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=108482318]
+[node name="SlotThreeImagePlaceholder" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=108482318]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 size_flags_vertical = 1
@@ -475,7 +475,7 @@ text = "LOCKED"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SlotThreeNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=1380264170]
+[node name="SlotThreeNameLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=1380264170]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -484,7 +484,7 @@ horizontal_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 2
 
-[node name="SlotThreeStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=352267861]
+[node name="SlotThreeStateLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/ExpeditionsTab/ExpeditionSlotsScroller/ExpeditionSlotsRow/SlotThreeCard/Margin/Content" unique_id=352267861]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -494,7 +494,7 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="CommissionsTab" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs" unique_id=570001016]
+[node name="CommissionsTab" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs" unique_id=570001016]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
@@ -505,26 +505,26 @@ theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 metadata/_tab_index = 1
 
-[node name="CommissionSlotsScroller" type="ScrollContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab" unique_id=570001017]
+[node name="CommissionSlotsScroller" type="ScrollContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab" unique_id=570001017]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 3
 vertical_scroll_mode = 0
 
-[node name="CommissionSlotsRow" type="HBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller" unique_id=1641990942]
+[node name="CommissionSlotsRow" type="HBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller" unique_id=1641990942]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="CommissionSlotOneCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow" unique_id=570001018]
+[node name="CommissionSlotOneCard" type="Button" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow" unique_id=570001018]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard" unique_id=570001019]
+[node name="Margin" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard" unique_id=570001019]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -537,20 +537,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin" unique_id=570001020]
+[node name="Content" type="VBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin" unique_id=570001020]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="CommissionSlotOneImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content" unique_id=570001021]
+[node name="CommissionSlotOneImage" type="TextureRect" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content" unique_id=570001021]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("11_toh44")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="CommissionSlotOneImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content" unique_id=570001022]
+[node name="CommissionSlotOneImagePlaceholder" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content" unique_id=570001022]
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
@@ -558,7 +558,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CommissionSlotOneNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content" unique_id=570001023]
+[node name="CommissionSlotOneNameLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content" unique_id=570001023]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -568,7 +568,7 @@ autowrap_mode = 2
 text_overrun_behavior = 3
 max_lines_visible = 2
 
-[node name="CommissionSlotOneStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content" unique_id=570001024]
+[node name="CommissionSlotOneStateLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content" unique_id=570001024]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -578,14 +578,14 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="CommissionSlotTwoCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow" unique_id=570001025]
+[node name="CommissionSlotTwoCard" type="Button" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow" unique_id=570001025]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard" unique_id=570001026]
+[node name="Margin" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard" unique_id=570001026]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -598,20 +598,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin" unique_id=570001027]
+[node name="Content" type="VBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin" unique_id=570001027]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="CommissionSlotTwoImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content" unique_id=570001028]
+[node name="CommissionSlotTwoImage" type="TextureRect" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content" unique_id=570001028]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("12_hk77b")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="CommissionSlotTwoImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content" unique_id=570001029]
+[node name="CommissionSlotTwoImagePlaceholder" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content" unique_id=570001029]
 visible = false
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
@@ -620,7 +620,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CommissionSlotTwoNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content" unique_id=570001030]
+[node name="CommissionSlotTwoNameLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content" unique_id=570001030]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -630,7 +630,7 @@ autowrap_mode = 2
 text_overrun_behavior = 3
 max_lines_visible = 2
 
-[node name="CommissionSlotTwoStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content" unique_id=570001031]
+[node name="CommissionSlotTwoStateLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content" unique_id=570001031]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -640,14 +640,14 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="CommissionSlotThreeCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow" unique_id=570001032]
+[node name="CommissionSlotThreeCard" type="Button" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow" unique_id=570001032]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard" unique_id=570001033]
+[node name="Margin" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard" unique_id=570001033]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -660,20 +660,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin" unique_id=570001034]
+[node name="Content" type="VBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin" unique_id=570001034]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="CommissionSlotThreeImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content" unique_id=570001035]
+[node name="CommissionSlotThreeImage" type="TextureRect" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content" unique_id=570001035]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("13_6sj14")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="CommissionSlotThreeImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content" unique_id=570001036]
+[node name="CommissionSlotThreeImagePlaceholder" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content" unique_id=570001036]
 visible = false
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
@@ -682,7 +682,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CommissionSlotThreeNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content" unique_id=570001037]
+[node name="CommissionSlotThreeNameLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content" unique_id=570001037]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -692,7 +692,7 @@ autowrap_mode = 2
 text_overrun_behavior = 3
 max_lines_visible = 2
 
-[node name="CommissionSlotThreeStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content" unique_id=570001038]
+[node name="CommissionSlotThreeStateLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content" unique_id=570001038]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -702,7 +702,7 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="SupplyRunsTab" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs" unique_id=1102694115]
+[node name="SupplyRunsTab" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs" unique_id=1102694115]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
@@ -713,26 +713,26 @@ theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 metadata/_tab_index = 2
 
-[node name="SupplyRunSlotsScroller" type="ScrollContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab" unique_id=1256062017]
+[node name="SupplyRunSlotsScroller" type="ScrollContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab" unique_id=1256062017]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 3
 vertical_scroll_mode = 0
 
-[node name="SupplyRunSlotsRow" type="HBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller" unique_id=571511961]
+[node name="SupplyRunSlotsRow" type="HBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller" unique_id=571511961]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="SupplyRunSlotOneCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow" unique_id=801642073]
+[node name="SupplyRunSlotOneCard" type="Button" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow" unique_id=801642073]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard" unique_id=611397988]
+[node name="Margin" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard" unique_id=611397988]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -745,20 +745,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin" unique_id=727296883]
+[node name="Content" type="VBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin" unique_id=727296883]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SupplyRunSlotOneImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=1768861594]
+[node name="SupplyRunSlotOneImage" type="TextureRect" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=1768861594]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("14_vtwey")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="SupplyRunSlotOneImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=817910645]
+[node name="SupplyRunSlotOneImagePlaceholder" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=817910645]
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
@@ -766,7 +766,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SupplyRunSlotOneNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=1640847015]
+[node name="SupplyRunSlotOneNameLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=1640847015]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -776,7 +776,7 @@ autowrap_mode = 2
 text_overrun_behavior = 3
 max_lines_visible = 2
 
-[node name="SupplyRunSlotOneStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=383058310]
+[node name="SupplyRunSlotOneStateLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=383058310]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -786,14 +786,14 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="SupplyRunSlotTwoCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow" unique_id=692371698]
+[node name="SupplyRunSlotTwoCard" type="Button" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow" unique_id=692371698]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard" unique_id=1407627177]
+[node name="Margin" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard" unique_id=1407627177]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -806,20 +806,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin" unique_id=2063611373]
+[node name="Content" type="VBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin" unique_id=2063611373]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SupplyRunSlotTwoImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=248242728]
+[node name="SupplyRunSlotTwoImage" type="TextureRect" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=248242728]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("15_gl6fg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="SupplyRunSlotTwoImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=1301947634]
+[node name="SupplyRunSlotTwoImagePlaceholder" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=1301947634]
 visible = false
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
@@ -828,7 +828,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SupplyRunSlotTwoNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=618303112]
+[node name="SupplyRunSlotTwoNameLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=618303112]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -838,7 +838,7 @@ autowrap_mode = 2
 text_overrun_behavior = 3
 max_lines_visible = 2
 
-[node name="SupplyRunSlotTwoStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=1788923928]
+[node name="SupplyRunSlotTwoStateLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=1788923928]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -848,14 +848,14 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="SupplyRunSlotThreeCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow" unique_id=1962744125]
+[node name="SupplyRunSlotThreeCard" type="Button" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow" unique_id=1962744125]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard" unique_id=954766352]
+[node name="Margin" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard" unique_id=954766352]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -868,20 +868,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin" unique_id=1050904332]
+[node name="Content" type="VBoxContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin" unique_id=1050904332]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SupplyRunSlotThreeImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=288798940]
+[node name="SupplyRunSlotThreeImage" type="TextureRect" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=288798940]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("16_7nidb")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="SupplyRunSlotThreeImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=1247052140]
+[node name="SupplyRunSlotThreeImagePlaceholder" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=1247052140]
 visible = false
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
@@ -890,7 +890,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SupplyRunSlotThreeNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=427351736]
+[node name="SupplyRunSlotThreeNameLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=427351736]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -900,7 +900,7 @@ autowrap_mode = 2
 text_overrun_behavior = 3
 max_lines_visible = 2
 
-[node name="SupplyRunSlotThreeStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=789044977]
+[node name="SupplyRunSlotThreeStateLabel" type="Label" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=789044977]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
