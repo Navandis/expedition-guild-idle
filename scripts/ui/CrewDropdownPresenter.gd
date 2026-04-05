@@ -46,6 +46,11 @@ func _on_dropdown_button_pressed() -> void:
 		_dropdown_popup.hide()
 		return
 
+	# Keep authored width, but shrink height to the popup content so no blank row appears.
+	var authored_width := _dropdown_popup.size.x
+	_dropdown_popup.reset_size()
+	_dropdown_popup.size = Vector2i(max(authored_width, _dropdown_popup.size.x), _dropdown_popup.size.y)
+
 	# PopupPanel gives a compact dropdown that closes when focus/tap moves away.
 	var button_rect := _dropdown_button.get_global_rect()
 	_dropdown_popup.position = Vector2i(
