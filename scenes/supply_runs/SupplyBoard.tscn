@@ -13,17 +13,22 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_vertical = 3
 script = ExtResource("1_supply_board_script")
 
 [node name="MainColumn" type="VBoxContainer" parent="." unique_id=1356495045]
 layout_mode = 1
-anchors_preset = -1
+anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 0.92
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 6
 
 [node name="ResourceRowPanel" type="PanelContainer" parent="MainColumn" unique_id=2086569854]
 layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.1
 
 [node name="ResourceRowMargin" type="MarginContainer" parent="MainColumn/ResourceRowPanel" unique_id=559176587]
 layout_mode = 2
@@ -161,10 +166,8 @@ size_flags_vertical = 3
 
 [node name="OffersMargin" type="MarginContainer" parent="MainColumn/OffersPanel" unique_id=2074211931]
 layout_mode = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_right = 2
 
 [node name="OffersColumn" type="VBoxContainer" parent="MainColumn/OffersPanel/OffersMargin" unique_id=1420860080]
 layout_mode = 2
@@ -235,6 +238,10 @@ autowrap_mode = 3
 
 [node name="BottomNavSafe" type="MarginContainer" parent="MainColumn" unique_id=874818070]
 layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.1
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_right = 2
 
 [node name="BottomNavBar" parent="MainColumn/BottomNavSafe" unique_id=480504073 instance=ExtResource("2_nav")]
 layout_mode = 2
