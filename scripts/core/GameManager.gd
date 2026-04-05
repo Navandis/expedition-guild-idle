@@ -284,7 +284,10 @@ func _show_supply_board() -> void:
 		int(_resources.get("gold", 0)),
 		_commission_resolver.get_supplies(),
 		_supply_run_runtime_manager.get_active_slot_usage(),
-		int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0))
+		int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0)),
+		_commission_resolver.get_assigned_crew(),
+		_commission_resolver.get_recovering_crew(),
+		_commission_resolver.get_max_crew()
 	)
 	_show_screen(_supply_board_screen_controller)
 
@@ -1117,7 +1120,10 @@ func _refresh_supply_board_context() -> void:
 		int(_resources.get("gold", 0)),
 		_commission_resolver.get_supplies(),
 		_supply_run_runtime_manager.get_active_slot_usage(),
-		int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0))
+		int(_slot_capacities.get("supply_run", {}).get("current_supply_run_slot_capacity", 0)),
+		_commission_resolver.get_assigned_crew(),
+		_commission_resolver.get_recovering_crew(),
+		_commission_resolver.get_max_crew()
 	)
 
 

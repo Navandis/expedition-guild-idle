@@ -19,7 +19,11 @@ signal supply_dispatch_requested(offer_id: String)
 const _VISIBLE_CARD_COUNT := 3
 
 @onready var _gold_value_label: Label = $MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row/GoldValueLabel
-@onready var _crew_value_label: Label = $MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewValueLabel
+@onready var _crew_dropdown_button: Button = $MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton
+@onready var _crew_collapsed_value: RichTextLabel = $MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton/CrewCollapsedValue
+@onready var _crew_dropdown_popup: PopupPanel = $MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup
+@onready var _assigned_crew_value_label: RichTextLabel = $MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues/AssignedCrewValueLabel
+@onready var _recovering_crew_value_label: RichTextLabel = $MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues/RecoveringCrewValueLabel
 @onready var _supplies_value_label: Label = $MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter/Row/SuppliesValueLabel
 @onready var _card_buttons: Array[Button] = [
 	$MainColumn/OffersPanel/OffersMargin/OffersColumn/CardsGrid/SR1Button,
@@ -30,16 +34,20 @@ const _VISIBLE_CARD_COUNT := 3
 @onready var _selected_info_label: Label = $MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin/DetailColumn/SelectedInfoLabel
 @onready var _dispatch_button: Button = $MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin/DetailColumn/DispatchButton
 @onready var _status_label: Label = $MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin/DetailColumn/StatusLabel
-@onready var _bottom_nav: BottomNavBar = $BottomNavSafe/BottomNavBar
+@onready var _bottom_nav: BottomNavBar = $MainColumn/BottomNavSafe/BottomNavBar
 
 var _offers: Array[Dictionary] = []
 var _selected_offer: Dictionary = {}
 var _available_crew := 0
+var _assigned_crew := 0
+var _recovering_crew := 0
+var _max_crew := 0
 var _current_gold := 0
 var _available_supplies := 0
 var _slot_usage := 0
 var _slot_capacity := 0
 var _ui_ready := false
+var _crew_dropdown_presenter := CrewDropdownPresenter.new()
 
 
 func _ready() -> void:
@@ -47,6 +55,14 @@ func _ready() -> void:
 	_bottom_nav.set_current_screen(BottomNavBar.TARGET_SUPPLY_BOARD)
 	_bottom_nav.navigate_requested.connect(func(target_screen: String) -> void:
 		navigate_requested.emit(target_screen)
+	)
+	# Mirror the same crew dropdown interaction used in Guild Hall/Commission Board.
+	_crew_dropdown_presenter.configure(
+		_crew_dropdown_button,
+		_crew_collapsed_value,
+		_crew_dropdown_popup,
+		_assigned_crew_value_label,
+		_recovering_crew_value_label
 	)
 
 	for i in range(_card_buttons.size()):
@@ -67,11 +83,17 @@ func set_supply_board_context(
 	current_gold: int,
 	available_supplies: int,
 	slot_usage: int,
-	slot_capacity: int
+	slot_capacity: int,
+	assigned_crew: int = 0,
+	recovering_crew: int = 0,
+	max_crew: int = 0
 ) -> void:
 	# UI binding is a projection of runtime/board state from GameManager.
 	_offers = offers.duplicate(true)
 	_available_crew = maxi(0, available_crew)
+	_assigned_crew = maxi(0, assigned_crew)
+	_recovering_crew = maxi(0, recovering_crew)
+	_max_crew = maxi(_available_crew, max_crew)
 	_current_gold = maxi(0, current_gold)
 	_slot_usage = maxi(0, slot_usage)
 	_slot_capacity = maxi(0, slot_capacity)
@@ -89,7 +111,7 @@ func _apply_header_resources() -> void:
 	if not _ui_ready:
 		return
 	_gold_value_label.text = str(_current_gold)
-	_crew_value_label.text = str(_available_crew)
+	_crew_dropdown_presenter.set_values(_available_crew, _max_crew, _assigned_crew, _recovering_crew)
 	_supplies_value_label.text = str(_available_supplies)
 
 
