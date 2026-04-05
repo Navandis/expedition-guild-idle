@@ -168,6 +168,7 @@ size_flags_vertical = 3
 layout_mode = 2
 theme_override_constants/margin_left = 2
 theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 1
 
 [node name="OffersColumn" type="VBoxContainer" parent="MainColumn/OffersPanel/OffersMargin" unique_id=1420860080]
 layout_mode = 2
@@ -241,6 +242,7 @@ layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 1
 theme_override_constants/margin_right = 2
 
 [node name="BottomNavBar" parent="MainColumn/BottomNavSafe" unique_id=480504073 instance=ExtResource("2_nav")]

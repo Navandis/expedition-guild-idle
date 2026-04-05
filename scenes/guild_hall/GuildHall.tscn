@@ -283,14 +283,13 @@ grow_vertical = 2
 [node name="OperationsSectionPanel" type="PanelContainer" parent="OperationsBottomStack" unique_id=570001011]
 layout_mode = 2
 size_flags_vertical = 3
-size_flags_stretch_ratio = 1.0
 
 [node name="OperationsSectionMargin" type="MarginContainer" parent="OperationsBottomStack/OperationsSectionPanel" unique_id=570001012]
 layout_mode = 2
-theme_override_constants/margin_left = 0
+theme_override_constants/margin_left = 2
 theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 0
-theme_override_constants/margin_bottom = 0
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 1
 
 [node name="OperationsTabs" type="TabContainer" parent="OperationsBottomStack/OperationsSectionPanel/OperationsSectionMargin" unique_id=1370000004]
 layout_mode = 2
@@ -912,10 +911,11 @@ max_lines_visible = 4
 
 [node name="BottomNavSafe" type="MarginContainer" parent="OperationsBottomStack" unique_id=1491293952]
 layout_mode = 2
-size_flags_vertical = 8
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 1
+theme_override_constants/margin_right = 2
 theme_override_constants/margin_bottom = 0
 
 [node name="BottomNavBar" parent="OperationsBottomStack/BottomNavSafe" unique_id=1735187439 instance=ExtResource("2_nav")]
