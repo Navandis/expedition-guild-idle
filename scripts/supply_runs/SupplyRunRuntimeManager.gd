@@ -67,7 +67,10 @@ func get_ready_to_claim_entries() -> Array[Dictionary]:
 
 
 func get_active_slot_usage() -> int:
-	return get_active_entries().size()
+	# Slot occupancy is "dispatched but not yet fully cleared."
+	# That includes in-progress rows and ready-to-claim rows.
+	# A slot only frees after claim removes the ready entry.
+	return get_active_entries().size() + get_ready_to_claim_entries().size()
 
 
 func can_start_supply_run(current_slot_capacity: int) -> bool:
@@ -118,8 +121,9 @@ func process_time_progress(now_unix: int = -1) -> Array[Dictionary]:
 	for entry in get_active_entries():
 		if int(entry.get("ready_at_unix", 0)) <= now:
 			# Active -> ready happens here as the timer boundary is crossed.
-			# We move rows into ready_to_claim immediately so active-slot usage drops
-			# before claim, which keeps Guild Hall capacity/status truthful.
+			# The row still occupies a slot while it waits for claim.
+			# It leaves the active bucket, but still counts in slot usage because
+			# get_active_slot_usage includes ready-to-claim entries too.
 			var completed := entry.duplicate(true)
 			completed["state"] = "ready_to_claim"
 			completed["completed_at_unix"] = now
