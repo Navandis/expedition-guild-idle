@@ -11,7 +11,12 @@
 [ext_resource type="Texture2D" uid="uid://54g82p854pgd" path="res://assets/Regions/Emberwake Coast - sketch v4.png" id="5_513lt"]
 [ext_resource type="Texture2D" uid="uid://bvmnwunr0da8o" path="res://assets/UI/ResourceCounters/supplies.png" id="5_supplies_icon"]
 [ext_resource type="Script" uid="uid://dea00ojayku33" path="res://scripts/ui/TouchScrollCardButton.gd" id="6_touch_card"]
-[ext_resource type="Texture2D" uid="uid://8qgknq71pugv" path="res://assets/Regions/Greyfen March - Sketch - v2.png" id="7_o7uwm"]
+[ext_resource type="Texture2D" uid="uid://bajg8i12jwnvf" path="res://assets/Regions/Greyfen March - variant 8.png" id="11_toh44"]
+[ext_resource type="Texture2D" uid="uid://csu2tsy4y87j6" path="res://assets/Regions/Greenhollow Reaches - v5.png" id="12_hk77b"]
+[ext_resource type="Texture2D" uid="uid://cwd20037gyhqp" path="res://assets/Regions/Sunscar Expanse - v7.png" id="13_6sj14"]
+[ext_resource type="Texture2D" uid="uid://d2igrle28yjbk" path="res://assets/Regions/Greenhollow Reaches - v1.png" id="14_vtwey"]
+[ext_resource type="Texture2D" uid="uid://bv6gjkd8ihhnf" path="res://assets/Regions/Greyfen March - variant 6.png" id="15_gl6fg"]
+[ext_resource type="Texture2D" uid="uid://dcyudlqjo70dm" path="res://assets/Regions/Sunscar Expanse - v10.png" id="16_7nidb"]
 
 [node name="GuildHall" type="Control" unique_id=1458496136]
 layout_mode = 3
@@ -268,13 +273,10 @@ text = "DBG-RES"
 
 [node name="OperationsSectionPanel" type="PanelContainer" parent="." unique_id=570001011]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
+anchor_top = 0.45
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 261.0
-offset_bottom = -110.0
-grow_horizontal = 2
-grow_vertical = 2
+anchor_bottom = 0.9
 
 [node name="OperationsSectionMargin" type="MarginContainer" parent="OperationsSectionPanel" unique_id=570001012]
 layout_mode = 2
@@ -494,7 +496,7 @@ theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
-metadata/_tab_index = 2
+metadata/_tab_index = 1
 
 [node name="CommissionSlotsScroller" type="ScrollContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab" unique_id=570001017]
 layout_mode = 2
@@ -537,7 +539,7 @@ theme_override_constants/separation = 6
 [node name="CommissionSlotOneImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotOneCard/Margin/Content" unique_id=570001021]
 layout_mode = 2
 size_flags_vertical = 3
-texture = ExtResource("5_0pdko")
+texture = ExtResource("11_toh44")
 expand_mode = 1
 stretch_mode = 6
 
@@ -598,7 +600,7 @@ theme_override_constants/separation = 6
 [node name="CommissionSlotTwoImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotTwoCard/Margin/Content" unique_id=570001028]
 layout_mode = 2
 size_flags_vertical = 3
-texture = ExtResource("5_513lt")
+texture = ExtResource("12_hk77b")
 expand_mode = 1
 stretch_mode = 6
 
@@ -660,7 +662,7 @@ theme_override_constants/separation = 6
 [node name="CommissionSlotThreeImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/CommissionsTab/CommissionSlotsScroller/CommissionSlotsRow/CommissionSlotThreeCard/Margin/Content" unique_id=570001035]
 layout_mode = 2
 size_flags_vertical = 3
-texture = ExtResource("7_o7uwm")
+texture = ExtResource("13_6sj14")
 expand_mode = 1
 stretch_mode = 6
 
@@ -693,7 +695,7 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="SupplyRunsTab" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs"]
+[node name="SupplyRunsTab" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs" unique_id=1102694115]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
@@ -702,28 +704,28 @@ theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
-metadata/_tab_index = 1
+metadata/_tab_index = 2
 
-[node name="SupplyRunSlotsScroller" type="ScrollContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab"]
+[node name="SupplyRunSlotsScroller" type="ScrollContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab" unique_id=1256062017]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 3
 vertical_scroll_mode = 0
 
-[node name="SupplyRunSlotsRow" type="HBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller"]
+[node name="SupplyRunSlotsRow" type="HBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller" unique_id=571511961]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="SupplyRunSlotOneCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow"]
+[node name="SupplyRunSlotOneCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow" unique_id=801642073]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard"]
+[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard" unique_id=611397988]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -736,20 +738,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin"]
+[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin" unique_id=727296883]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SupplyRunSlotOneImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content"]
+[node name="SupplyRunSlotOneImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=1768861594]
 layout_mode = 2
 size_flags_vertical = 3
-texture = ExtResource("5_0pdko")
+texture = ExtResource("14_vtwey")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="SupplyRunSlotOneImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content"]
+[node name="SupplyRunSlotOneImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=817910645]
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
@@ -757,7 +759,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SupplyRunSlotOneNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content"]
+[node name="SupplyRunSlotOneNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=1640847015]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -767,7 +769,7 @@ autowrap_mode = 2
 text_overrun_behavior = 3
 max_lines_visible = 2
 
-[node name="SupplyRunSlotOneStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content"]
+[node name="SupplyRunSlotOneStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotOneCard/Margin/Content" unique_id=383058310]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -777,14 +779,14 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="SupplyRunSlotTwoCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow"]
+[node name="SupplyRunSlotTwoCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow" unique_id=692371698]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard"]
+[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard" unique_id=1407627177]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -797,20 +799,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin"]
+[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin" unique_id=2063611373]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SupplyRunSlotTwoImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content"]
+[node name="SupplyRunSlotTwoImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=248242728]
 layout_mode = 2
 size_flags_vertical = 3
-texture = ExtResource("5_513lt")
+texture = ExtResource("15_gl6fg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="SupplyRunSlotTwoImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content"]
+[node name="SupplyRunSlotTwoImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=1301947634]
 visible = false
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
@@ -819,7 +821,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SupplyRunSlotTwoNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content"]
+[node name="SupplyRunSlotTwoNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=618303112]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -829,7 +831,7 @@ autowrap_mode = 2
 text_overrun_behavior = 3
 max_lines_visible = 2
 
-[node name="SupplyRunSlotTwoStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content"]
+[node name="SupplyRunSlotTwoStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotTwoCard/Margin/Content" unique_id=1788923928]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -839,14 +841,14 @@ vertical_alignment = 1
 autowrap_mode = 2
 max_lines_visible = 4
 
-[node name="SupplyRunSlotThreeCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow"]
+[node name="SupplyRunSlotThreeCard" type="Button" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow" unique_id=1962744125]
 custom_minimum_size = Vector2(150, 196)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("6_touch_card")
 
-[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard"]
+[node name="Margin" type="MarginContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard" unique_id=954766352]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -859,20 +861,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin"]
+[node name="Content" type="VBoxContainer" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin" unique_id=1050904332]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="SupplyRunSlotThreeImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content"]
+[node name="SupplyRunSlotThreeImage" type="TextureRect" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=288798940]
 layout_mode = 2
 size_flags_vertical = 3
-texture = ExtResource("7_o7uwm")
+texture = ExtResource("16_7nidb")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="SupplyRunSlotThreeImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content"]
+[node name="SupplyRunSlotThreeImagePlaceholder" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=1247052140]
 visible = false
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
@@ -881,7 +883,7 @@ text = "IMG"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SupplyRunSlotThreeNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content"]
+[node name="SupplyRunSlotThreeNameLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=427351736]
 layout_mode = 2
 size_flags_vertical = 6
 theme_override_font_sizes/font_size = 10
@@ -891,7 +893,7 @@ autowrap_mode = 2
 text_overrun_behavior = 3
 max_lines_visible = 2
 
-[node name="SupplyRunSlotThreeStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content"]
+[node name="SupplyRunSlotThreeStateLabel" type="Label" parent="OperationsSectionPanel/OperationsSectionMargin/OperationsTabs/SupplyRunsTab/SupplyRunSlotsScroller/SupplyRunSlotsRow/SupplyRunSlotThreeCard/Margin/Content" unique_id=789044977]
 layout_mode = 2
 size_flags_vertical = 1
 theme_override_font_sizes/font_size = 9
@@ -903,13 +905,10 @@ max_lines_visible = 4
 
 [node name="BottomNavSafe" type="MarginContainer" parent="." unique_id=1491293952]
 layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
+anchors_preset = -1
+anchor_top = 0.922
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -50.0
-grow_horizontal = 2
-grow_vertical = 0
+anchor_bottom = 0.922
 theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0

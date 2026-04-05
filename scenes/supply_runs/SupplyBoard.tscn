@@ -1,12 +1,12 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dwgtwg2p0ryrh"]
 
-[ext_resource type="Script" path="res://scripts/ui/SupplyBoardScreenController.gd" id="1_supply_board_script"]
-[ext_resource type="PackedScene" path="res://scenes/components/BottomNavBar.tscn" id="2_nav"]
+[ext_resource type="Script" uid="uid://6ui6rvjkvvt3" path="res://scripts/ui/SupplyBoardScreenController.gd" id="1_supply_board_script"]
+[ext_resource type="PackedScene" uid="uid://dxy77rjcxh2v2" path="res://scenes/components/BottomNavBar.tscn" id="2_nav"]
 [ext_resource type="Texture2D" uid="uid://py6ohnws3tte" path="res://assets/UI/ResourceCounters/gold.png" id="3_gold_icon"]
 [ext_resource type="Texture2D" uid="uid://bv5xb7c6dh0gp" path="res://assets/UI/ResourceCounters/crew.png" id="4_crew_icon"]
 [ext_resource type="Texture2D" uid="uid://bvmnwunr0da8o" path="res://assets/UI/ResourceCounters/supplies.png" id="5_supplies_icon"]
 
-[node name="SupplyBoard" type="Control"]
+[node name="SupplyBoard" type="Control" unique_id=944649566]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,39 +15,36 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_supply_board_script")
 
-[node name="MainColumn" type="VBoxContainer" parent="."]
+[node name="MainColumn" type="VBoxContainer" parent="." unique_id=1356495045]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_bottom = -50.0
-grow_horizontal = 2
-grow_vertical = 2
+anchor_bottom = 0.92
 theme_override_constants/separation = 6
 
-[node name="ResourceRowPanel" type="PanelContainer" parent="MainColumn"]
+[node name="ResourceRowPanel" type="PanelContainer" parent="MainColumn" unique_id=2086569854]
 layout_mode = 2
 
-[node name="ResourceRowMargin" type="MarginContainer" parent="MainColumn/ResourceRowPanel"]
+[node name="ResourceRowMargin" type="MarginContainer" parent="MainColumn/ResourceRowPanel" unique_id=559176587]
 layout_mode = 2
 theme_override_constants/margin_left = 3
 theme_override_constants/margin_top = 3
 theme_override_constants/margin_right = 3
 theme_override_constants/margin_bottom = 6
 
-[node name="ResourceSlots" type="HBoxContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin"]
+[node name="ResourceSlots" type="HBoxContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin" unique_id=230270124]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="GoldCounter" type="PanelContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots"]
+[node name="GoldCounter" type="PanelContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=2129721683]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.9
 
-[node name="Row" type="HBoxContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter"]
+[node name="Row" type="HBoxContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter" unique_id=140210170]
 layout_mode = 2
 
-[node name="GoldIcon" type="TextureRect" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row"]
+[node name="GoldIcon" type="TextureRect" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row" unique_id=1841623073]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 mouse_filter = 2
@@ -55,20 +52,20 @@ texture = ExtResource("3_gold_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="GoldValueLabel" type="Label" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row"]
+[node name="GoldValueLabel" type="Label" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/GoldCounter/Row" unique_id=891149299]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="CrewCounter" type="PanelContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots"]
+[node name="CrewCounter" type="PanelContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=1995953742]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Row" type="HBoxContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter"]
+[node name="Row" type="HBoxContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter" unique_id=1235752576]
 layout_mode = 2
 
-[node name="CrewIcon" type="TextureRect" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row"]
+[node name="CrewIcon" type="TextureRect" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row" unique_id=475000607]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 mouse_filter = 2
@@ -76,21 +73,21 @@ texture = ExtResource("4_crew_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CrewValueLabel" type="Label" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row"]
+[node name="CrewValueLabel" type="Label" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row" unique_id=738452560]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="SuppliesCounter" type="PanelContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots"]
+[node name="SuppliesCounter" type="PanelContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=1538528339]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.8
 
-[node name="Row" type="HBoxContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter"]
+[node name="Row" type="HBoxContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter" unique_id=630097343]
 layout_mode = 2
 
-[node name="SuppliesIcon" type="TextureRect" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter/Row"]
+[node name="SuppliesIcon" type="TextureRect" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter/Row" unique_id=2056318323]
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 mouse_filter = 2
@@ -98,97 +95,97 @@ texture = ExtResource("5_supplies_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SuppliesValueLabel" type="Label" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter/Row"]
+[node name="SuppliesValueLabel" type="Label" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/SuppliesCounter/Row" unique_id=1403582280]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
 horizontal_alignment = 2
 
-[node name="OffersPanel" type="PanelContainer" parent="MainColumn"]
+[node name="OffersPanel" type="PanelContainer" parent="MainColumn" unique_id=583433151]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="OffersMargin" type="MarginContainer" parent="MainColumn/OffersPanel"]
+[node name="OffersMargin" type="MarginContainer" parent="MainColumn/OffersPanel" unique_id=2074211931]
 layout_mode = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
-[node name="OffersColumn" type="VBoxContainer" parent="MainColumn/OffersPanel/OffersMargin"]
+[node name="OffersColumn" type="VBoxContainer" parent="MainColumn/OffersPanel/OffersMargin" unique_id=1420860080]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="OffersHeader" type="Label" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn"]
+[node name="OffersHeader" type="Label" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn" unique_id=1491758999]
 layout_mode = 2
 text = "Supply Board Offers"
 
-[node name="CardsGrid" type="GridContainer" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn"]
+[node name="CardsGrid" type="GridContainer" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn" unique_id=681686545]
 layout_mode = 2
 size_flags_vertical = 3
-columns = 3
 theme_override_constants/h_separation = 6
 theme_override_constants/v_separation = 6
+columns = 3
 
-[node name="SR1Button" type="Button" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/CardsGrid"]
+[node name="SR1Button" type="Button" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/CardsGrid" unique_id=2119905822]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "SR1"
+autowrap_mode = 3
 
-[node name="SR2Button" type="Button" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/CardsGrid"]
+[node name="SR2Button" type="Button" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/CardsGrid" unique_id=1563027482]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "SR2"
+autowrap_mode = 3
 
-[node name="SR3Button" type="Button" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/CardsGrid"]
+[node name="SR3Button" type="Button" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/CardsGrid" unique_id=1100889405]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "SR3"
+autowrap_mode = 3
 
-[node name="DetailPanel" type="PanelContainer" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn"]
+[node name="DetailPanel" type="PanelContainer" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn" unique_id=573174047]
 layout_mode = 2
 
-[node name="DetailMargin" type="MarginContainer" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel"]
+[node name="DetailMargin" type="MarginContainer" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel" unique_id=1871862712]
 layout_mode = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
-[node name="DetailColumn" type="VBoxContainer" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin"]
+[node name="DetailColumn" type="VBoxContainer" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin" unique_id=2125223815]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="SelectedTitleLabel" type="Label" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin/DetailColumn"]
+[node name="SelectedTitleLabel" type="Label" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin/DetailColumn" unique_id=91219219]
 layout_mode = 2
 text = "Select a Supply Run"
 
-[node name="SelectedInfoLabel" type="Label" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin/DetailColumn"]
+[node name="SelectedInfoLabel" type="Label" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin/DetailColumn" unique_id=232921965]
 layout_mode = 2
 text = "Tap a card to inspect dispatch details."
 autowrap_mode = 3
 
-[node name="DispatchButton" type="Button" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin/DetailColumn"]
+[node name="DispatchButton" type="Button" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin/DetailColumn" unique_id=1449792231]
 layout_mode = 2
 text = "Dispatch"
 
-[node name="StatusLabel" type="Label" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin/DetailColumn"]
+[node name="StatusLabel" type="Label" parent="MainColumn/OffersPanel/OffersMargin/OffersColumn/DetailPanel/DetailMargin/DetailColumn" unique_id=1537325292]
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="BottomNavSafe" type="MarginContainer" parent="."]
+[node name="BottomNavSafe" type="MarginContainer" parent="." unique_id=874818070]
 layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
+anchors_preset = -1
+anchor_top = 0.922
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -50.0
-grow_horizontal = 2
-grow_vertical = 0
+anchor_bottom = 0.922
 
-[node name="BottomNavBar" parent="BottomNavSafe" instance=ExtResource("2_nav")]
+[node name="BottomNavBar" parent="BottomNavSafe" unique_id=480504073 instance=ExtResource("2_nav")]
 layout_mode = 2
 size_flags_vertical = 3
