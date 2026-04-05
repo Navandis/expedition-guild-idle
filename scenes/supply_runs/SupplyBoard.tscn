@@ -64,6 +64,7 @@ size_flags_horizontal = 3
 
 [node name="Row" type="HBoxContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter" unique_id=1235752576]
 layout_mode = 2
+theme_override_constants/separation = 0
 
 [node name="CrewIcon" type="TextureRect" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row" unique_id=475000607]
 custom_minimum_size = Vector2(24, 24)
@@ -73,10 +74,63 @@ texture = ExtResource("4_crew_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CrewValueLabel" type="Label" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row" unique_id=738452560]
+[node name="CrewDropdownButton" type="Button" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row" unique_id=738452560]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "0"
+text = "▼"
+flat = true
+alignment = 2
+icon_alignment = 2
+
+[node name="CrewCollapsedValue" type="RichTextLabel" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/Row/CrewDropdownButton" unique_id=157384626]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_right = -22.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = "[color=#6EEB74]0[/color] / 0"
+fit_content = true
+scroll_active = false
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="CrewDropdownPopup" type="PopupPanel" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter" unique_id=1107261723]
+size = Vector2i(110, 72)
+
+[node name="CrewDropdownMargin" type="MarginContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup" unique_id=343749216]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 106.0
+offset_bottom = 68.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CrewDropdownValues" type="VBoxContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin" unique_id=853469370]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="AssignedCrewValueLabel" type="RichTextLabel" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues" unique_id=1617126897]
+layout_mode = 2
+bbcode_enabled = true
+text = "[color=#F5D547]0[/color]"
+fit_content = true
+scroll_active = false
+horizontal_alignment = 2
+
+[node name="RecoveringCrewValueLabel" type="RichTextLabel" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots/CrewCounter/CrewDropdownPopup/CrewDropdownMargin/CrewDropdownValues" unique_id=1299012779]
+layout_mode = 2
+bbcode_enabled = true
+text = "[color=#F2A14A]0[/color]"
+fit_content = true
+scroll_active = false
 horizontal_alignment = 2
 
 [node name="SuppliesCounter" type="PanelContainer" parent="MainColumn/ResourceRowPanel/ResourceRowMargin/ResourceSlots" unique_id=1538528339]
@@ -179,13 +233,9 @@ text = "Dispatch"
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="BottomNavSafe" type="MarginContainer" parent="." unique_id=874818070]
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.922
-anchor_right = 1.0
-anchor_bottom = 0.922
+[node name="BottomNavSafe" type="MarginContainer" parent="MainColumn" unique_id=874818070]
+layout_mode = 2
 
-[node name="BottomNavBar" parent="BottomNavSafe" unique_id=480504073 instance=ExtResource("2_nav")]
+[node name="BottomNavBar" parent="MainColumn/BottomNavSafe" unique_id=480504073 instance=ExtResource("2_nav")]
 layout_mode = 2
 size_flags_vertical = 3
