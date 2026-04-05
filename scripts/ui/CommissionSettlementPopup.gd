@@ -93,7 +93,16 @@ func open_for_entry(entry: Dictionary) -> void:
 		_recovery_time_label.text = "Recovery Time: %s" % TimeFormat.format_seconds_hms(recovery_seconds)
 	# Summary row removed because outcome + payout/recovery deltas already explain
 	# the settlement result in a more direct and compact way.
+	# First-show lifecycle note:
+	# On a fresh app launch, Godot can still be finishing layout/theme passes for
+	# this popup's RichTextLabel-heavy content in the same frame as first bind.
+	# Deferring the actual popup call by one frame avoids the "frame only" first
+	# render where inner controls appear missing until a second open.
+	call_deferred("_show_bound_popup")
 
+
+func _show_bound_popup() -> void:
+	await get_tree().process_frame
 	popup_centered()
 
 

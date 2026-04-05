@@ -773,6 +773,9 @@ func _build_commission_settlement_popup() -> void:
 		return
 	_commission_settlement_popup = _COMMISSION_SETTLEMENT_POPUP_SCENE.instantiate() as CommissionSettlementPopup
 	add_child(_commission_settlement_popup)
+	# Keep startup state explicit so first real show always happens through the
+	# popup script's deferred open path after content binding.
+	_commission_settlement_popup.hide()
 	_commission_settlement_popup.claim_requested.connect(func(runtime_id: int) -> void:
 		commission_claim_requested.emit(runtime_id)
 	)
