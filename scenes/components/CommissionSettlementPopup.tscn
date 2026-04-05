@@ -7,7 +7,7 @@ transparent_bg = false
 oversampling_override = 1.0
 initial_position = 1
 size = Vector2i(296, 251)
-visible = true
+visible = false
 transparent = false
 script = ExtResource("1_settlement_script")
 
