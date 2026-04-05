@@ -173,6 +173,13 @@ func _finalize_offer(candidate: Dictionary) -> Dictionary:
 		"duration_minutes": duration_minutes,
 		"crew_required": crew_required,
 		"gold_cost": gold_cost,
+		# Keep an explicit payout roll band on the board offer snapshot.
+		# Runtime dispatch will use this band to pre-roll the true payout.
+		# The estimate below remains board-facing only.
+		"supplies_payout_band": {
+			"min": int(supplies_band.get("min", 10)),
+			"max": int(supplies_band.get("max", 20))
+		},
 		"supplies_yield_estimate": supplies_yield,
 		"note_text": _pick_text_option(
 			_to_string_array(family.get("note_text_options", [])),
