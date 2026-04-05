@@ -231,10 +231,34 @@ func _resolve_duration_seconds(offer_snapshot: Dictionary) -> int:
 func _roll_supplies_payout(offer_snapshot: Dictionary) -> int:
 	# Dispatch stores final payout immediately so completion/claim remains a
 	# simple transfer with no extra random roll during claim.
-	var estimate := maxi(0, int(offer_snapshot.get("supplies_yield_estimate", 0)))
-	if estimate > 0:
-		return estimate
-	return _rng.randi_range(DEFAULT_SUPPLIES_PAYOUT_MIN, DEFAULT_SUPPLIES_PAYOUT_MAX)
+	#
+	# Important: board `supplies_yield_estimate` is player-facing preview text,
+	# not the final payout value. The final payout must be freshly rolled here.
+	var payout_band := _resolve_payout_band(offer_snapshot)
+	var minimum := int(payout_band.get("min", DEFAULT_SUPPLIES_PAYOUT_MIN))
+	var maximum := int(payout_band.get("max", DEFAULT_SUPPLIES_PAYOUT_MAX))
+	if maximum < minimum:
+		maximum = minimum
+	if maximum == minimum:
+		return minimum
+	return _rng.randi_range(minimum, maximum)
+
+
+func _resolve_payout_band(offer_snapshot: Dictionary) -> Dictionary:
+	# New offers provide an authored dispatch band directly.
+	var raw_band := offer_snapshot.get("supplies_payout_band", {})
+	if raw_band is Dictionary:
+		var band := raw_band as Dictionary
+		var minimum := maxi(0, int(band.get("min", DEFAULT_SUPPLIES_PAYOUT_MIN)))
+		var maximum := maxi(minimum, int(band.get("max", DEFAULT_SUPPLIES_PAYOUT_MAX)))
+		return {"min": minimum, "max": maximum}
+
+	# Save-compatibility fallback: older offers may not include the band yet.
+	# We intentionally do NOT treat `supplies_yield_estimate` as final payout.
+	return {
+		"min": DEFAULT_SUPPLIES_PAYOUT_MIN,
+		"max": DEFAULT_SUPPLIES_PAYOUT_MAX
+	}
 
 
 func _resolve_title(row: Dictionary) -> String:
